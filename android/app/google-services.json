@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "400213109312",
+    "project_id": "alerta-vecinal-297eb",
+    "storage_bucket": "alerta-vecinal-297eb.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:400213109312:android:55ca28219cd8b6f0934da5",
+        "android_client_info": {
+          "package_name": "com.example.alerta_vecinal"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBzIP82IL_VmuWTDdjr-ypDXziAInbL0XQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

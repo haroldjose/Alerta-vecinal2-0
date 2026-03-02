@@ -1,0 +1,153 @@
+[2025-11-19T20:05:23.084Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[2025-11-19T20:05:23.086Z] > authorizing via signed-in user (haroldjosano23@gmail.com)
+[2025-11-19T20:05:23.087Z] [iam] checking project alerta-vecinal-297eb for permissions ["cloudfunctions.functions.create","cloudfunctions.functions.delete","cloudfunctions.functions.get","cloudfunctions.functions.list","cloudfunctions.functions.update","cloudfunctions.operations.get","firebase.projects.get"]
+[2025-11-19T20:05:23.088Z] Checked if tokens are valid: true, expires at: 1763584390303
+[2025-11-19T20:05:23.089Z] Checked if tokens are valid: true, expires at: 1763584390303
+[2025-11-19T20:05:23.090Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/alerta-vecinal-297eb:testIamPermissions [none]
+[2025-11-19T20:05:23.091Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/alerta-vecinal-297eb:testIamPermissions x-goog-quota-user=projects/alerta-vecinal-297eb
+[2025-11-19T20:05:23.091Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/alerta-vecinal-297eb:testIamPermissions {"permissions":["cloudfunctions.functions.create","cloudfunctions.functions.delete","cloudfunctions.functions.get","cloudfunctions.functions.list","cloudfunctions.functions.update","cloudfunctions.operations.get","firebase.projects.get"]}
+[2025-11-19T20:05:24.596Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/alerta-vecinal-297eb:testIamPermissions 200
+[2025-11-19T20:05:24.597Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/alerta-vecinal-297eb:testIamPermissions {"permissions":["cloudfunctions.functions.create","cloudfunctions.functions.delete","cloudfunctions.functions.get","cloudfunctions.functions.list","cloudfunctions.functions.update","cloudfunctions.operations.get","firebase.projects.get"]}
+[2025-11-19T20:05:24.598Z] Checked if tokens are valid: true, expires at: 1763584390303
+[2025-11-19T20:05:24.598Z] Checked if tokens are valid: true, expires at: 1763584390303
+[2025-11-19T20:05:24.598Z] >>> [apiv2][query] POST https://iam.googleapis.com/v1/projects/alerta-vecinal-297eb/serviceAccounts/alerta-vecinal-297eb@appspot.gserviceaccount.com:testIamPermissions [none]
+[2025-11-19T20:05:24.598Z] >>> [apiv2][body] POST https://iam.googleapis.com/v1/projects/alerta-vecinal-297eb/serviceAccounts/alerta-vecinal-297eb@appspot.gserviceaccount.com:testIamPermissions {"permissions":["iam.serviceAccounts.actAs"]}
+[2025-11-19T20:05:26.227Z] <<< [apiv2][status] POST https://iam.googleapis.com/v1/projects/alerta-vecinal-297eb/serviceAccounts/alerta-vecinal-297eb@appspot.gserviceaccount.com:testIamPermissions 404
+[2025-11-19T20:05:26.227Z] <<< [apiv2][body] POST https://iam.googleapis.com/v1/projects/alerta-vecinal-297eb/serviceAccounts/alerta-vecinal-297eb@appspot.gserviceaccount.com:testIamPermissions {"error":{"code":404,"message":"Unknown service account","status":"NOT_FOUND"}}
+[2025-11-19T20:05:26.228Z] [functions] service account IAM check errored, deploy may fail: Request to https://iam.googleapis.com/v1/projects/alerta-vecinal-297eb/serviceAccounts/alerta-vecinal-297eb@appspot.gserviceaccount.com:testIamPermissions had HTTP Error: 404, Unknown service account {"name":"FirebaseError","children":[],"context":{"body":{"error":{"code":404,"message":"Unknown service account","status":"NOT_FOUND"}},"response":{"statusCode":404}},"exit":1,"message":"Request to https://iam.googleapis.com/v1/projects/alerta-vecinal-297eb/serviceAccounts/alerta-vecinal-297eb@appspot.gserviceaccount.com:testIamPermissions had HTTP Error: 404, Unknown service account","status":404}
+
+=== Deploying to 'alerta-vecinal-297eb'...
+
+i  deploying functions 
+[2025-11-19T20:05:26.237Z] Checked if tokens are valid: true, expires at: 1763584390303
+[2025-11-19T20:05:26.237Z] Checked if tokens are valid: true, expires at: 1763584390303
+[2025-11-19T20:05:26.238Z] >>> [apiv2][query] GET https://cloudresourcemanager.googleapis.com/v1/projects/alerta-vecinal-297eb [none]
+[2025-11-19T20:05:26.635Z] <<< [apiv2][status] GET https://cloudresourcemanager.googleapis.com/v1/projects/alerta-vecinal-297eb 200
+[2025-11-19T20:05:26.636Z] <<< [apiv2][body] GET https://cloudresourcemanager.googleapis.com/v1/projects/alerta-vecinal-297eb {"projectNumber":"400213109312","projectId":"alerta-vecinal-297eb","lifecycleState":"ACTIVE","name":"Alerta Vecinal","labels":{"firebase":"enabled","firebase-core":"disabled"},"createTime":"2025-07-23T11:21:06.985804Z"}
+i  functions: preparing codebase default for deployment 
+i  functions: ensuring required API cloudfunctions.googleapis.com is enabled... 
+i  functions: ensuring required API cloudbuild.googleapis.com is enabled... 
+i  artifactregistry: ensuring required API artifactregistry.googleapis.com is enabled... 
+[2025-11-19T20:05:26.642Z] Checked if tokens are valid: true, expires at: 1763584390303
+[2025-11-19T20:05:26.643Z] Checked if tokens are valid: true, expires at: 1763584390303
+[2025-11-19T20:05:26.643Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/alerta-vecinal-297eb/adminSdkConfig [none]
+[2025-11-19T20:05:27.369Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/alerta-vecinal-297eb/adminSdkConfig 200
+[2025-11-19T20:05:27.369Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/alerta-vecinal-297eb/adminSdkConfig {"projectId":"alerta-vecinal-297eb","storageBucket":"alerta-vecinal-297eb.firebasestorage.app"}
+[2025-11-19T20:05:27.373Z] Validating nodejs source
+!  functions: package.json indicates an outdated version of firebase-functions. Please upgrade using npm install --save firebase-functions@latest in your functions directory. 
+!  functions: Please note that there will be breaking changes when you upgrade. 
+[2025-11-19T20:05:29.519Z] > [functions] package.json contents: {
+  "name": "functions",
+  "description": "Cloud Functions for Firebase",
+  "scripts": {
+    "serve": "firebase emulators:start --only functions",
+    "shell": "firebase functions:shell",
+    "start": "npm run shell",
+    "deploy": "firebase deploy --only functions",
+    "logs": "firebase functions:log"
+  },
+  "engines": {
+    "node": "20"
+  },
+  "main": "index.js",
+  "dependencies": {
+    "firebase-admin": "^12.0.0",
+    "firebase-functions": "^5.0.0"
+  },
+  "devDependencies": {
+    "firebase-functions-test": "^3.1.0"
+  },
+  "private": true
+}
+[2025-11-19T20:05:29.519Z] Building nodejs source
+i  functions: Loading and analyzing source code for codebase default to determine what to deploy 
+[2025-11-19T20:05:29.521Z] Could not find functions.yaml. Must use http discovery
+[2025-11-19T20:05:29.541Z] Found firebase-functions binary at 'D:\maestria UCB\diplomado\proyecto final\proyecto\alertaVecinal\alerta_vecinal\functions\node_modules\.bin\firebase-functions'
+Serving at port 8014
+
+[2025-11-19T20:05:30.379Z] Got response from /__/functions.yaml {"endpoints":{"sendReportNotification":{"availableMemoryMb":null,"timeoutSeconds":null,"minInstances":null,"maxInstances":null,"ingressSettings":null,"concurrency":null,"serviceAccountEmail":null,"vpc":null,"platform":"gcfv2","labels":{},"eventTrigger":{"eventType":"google.cloud.firestore.document.v1.created","eventFilters":{"database":"(default)","namespace":"(default)"},"eventFilterPathPatterns":{"document":"notifications/{notificationId}"},"retry":false},"entryPoint":"sendReportNotification"}},"specVersion":"v1alpha1","requiredAPIs":[],"extensions":{}}
+i  extensions: ensuring required API firebaseextensions.googleapis.com is enabled... 
+[2025-11-19T20:05:34.458Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[2025-11-19T20:05:34.458Z] > authorizing via signed-in user (haroldjosano23@gmail.com)
+[2025-11-19T20:05:34.458Z] [iam] checking project alerta-vecinal-297eb for permissions ["firebase.projects.get","firebaseextensions.instances.list"]
+[2025-11-19T20:05:34.459Z] Checked if tokens are valid: true, expires at: 1763584390303
+[2025-11-19T20:05:34.459Z] Checked if tokens are valid: true, expires at: 1763584390303
+[2025-11-19T20:05:34.460Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/alerta-vecinal-297eb:testIamPermissions [none]
+[2025-11-19T20:05:34.460Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/alerta-vecinal-297eb:testIamPermissions x-goog-quota-user=projects/alerta-vecinal-297eb
+[2025-11-19T20:05:34.460Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/alerta-vecinal-297eb:testIamPermissions {"permissions":["firebase.projects.get","firebaseextensions.instances.list"]}
+[2025-11-19T20:05:35.851Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/alerta-vecinal-297eb:testIamPermissions 200
+[2025-11-19T20:05:35.851Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/alerta-vecinal-297eb:testIamPermissions {"permissions":["firebase.projects.get","firebaseextensions.instances.list"]}
+[2025-11-19T20:05:35.852Z] Checked if tokens are valid: true, expires at: 1763584390303
+[2025-11-19T20:05:35.852Z] Checked if tokens are valid: true, expires at: 1763584390303
+[2025-11-19T20:05:35.853Z] >>> [apiv2][query] GET https://firebaseextensions.googleapis.com/v1beta/projects/alerta-vecinal-297eb/instances pageSize=100&pageToken=
+[2025-11-19T20:05:37.388Z] <<< [apiv2][status] GET https://firebaseextensions.googleapis.com/v1beta/projects/alerta-vecinal-297eb/instances 200
+[2025-11-19T20:05:37.388Z] <<< [apiv2][body] GET https://firebaseextensions.googleapis.com/v1beta/projects/alerta-vecinal-297eb/instances {}
+i  functions: preparing functions directory for uploading... 
+i  functions: packaged D:\maestria UCB\diplomado\proyecto final\proyecto\alertaVecinal\alerta_vecinal\functions (70.3 KB) for uploading 
+[2025-11-19T20:05:37.530Z] Checked if tokens are valid: true, expires at: 1763584390303
+[2025-11-19T20:05:37.530Z] Checked if tokens are valid: true, expires at: 1763584390303
+[2025-11-19T20:05:37.530Z] >>> [apiv2][query] GET https://cloudfunctions.googleapis.com/v1/projects/alerta-vecinal-297eb/locations/-/functions [none]
+[2025-11-19T20:05:38.927Z] <<< [apiv2][status] GET https://cloudfunctions.googleapis.com/v1/projects/alerta-vecinal-297eb/locations/-/functions 200
+[2025-11-19T20:05:38.928Z] <<< [apiv2][body] GET https://cloudfunctions.googleapis.com/v1/projects/alerta-vecinal-297eb/locations/-/functions {}
+[2025-11-19T20:05:38.929Z] Checked if tokens are valid: true, expires at: 1763584390303
+[2025-11-19T20:05:38.929Z] Checked if tokens are valid: true, expires at: 1763584390303
+[2025-11-19T20:05:38.930Z] >>> [apiv2][query] GET https://cloudfunctions.googleapis.com/v2/projects/alerta-vecinal-297eb/locations/-/functions filter=environment%3D%22GEN_2%22
+[2025-11-19T20:05:40.359Z] <<< [apiv2][status] GET https://cloudfunctions.googleapis.com/v2/projects/alerta-vecinal-297eb/locations/-/functions 200
+[2025-11-19T20:05:40.360Z] <<< [apiv2][body] GET https://cloudfunctions.googleapis.com/v2/projects/alerta-vecinal-297eb/locations/-/functions {"functions":[{"name":"projects/alerta-vecinal-297eb/locations/us-central1/functions/sendReportNotification","buildConfig":{"build":"projects/400213109312/locations/us-central1/builds/37885e18-62ed-4c5a-8c86-623d69acefc2","runtime":"nodejs20","entryPoint":"sendReportNotification","source":{"storageSource":{"bucket":"gcf-v2-sources-400213109312-us-central1","object":"sendReportNotification/function-source.zip","generation":"1763582478896532"}},"environmentVariables":{"GOOGLE_NODE_RUN_SCRIPTS":""},"dockerRepository":"projects/alerta-vecinal-297eb/locations/us-central1/repositories/gcf-artifacts","sourceProvenance":{"resolvedStorageSource":{"bucket":"gcf-v2-sources-400213109312-us-central1","object":"sendReportNotification/function-source.zip","generation":"1763582478896532"}},"dockerRegistry":"ARTIFACT_REGISTRY","serviceAccount":"projects/alerta-vecinal-297eb/serviceAccounts/400213109312-compute@developer.gserviceaccount.com","automaticUpdatePolicy":{}},"serviceConfig":{"service":"projects/alerta-vecinal-297eb/locations/us-central1/services/sendreportnotification","timeoutSeconds":60,"environmentVariables":{"FIREBASE_CONFIG":"{\"projectId\":\"alerta-vecinal-297eb\",\"storageBucket\":\"alerta-vecinal-297eb.firebasestorage.app\"}","GCLOUD_PROJECT":"alerta-vecinal-297eb","EVENTARC_CLOUD_EVENT_SOURCE":"projects/alerta-vecinal-297eb/locations/us-central1/services/sendReportNotification","FUNCTION_SIGNATURE_TYPE":"cloudevent","FUNCTION_TARGET":"sendReportNotification","LOG_EXECUTION_ID":"true"},"ingressSettings":"ALLOW_ALL","uri":"https://sendreportnotification-4myjywlgmq-uc.a.run.app","serviceAccountEmail":"400213109312-compute@developer.gserviceaccount.com","availableMemory":"256Mi","allTrafficOnLatestRevision":true,"revision":"sendreportnotification-00001-dex","maxInstanceRequestConcurrency":80,"availableCpu":"1"},"eventTrigger":{"trigger":"projects/alerta-vecinal-297eb/locations/nam5/triggers/sendreportnotification-012664","triggerRegion":"nam5","eventType":"google.cloud.firestore.document.v1.created","eventFilters":[{"attribute":"database","value":"(default)"},{"attribute":"namespace","value":"(default)"},{"attribute":"document","value":"notifications/{notificationId}","operator":"match-path-pattern"}],"pubsubTopic":"projects/alerta-vecinal-297eb/topics/eventarc-nam5-sendreportnotification-012664-802","serviceAccountEmail":"400213109312-compute@developer.gserviceaccount.com","retryPolicy":"RETRY_POLICY_DO_NOT_RETRY"},"state":"ACTIVE","updateTime":"2025-11-19T20:02:53.669358161Z","labels":{"deployment-tool":"cli-firebase","firebase-functions-hash":"9fa5b7b61ea0cbd3cf0658e148b65963cf54b9b2"},"environment":"GEN_2","url":"https://us-central1-alerta-vecinal-297eb.cloudfunctions.net/sendReportNotification","createTime":"2025-11-19T20:01:19.659128853Z","satisfiesPzi":true}]}
+[2025-11-19T20:05:40.362Z] Checked if tokens are valid: true, expires at: 1763584390303
+[2025-11-19T20:05:40.363Z] Checked if tokens are valid: true, expires at: 1763584390303
+[2025-11-19T20:05:40.363Z] >>> [apiv2][query] GET https://firestore.googleapis.com/v1/projects/alerta-vecinal-297eb/databases/(default) [none]
+[2025-11-19T20:05:41.780Z] <<< [apiv2][status] GET https://firestore.googleapis.com/v1/projects/alerta-vecinal-297eb/databases/(default) 200
+[2025-11-19T20:05:41.780Z] <<< [apiv2][body] GET https://firestore.googleapis.com/v1/projects/alerta-vecinal-297eb/databases/(default) {"name":"projects/alerta-vecinal-297eb/databases/(default)","uid":"4e6ffaee-b9b7-4224-8ce2-05d188f58946","createTime":"2025-07-23T11:30:28.309132Z","updateTime":"2025-07-23T11:30:28.309132Z","locationId":"nam5","type":"FIRESTORE_NATIVE","concurrencyMode":"PESSIMISTIC","versionRetentionPeriod":"3600s","earliestVersionTime":"2025-11-19T19:05:41.288087Z","appEngineIntegrationMode":"DISABLED","keyPrefix":"s","pointInTimeRecoveryEnablement":"POINT_IN_TIME_RECOVERY_DISABLED","deleteProtectionState":"DELETE_PROTECTION_DISABLED","databaseEdition":"STANDARD","freeTier":true,"realtimeUpdatesMode":"REALTIME_UPDATES_MODE_ENABLED","etag":"IMijztaB/5ADMKH/j7Ho944D"}
+i  functions: ensuring required API run.googleapis.com is enabled... 
+i  functions: ensuring required API eventarc.googleapis.com is enabled... 
+i  functions: ensuring required API pubsub.googleapis.com is enabled... 
+i  functions: ensuring required API storage.googleapis.com is enabled... 
+i  functions: generating the service identity for pubsub.googleapis.com... 
+[2025-11-19T20:05:41.785Z] Checked if tokens are valid: true, expires at: 1763584390303
+[2025-11-19T20:05:41.785Z] Checked if tokens are valid: true, expires at: 1763584390303
+i  functions: generating the service identity for eventarc.googleapis.com... 
+[2025-11-19T20:05:41.786Z] Checked if tokens are valid: true, expires at: 1763584390303
+[2025-11-19T20:05:41.786Z] Checked if tokens are valid: true, expires at: 1763584390303
+[2025-11-19T20:05:41.786Z] >>> [apiv2][query] POST https://serviceusage.googleapis.com/v1beta1/projects/400213109312/services/pubsub.googleapis.com:generateServiceIdentity [none]
+[2025-11-19T20:05:41.786Z] >>> [apiv2][(partial)header] POST https://serviceusage.googleapis.com/v1beta1/projects/400213109312/services/pubsub.googleapis.com:generateServiceIdentity x-goog-quota-user=projects/400213109312
+[2025-11-19T20:05:41.786Z] >>> [apiv2][body] POST https://serviceusage.googleapis.com/v1beta1/projects/400213109312/services/pubsub.googleapis.com:generateServiceIdentity {}
+[2025-11-19T20:05:41.788Z] >>> [apiv2][query] POST https://serviceusage.googleapis.com/v1beta1/projects/400213109312/services/eventarc.googleapis.com:generateServiceIdentity [none]
+[2025-11-19T20:05:41.788Z] >>> [apiv2][(partial)header] POST https://serviceusage.googleapis.com/v1beta1/projects/400213109312/services/eventarc.googleapis.com:generateServiceIdentity x-goog-quota-user=projects/400213109312
+[2025-11-19T20:05:41.788Z] >>> [apiv2][body] POST https://serviceusage.googleapis.com/v1beta1/projects/400213109312/services/eventarc.googleapis.com:generateServiceIdentity {}
+[2025-11-19T20:05:43.329Z] <<< [apiv2][status] POST https://serviceusage.googleapis.com/v1beta1/projects/400213109312/services/eventarc.googleapis.com:generateServiceIdentity 200
+[2025-11-19T20:05:43.329Z] <<< [apiv2][body] POST https://serviceusage.googleapis.com/v1beta1/projects/400213109312/services/eventarc.googleapis.com:generateServiceIdentity {"name":"operations/finished.DONE_OPERATION","done":true,"response":{"@type":"type.googleapis.com/google.api.serviceusage.v1beta1.ServiceIdentity","email":"service-400213109312@gcp-sa-eventarc.iam.gserviceaccount.com","uniqueId":"115985545105909446489"}}
+[2025-11-19T20:05:43.333Z] <<< [apiv2][status] POST https://serviceusage.googleapis.com/v1beta1/projects/400213109312/services/pubsub.googleapis.com:generateServiceIdentity 200
+[2025-11-19T20:05:43.334Z] <<< [apiv2][body] POST https://serviceusage.googleapis.com/v1beta1/projects/400213109312/services/pubsub.googleapis.com:generateServiceIdentity {"name":"operations/finished.DONE_OPERATION","done":true,"response":{"@type":"type.googleapis.com/google.api.serviceusage.v1beta1.ServiceIdentity","email":"service-400213109312@gcp-sa-pubsub.iam.gserviceaccount.com","uniqueId":"108709669392363265349"}}
+[2025-11-19T20:05:43.342Z] Checked if tokens are valid: true, expires at: 1763584390303
+[2025-11-19T20:05:43.342Z] Checked if tokens are valid: true, expires at: 1763584390303
+[2025-11-19T20:05:43.343Z] >>> [apiv2][query] GET https://cloudresourcemanager.googleapis.com/v1/projects/alerta-vecinal-297eb [none]
+[2025-11-19T20:05:44.759Z] <<< [apiv2][status] GET https://cloudresourcemanager.googleapis.com/v1/projects/alerta-vecinal-297eb 200
+[2025-11-19T20:05:44.760Z] <<< [apiv2][body] GET https://cloudresourcemanager.googleapis.com/v1/projects/alerta-vecinal-297eb {"projectNumber":"400213109312","projectId":"alerta-vecinal-297eb","lifecycleState":"ACTIVE","name":"Alerta Vecinal","labels":{"firebase":"enabled","firebase-core":"disabled"},"createTime":"2025-07-23T11:21:06.985804Z"}
+[2025-11-19T20:05:44.760Z] Checked if tokens are valid: true, expires at: 1763584390303
+[2025-11-19T20:05:44.761Z] Checked if tokens are valid: true, expires at: 1763584390303
+[2025-11-19T20:05:44.761Z] >>> [apiv2][query] GET https://compute.googleapis.com/compute/v1/projects/400213109312 [none]
+[2025-11-19T20:05:45.375Z] <<< [apiv2][status] GET https://compute.googleapis.com/compute/v1/projects/400213109312 403
+[2025-11-19T20:05:45.376Z] <<< [apiv2][body] GET https://compute.googleapis.com/compute/v1/projects/400213109312 {"error":{"code":403,"message":"Compute Engine API has not been used in project 400213109312 before or it is disabled. Enable it by visiting https://console.developers.google.com/apis/api/compute.googleapis.com/overview?project=400213109312 then retry. If you enabled this API recently, wait a few minutes for the action to propagate to our systems and retry.","errors":[{"message":"Compute Engine API has not been used in project 400213109312 before or it is disabled. Enable it by visiting https://console.developers.google.com/apis/api/compute.googleapis.com/overview?project=400213109312 then retry. If you enabled this API recently, wait a few minutes for the action to propagate to our systems and retry.","domain":"usageLimits","reason":"accessNotConfigured","extendedHelp":"https://console.developers.google.com"}],"status":"PERMISSION_DENIED","details":[{"@type":"type.googleapis.com/google.rpc.ErrorInfo","reason":"SERVICE_DISABLED","domain":"googleapis.com","metadata":{"serviceTitle":"Compute Engine API","activationUrl":"https://console.developers.google.com/apis/api/compute.googleapis.com/overview?project=400213109312","service":"compute.googleapis.com","containerInfo":"400213109312","consumer":"projects/400213109312"}},{"@type":"type.googleapis.com/google.rpc.LocalizedMessage","locale":"en-US","message":"Compute Engine API has not been used in project 400213109312 before or it is disabled. Enable it by visiting https://console.developers.google.com/apis/api/compute.googleapis.com/overview?project=400213109312 then retry. If you enabled this API recently, wait a few minutes for the action to propagate to our systems and retry."},{"@type":"type.googleapis.com/google.rpc.Help","links":[{"description":"Google developers console API activation","url":"https://console.developers.google.com/apis/api/compute.googleapis.com/overview?project=400213109312"}]}]}}
+[2025-11-19T20:05:45.377Z] unable to look up default compute service account. Falling back to 400213109312-compute@developer.gserviceaccount.com. Error: {"name":"FirebaseError","children":[],"context":{"body":{"error":{"code":403,"message":"Compute Engine API has not been used in project 400213109312 before or it is disabled. Enable it by visiting https://console.developers.google.com/apis/api/compute.googleapis.com/overview?project=400213109312 then retry. If you enabled this API recently, wait a few minutes for the action to propagate to our systems and retry.","errors":[{"message":"Compute Engine API has not been used in project 400213109312 before or it is disabled. Enable it by visiting https://console.developers.google.com/apis/api/compute.googleapis.com/overview?project=400213109312 then retry. If you enabled this API recently, wait a few minutes for the action to propagate to our systems and retry.","domain":"usageLimits","reason":"accessNotConfigured","extendedHelp":"https://console.developers.google.com"}],"status":"PERMISSION_DENIED","details":[{"@type":"type.googleapis.com/google.rpc.ErrorInfo","reason":"SERVICE_DISABLED","domain":"googleapis.com","metadata":{"serviceTitle":"Compute Engine API","activationUrl":"https://console.developers.google.com/apis/api/compute.googleapis.com/overview?project=400213109312","service":"compute.googleapis.com","containerInfo":"400213109312","consumer":"projects/400213109312"}},{"@type":"type.googleapis.com/google.rpc.LocalizedMessage","locale":"en-US","message":"Compute Engine API has not been used in project 400213109312 before or it is disabled. Enable it by visiting https://console.developers.google.com/apis/api/compute.googleapis.com/overview?project=400213109312 then retry. If you enabled this API recently, wait a few minutes for the action to propagate to our systems and retry."},{"@type":"type.googleapis.com/google.rpc.Help","links":[{"description":"Google developers console API activation","url":"https://console.developers.google.com/apis/api/compute.googleapis.com/overview?project=400213109312"}]}]}},"response":{"statusCode":403}},"exit":1,"message":"Request to https://compute.googleapis.com/compute/v1/projects/400213109312 had HTTP Error: 403, Compute Engine API has not been used in project 400213109312 before or it is disabled. Enable it by visiting https://console.developers.google.com/apis/api/compute.googleapis.com/overview?project=400213109312 then retry. If you enabled this API recently, wait a few minutes for the action to propagate to our systems and retry.","status":403}
+[2025-11-19T20:05:45.381Z] Checked if tokens are valid: true, expires at: 1763584390303
+[2025-11-19T20:05:45.381Z] Checked if tokens are valid: true, expires at: 1763584390303
+[2025-11-19T20:05:45.382Z] >>> [apiv2][query] GET https://cloudbilling.googleapis.com/v1/projects/alerta-vecinal-297eb/billingInfo [none]
+[2025-11-19T20:05:46.902Z] <<< [apiv2][status] GET https://cloudbilling.googleapis.com/v1/projects/alerta-vecinal-297eb/billingInfo 200
+[2025-11-19T20:05:46.902Z] <<< [apiv2][body] GET https://cloudbilling.googleapis.com/v1/projects/alerta-vecinal-297eb/billingInfo {"name":"projects/alerta-vecinal-297eb/billingInfo","projectId":"alerta-vecinal-297eb","billingAccountName":"billingAccounts/01AC63-213C30-037A03","billingEnabled":true}
+i  functions: Skipping the deploy of unchanged functions. 
++  functions[sendReportNotification(us-central1)] Skipped (No changes detected) 
+[2025-11-19T20:05:46.917Z] Total Function Deployment time: 1
+[2025-11-19T20:05:46.918Z] 0 Functions Deployed
+[2025-11-19T20:05:46.918Z] 0 Functions Errored
+[2025-11-19T20:05:46.918Z] 0 Function Deployments Aborted
+[2025-11-19T20:05:46.918Z] Average Function Deployment time: NaN
+[2025-11-19T20:05:47.318Z] Checked if tokens are valid: true, expires at: 1763584390303
+[2025-11-19T20:05:47.318Z] Checked if tokens are valid: true, expires at: 1763584390303
+[2025-11-19T20:05:47.318Z] >>> [apiv2][query] GET https://artifactregistry.googleapis.com/v1/projects/alerta-vecinal-297eb/locations/us-central1/repositories/gcf-artifacts [none]
+[2025-11-19T20:05:48.704Z] <<< [apiv2][status] GET https://artifactregistry.googleapis.com/v1/projects/alerta-vecinal-297eb/locations/us-central1/repositories/gcf-artifacts 200
+[2025-11-19T20:05:48.704Z] <<< [apiv2][body] GET https://artifactregistry.googleapis.com/v1/projects/alerta-vecinal-297eb/locations/us-central1/repositories/gcf-artifacts {"name":"projects/alerta-vecinal-297eb/locations/us-central1/repositories/gcf-artifacts","format":"DOCKER","description":"This repository is created and used by Cloud Functions for storing function docker images.","labels":{"goog-managed-by":"cloudfunctions"},"createTime":"2025-11-19T20:01:32.314246Z","updateTime":"2025-11-19T20:04:51.223741Z","mode":"STANDARD_REPOSITORY","cleanupPolicies":{"firebase-functions-cleanup":{"id":"firebase-functions-cleanup","action":"DELETE","condition":{"tagState":"ANY","olderThan":"86400s"}}},"sizeBytes":"86386059","vulnerabilityScanningConfig":{"lastEnableTime":"2025-11-19T20:01:19.830869915Z","enablementState":"SCANNING_DISABLED","enablementStateReason":"API containerscanning.googleapis.com is not enabled."},"satisfiesPzi":true,"registryUri":"us-central1-docker.pkg.dev/alerta-vecinal-297eb/gcf-artifacts"}
+
++  Deploy complete! 
+
+Project Console: https://console.firebase.google.com/project/alerta-vecinal-297eb/overview
