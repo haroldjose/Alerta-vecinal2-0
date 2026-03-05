@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../models/user_model.dart';
 import '../../core/utils/validators.dart';
@@ -21,17 +22,22 @@ class RegisterScreen extends ConsumerStatefulWidget {
 class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   // Controladores de texto
   final _nameController = TextEditingController();
+  final _cedulaController = TextEditingController();         //
+  final _usernameController = TextEditingController();       //
+  final _celularController = TextEditingController();        //
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
-  final _cargoController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   
+  //estados de error
   String? _nameError;
+  String? _cedulaError;     //
+  String? _usernameError;   //
+  String? _celularError;    //
   String? _emailError;
   String? _passwordError;
   String? _confirmPasswordError;
-  String? _cargoError;
   String? _roleError;
   
   bool _isLoading = false;
@@ -43,24 +49,51 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     
     // Agregar listeners para validar mientras se escribe
     _nameController.addListener(_onFieldChanged);
+    _cedulaController.addListener(_onCedulaChanged); // 
+    _celularController.addListener(_onFieldChanged); //
     _emailController.addListener(_onFieldChanged);
     _passwordController.addListener(_onFieldChanged);
     _confirmPasswordController.addListener(_onFieldChanged);
-    _cargoController.addListener(_onFieldChanged);
+    
   }
 
   @override
   void dispose() {
     _nameController.dispose();
+    _cedulaController.dispose();    // 
+    _usernameController.dispose();  // 
+    _celularController.dispose();   // 
     _emailController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
-    _cargoController.dispose();
     super.dispose();
+  }
+
+   // listener regenera el username automáticamente*
+  void _onCedulaChanged() {
+    _autoGenerateUsername();
+    _validateAllFields();
+  }
+
+  // Genera el nombre de usuario combinando primer nombre + 2 primeros dígitos de cédula
+  void _autoGenerateUsername() {
+    final name = _nameController.text.trim();
+    final cedula = _cedulaController.text.trim();
+
+    if (name.isNotEmpty && cedula.isNotEmpty) {
+      final generated = Validators.generateUsername(name, cedula);
+      // Solo actualiza si el valor cambió para evitar rebuilds innecesarios
+      if (_usernameController.text != generated) {
+        _usernameController.text = generated;
+      }
+    } else {
+      _usernameController.clear();
+    }
   }
 
   // Método se ejecuta cuando cualquier campo cambia
   void _onFieldChanged() {
+    _autoGenerateUsername(); // Si el nombre cambia, también hay que regenerar el username
     _validateAllFields();
   }
 
@@ -71,6 +104,20 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       _nameError = _nameController.text.isNotEmpty 
           ? Validators.validateName(_nameController.text) 
           : null;
+      // validación cédula
+      _cedulaError = _cedulaController.text.isNotEmpty
+          ? Validators.validateCedula(_cedulaController.text)
+          : null;
+
+      // validación username (autogenerado, solo muestra error si está vacío)
+      _usernameError = _usernameController.text.isNotEmpty
+          ? null
+          : null; 
+
+      // validación celular
+      _celularError = _celularController.text.isNotEmpty
+          ? Validators.validateCelular(_celularController.text)
+          : null;    
       
       _emailError = _emailController.text.isNotEmpty 
           ? Validators.validateEmail(_emailController.text) 
@@ -85,16 +132,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
           : null;
       
       // Validación rol 
-      _roleError = _selectedRole == null ? 'Seleccione un rol' : null;
+      _roleError = _selectedRole == null ? null : null;
       
-      // Validación cargo  admin
-      if (_selectedRole == UserRole.admin) {
-        _cargoError = _cargoController.text.isNotEmpty 
-            ? Validators.validateCargo(_cargoController.text) 
-            : null;
-      } else {
-        _cargoError = null;
-      }
     });
   }
 
@@ -102,6 +141,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   void _validateForSubmission() {
     setState(() {
       _nameError = Validators.validateName(_nameController.text);
+      _cedulaError = Validators.validateCedula(_cedulaController.text);         // 
+      _usernameError = Validators.validateUsername(_usernameController.text);   // 
+      _celularError = Validators.validateCelular(_celularController.text);      //
       _emailError = Validators.validateEmail(_emailController.text);
       _passwordError = Validators.validatePassword(_passwordController.text);
       _confirmPasswordError = Validators.validateConfirmPassword(
@@ -110,34 +152,35 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       );
       _roleError = _selectedRole == null ? 'Seleccione un rol' : null;
       
-      if (_selectedRole == UserRole.admin) {
-        _cargoError = Validators.validateCargo(_cargoController.text);
-      } else {
-        _cargoError = null;
-      }
     });
   }
 
-  // Verificando si el formulario es válido
+  // Verificando si el formulario es válido *
   bool get _isFormValid {
     final hasAllRequiredFields = _nameController.text.isNotEmpty &&
+        _cedulaController.text.isNotEmpty &&     // 
+        _usernameController.text.isNotEmpty &&   // 
+        _celularController.text.isNotEmpty &&    //
         _emailController.text.isNotEmpty &&
         _passwordController.text.isNotEmpty &&
         _confirmPasswordController.text.isNotEmpty &&
-        _selectedRole != null &&
-        (_selectedRole == UserRole.user || _cargoController.text.isNotEmpty);
+        _selectedRole != null;
 
     final hasNoErrors = _nameError == null &&
+        _cedulaError == null &&           // 
+        _usernameError == null &&         // 
+        _celularError == null &&  
         _emailError == null &&
         _passwordError == null &&
         _confirmPasswordError == null &&
-        _roleError == null &&
-        (_selectedRole == UserRole.user || _cargoError == null);
+        _roleError == null;
 
     final isValid = hasAllRequiredFields && hasNoErrors;
     return isValid;
   }
 
+
+  //*
   Future<void> _register() async {
     _validateForSubmission();
     
@@ -158,7 +201,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         email: _emailController.text.trim(),
         password: _passwordController.text,
         role: _selectedRole!,
-        cargo: _selectedRole == UserRole.admin ? _cargoController.text.trim() : null,
+        cedula: _cedulaController.text.trim(),       // 
+        username: _usernameController.text.trim(),   // 
+        celular: _celularController.text.trim(),     //
       );
 
       if (user != null && mounted) {
@@ -269,7 +314,137 @@ void _showSuccessMessage(String message) {
                 key: _formKey,
                 child: Column(
                   children: [
+                    //
+                    CustomTextField(
+                      hintText: 'Nombre completo', 
+                      controller: _nameController,
+                      errorText: _nameError,
+                      inputFormatters:[ //
+                        FilteringTextInputFormatter.allow(
+                          RegExp(r'[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]')),
+
+                      ], 
+                      ),
+
+                      const SizedBox(height: 24,),
+                      //
+                      CustomTextField(
+                      hintText: 'Cédula de identidad',
+                      controller: _cedulaController,
+                      errorText: _cedulaError,
+                      keyboardType: TextInputType.number,
+                      // Solo números, máximo 8 dígitos
+                      inputFormatters: [
+                        FilteringTextInputFormatter.digitsOnly,
+                        LengthLimitingTextInputFormatter(8),
+                      ],
+                    ),
+
+                    const SizedBox(height: 24),
                   
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 6),
+                            child: Text(
+                              'Nombre de usuario (autogenerado)',
+                              style: const TextStyle(
+                                color: AppColors.textSecondary,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ),
+                        Container(
+                          width: double.infinity,
+                          height: 48,
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: AppColors.border,
+                              width: 1.5,
+                            ),
+                            borderRadius: BorderRadius.circular(8),
+                            color: Colors.grey.shade100,
+                          ),
+                          child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              _usernameController.text.isEmpty
+                              ? 'Segenera automaticamente'
+                              : _usernameController.text,
+                                style: TextStyle(
+                                  color: _usernameController.text.isEmpty
+                                  ? AppColors.textSecondary
+                                  : AppColors.textPrimary,
+                                  fontSize: 14,
+                                ),
+                              ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    
+                    const SizedBox(height: 24),
+                    
+                    // Campo Celular 
+                    CustomTextField(
+                      hintText: 'Celular',
+                      controller: _celularController,
+                      errorText: _celularError,
+                      keyboardType: TextInputType.number,
+                      // Solo números, máximo 8 dígitos
+                      inputFormatters: [
+                        FilteringTextInputFormatter.digitsOnly,
+                        LengthLimitingTextInputFormatter(8),
+                      ],
+                    ),
+
+                    const SizedBox(height: 24),
+
+                    // Campo Email 
+                    CustomTextField(
+                      hintText: 'Email',
+                      controller: _emailController,
+                      keyboardType: TextInputType.emailAddress,
+                      errorText: _emailError,
+                    ),
+
+                    const SizedBox(height: 24),
+
+                    // Campo Contraseña 
+                    CustomTextField(
+                      hintText: 'Contraseña',
+                      controller: _passwordController,
+                      obscureText: true,
+                      errorText: _passwordError,
+                    ),
+
+                    // indicador de requisitos de contraseña
+                    if (_passwordController.text.isNotEmpty && _passwordError != null)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 6),
+                        child: Text(
+                          'Mínimo 14 caracteres, mayúscula, minúscula, número y carácter especial',
+                          style: TextStyle(
+                            color: AppColors.textSecondary,
+                            fontSize: 11,
+                          ),
+                        ),
+                      ),
+
+                    const SizedBox(height: 24),
+
+                    // Campo Confirmar contraseña
+                    CustomTextField(
+                      hintText: 'Confirmar contraseña',
+                      controller: _confirmPasswordController,
+                      obscureText: true,
+                      errorText: _confirmPasswordError,
+                    ),
+
+                    const SizedBox(height: 24),
+
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -286,7 +461,7 @@ void _showSuccessMessage(String message) {
                             ),
                           ),
                         Container(
-                          width: 335,
+                          width: double.infinity,
                           height: 48,
                           padding: const EdgeInsets.symmetric(horizontal: 16),
                           decoration: BoxDecoration(
@@ -304,34 +479,37 @@ void _showSuccessMessage(String message) {
                               value: _selectedRole,
                               isExpanded: true,
                               hint: const Text(
-                                'Selecciona tu tipo de usuario',
+                                'Asignación de rol',
                                 style: TextStyle(
                                   color: AppColors.textSecondary,
                                   fontSize: 14,
                                 ),
                               ),
-                              icon: const Icon(Icons.arrow_drop_down, color: AppColors.primary),
+                              icon: const Icon(Icons.arrow_drop_down,
+                                  color: AppColors.primary),
                               style: const TextStyle(
                                 color: AppColors.textPrimary,
                                 fontSize: 14,
                               ),
+                              //tres roles disponibles
                               items: const [
                                 DropdownMenuItem(
-                                  value: UserRole.user,
-                                  child: Text('Usuario'),
+                                  value: UserRole.vecino,
+                                  child: Text('Vecino'),
                                 ),
                                 DropdownMenuItem(
                                   value: UserRole.admin,
                                   child: Text('Administrador'),
                                 ),
+                                //opción de Seguridad
+                                DropdownMenuItem(
+                                  value: UserRole.security,
+                                  child: Text('Seguridad'),
+                                ),
                               ],
                               onChanged: (UserRole? newValue) {
-                                
                                 setState(() {
                                   _selectedRole = newValue;
-                                  if (newValue == UserRole.user) {
-                                    _cargoController.clear();
-                                  }
                                 });
                                 _validateAllFields();
                               },
@@ -340,68 +518,19 @@ void _showSuccessMessage(String message) {
                         ),
                       ],
                     ),
-                    
-                    const SizedBox(height: 24),
-                    
-                    // Campo Nombre
-                    CustomTextField(
-                      hintText: 'Nombre completo',
-                      controller: _nameController,
-                      errorText: _nameError,
-                    ),
-                    
-                    const SizedBox(height: 24),
-                    
-                    // Campo Email
-                    CustomTextField(
-                      hintText: 'Email',
-                      controller: _emailController,
-                      keyboardType: TextInputType.emailAddress,
-                      errorText: _emailError,
-                    ),
-                    
-                    const SizedBox(height: 24),
-                    
-                    // Campo Contraseña
-                    CustomTextField(
-                      hintText: 'Contraseña',
-                      controller: _passwordController,
-                      obscureText: true,
-                      errorText: _passwordError,
-                    ),
-                    
-                    const SizedBox(height: 24),
-                    
-                    // Campo Confirmar Contraseña
-                    CustomTextField(
-                      hintText: 'Confirmar contraseña',
-                      controller: _confirmPasswordController,
-                      obscureText: true,
-                      errorText: _confirmPasswordError,
-                    ),
-                    
-                    // Campo solo para administrador
-                    if (_selectedRole == UserRole.admin) ...[
-                      const SizedBox(height: 24),
-                      CustomTextField(
-                        hintText: 'Cargo',
-                        controller: _cargoController,
-                        errorText: _cargoError,
-                      ),
-                    ],
-                    
+
                     const SizedBox(height: 40),
-                    
-                    // Botón Registrarse
+
+                    // Boton Registrarse
                     CustomButton(
                       text: 'Registrarse',
                       onPressed: _isFormValid ? _register : null,
                       isLoading: _isLoading,
                     ),
-                    
+
                     const SizedBox(height: 24),
-                    
-                    // Enlace para iniciar sesión
+
+                    // enlace Iniciar sesión 
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -435,4 +564,3 @@ void _showSuccessMessage(String message) {
     );
   }
 }
-

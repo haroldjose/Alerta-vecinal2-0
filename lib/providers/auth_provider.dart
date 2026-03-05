@@ -36,15 +36,24 @@ class AuthService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final NotificationService _notificationService = NotificationService();
 
+  static const int _maxSecurityUsers = 2; //
+
   // Registrar usuario 
   Future<UserModel?> registerUser({
     required String name,
     required String email,
     required String password,
     required UserRole role,
+    required String cedula,    // 
+    required String username,  // 
+    required String celular,   //
     String? cargo,
   }) async {
     try {
+       if (role == UserRole.security) {   //
+        await _checkSecurityUserLimit();
+      }
+
       final UserCredential credential = await _auth.createUserWithEmailAndPassword(
         email: email,
         password: password,
@@ -57,10 +66,13 @@ class AuthService {
           name: name,
           email: email,
           role: role,
+          cedula: cedula,       // 
+          username: username,   //
+          celular: celular,    //
           cargo: cargo,
           createdAt: DateTime.now(),
         );
-
+        // guarda los campos en Firestore
         await _firestore
             .collection('users')
             .doc(firebaseUser.uid)
@@ -79,7 +91,19 @@ class AuthService {
     } on FirebaseException catch (e) {
       throw 'Error de Firebase: ${e.message}';
     } catch (e) {
-      throw 'Error inesperado durante el registro: $e';
+      rethrow;
+    }
+  }
+
+   // Verifica que no existan ya 2 usuarios con rol 'security' en Firestore
+  Future<void> _checkSecurityUserLimit() async {
+    final QuerySnapshot snapshot = await _firestore
+        .collection('users')
+        .where('role', isEqualTo: 'security')
+        .get();
+
+    if (snapshot.docs.length >= _maxSecurityUsers) {
+      throw 'Ya existe el máximo de $_maxSecurityUsers usuarios de seguridad permitidos';
     }
   }
 

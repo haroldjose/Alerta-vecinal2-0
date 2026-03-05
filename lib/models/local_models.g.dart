@@ -146,6 +146,9 @@ class LocalUserModelAdapter extends TypeAdapter<LocalUserModel> {
       cargo: fields[4] as String?,
       profileImage: fields[5] as String?,
       createdAt: fields[6] as DateTime,
+      cedula: fields[7] as String?,
+      username: fields[8] as String?,
+      celular: fields[9] as String?,
     );
   }
 
@@ -166,7 +169,13 @@ class LocalUserModelAdapter extends TypeAdapter<LocalUserModel> {
       ..writeByte(5)
       ..write(obj.profileImage)
       ..writeByte(6)
-      ..write(obj.createdAt);
+      ..write(obj.createdAt)
+      ..writeByte(7)
+      ..write(obj.cedula)
+      ..writeByte(8)
+      ..write(obj.username)
+      ..writeByte(9)
+      ..write(obj.celular);
   }
 
   @override

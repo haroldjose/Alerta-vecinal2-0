@@ -227,6 +227,15 @@ class LocalUserModel extends HiveObject {
   @HiveField(6)
   final DateTime createdAt;
 
+  @HiveField(7)
+  final String? cedula;    // 
+
+  @HiveField(8)
+  final String? username;  // 
+
+  @HiveField(9)
+  final String? celular;   //
+
   LocalUserModel({
     required this.id,
     required this.name,
@@ -235,6 +244,9 @@ class LocalUserModel extends HiveObject {
     this.cargo,
     this.profileImage,
     required this.createdAt,
+    this.cedula,    // 
+    this.username,  // 
+    this.celular,   //
   });
 
   factory LocalUserModel.fromUserModel(UserModel user) {
@@ -242,10 +254,13 @@ class LocalUserModel extends HiveObject {
       id: user.id,
       name: user.name,
       email: user.email,
-      role: user.role == UserRole.admin ? 'admin' : 'user',
+      role: UserModel.roleToString(user.role),
       cargo: user.cargo,
       profileImage: user.profileImage,
       createdAt: user.createdAt,
+      cedula: user.cedula,       // 
+      username: user.username,   // 
+      celular: user.celular,     //
     );
   }
 
@@ -254,10 +269,13 @@ class LocalUserModel extends HiveObject {
       id: id,
       name: name,
       email: email,
-      role: role == 'admin' ? UserRole.admin : UserRole.user,
+      role: UserModel.parseRole(role),
       cargo: cargo,
       profileImage: profileImage,
       createdAt: createdAt,
+      cedula: cedula,     // 
+      username: username, // 
+      celular: celular,   //
     );
   }
 }

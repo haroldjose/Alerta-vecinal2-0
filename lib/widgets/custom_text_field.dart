@@ -1,5 +1,6 @@
 import 'package:alerta_vecinal/core/constants/colors.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class CustomTextField extends StatefulWidget {
   final String hintText;
@@ -9,6 +10,7 @@ class CustomTextField extends StatefulWidget {
   final String? errorText;
   final TextInputType keyboardType;
   final bool enabled;
+  final List<TextInputFormatter>? inputFormatters; //
 
   const CustomTextField({
     super.key,
@@ -19,6 +21,7 @@ class CustomTextField extends StatefulWidget {
     this.errorText,
     this.keyboardType = TextInputType.text,
     this.enabled = true,
+     this.inputFormatters,
   });
 
   @override
@@ -74,6 +77,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
               obscureText: widget.obscureText,
               keyboardType: widget.keyboardType,
               enabled: widget.enabled,
+              inputFormatters: widget.inputFormatters, //
               decoration: InputDecoration(
                 hintText: widget.hintText,
                 hintStyle: const TextStyle(

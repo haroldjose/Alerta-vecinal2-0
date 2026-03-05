@@ -1,3 +1,4 @@
+import 'package:alerta_vecinal/models/user_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -7,6 +8,8 @@ import '../../widgets/custom_button.dart';
 import '../../widgets/custom_text_field.dart';
 import '../../providers/auth_provider.dart';
 import '../home/home_screen.dart';
+import 'register_screen.dart';
+import '../security/security_home_screen.dart';
 import 'register_screen.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
@@ -99,10 +102,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         await Future.delayed(const Duration(milliseconds: 1000));
         
         if (mounted) {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => const HomeScreen()),
-          );
+          _navigateByRole(user);
         }
       } else {
         _showErrorMessage('Error al iniciar sesión. Intenta nuevamente.');
@@ -119,6 +119,28 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       }
     }
   }
+
+// navega a la pantalla correspondiente según el rol
+  void _navigateByRole(UserModel user) {
+    Widget destination;
+
+    switch (user.role) {
+      case UserRole.security:
+        destination = const SecurityHomeScreen();
+        break;
+      case UserRole.admin:
+      case UserRole.vecino:
+      default:
+        destination = const HomeScreen();
+        break;
+    }
+
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => destination),
+    );
+  }
+
 
   void _showErrorMessage(String message) {
     ScaffoldMessenger.of(context).clearSnackBars();

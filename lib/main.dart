@@ -1,8 +1,11 @@
+import 'package:alerta_vecinal/models/user_model.dart';
 import 'package:alerta_vecinal/providers/active_users_provider.dart';
 import 'package:alerta_vecinal/providers/auth_provider.dart';
 import 'package:alerta_vecinal/providers/settings_provider.dart';
 import 'package:alerta_vecinal/screens/auth/login_screen.dart';
 import 'package:alerta_vecinal/screens/home/home_screen.dart';
+import 'package:alerta_vecinal/screens/security/security_home_screen.dart';
+
 import 'package:alerta_vecinal/core/constants/colors.dart';
 import 'package:alerta_vecinal/core/services/notification_service.dart';
 import 'package:alerta_vecinal/core/services/local_storage_service.dart';
@@ -83,9 +86,14 @@ class MyApp extends ConsumerWidget {
         builder: (context, ref, child) {
           final authState = ref.watch(authStateProvider);
           return authState.when(
-            data:
-                (user) =>
-                    user != null ? const HomeScreen() : const LoginScreen(),
+            data: (firebaseUser) {
+              // Si no hay sesión activa, ir al login
+              if (firebaseUser == null) return const LoginScreen();
+
+              // si hay sesión, leer el rol del usuario desde Firestore
+              return _RoleBasedHome(uid: firebaseUser.uid);
+            },
+                
             loading:
                 () => const Scaffold(
                   body: Center(child: CircularProgressIndicator()),
@@ -94,6 +102,38 @@ class MyApp extends ConsumerWidget {
           );
         },
       ),
+    );
+  }
+}
+
+//widget que lee el rol y lo redirige a la pantalla correspondiente
+class _RoleBasedHome extends ConsumerWidget {
+  final String uid;
+  const _RoleBasedHome({required this.uid});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final currentUserAsync = ref.watch(currentUserProvider);
+
+    return currentUserAsync.when(
+      // Mientras carga el perfil del usuario
+      loading: () => const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      ),
+      error: (_, __) => const LoginScreen(),
+      data: (user) {
+        if (user == null) return const LoginScreen();
+
+        // redirige según el rol
+        if (user == null) return const LoginScreen();
+
+        
+        if (user.role == UserRole.security) {
+          return const SecurityHomeScreen();
+        }
+        // admin y vecino van al home normal
+        return const HomeScreen();
+      },
     );
   }
 }
