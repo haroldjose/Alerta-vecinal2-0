@@ -7,7 +7,7 @@ import 'dart:io';
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   'Notificación en segundo plano: ${message.messageId}';
-}
+} 
 
 class NotificationService {
   static final NotificationService _instance = NotificationService._internal();

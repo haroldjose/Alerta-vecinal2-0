@@ -8,7 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 final imageServiceProvider = Provider<ImageService>((ref){
   return ImageService();
 });
-
+ 
 final userServiceProvider = Provider<UserService>((ref){
   return UserService();
 });

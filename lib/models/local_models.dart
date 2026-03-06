@@ -4,8 +4,8 @@ import 'user_model.dart';
 
 part 'local_models.g.dart';
 
-
-/// Adaptador para almacenar reportes en Hive
+  
+// Adaptador para almacenar reportes en Hive
 @HiveType(typeId: 0)
 class LocalReportModel extends HiveObject {
   @HiveField(0)

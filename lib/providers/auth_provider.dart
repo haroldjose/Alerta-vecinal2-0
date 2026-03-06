@@ -2,7 +2,23 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/user_model.dart';
-import '../core/services/notification_service.dart';
+import '../core/services/notification_service.dart'; 
+
+//La excepcion se lanza cuando el username no existe en Firestore.
+class UsernameNotFoundException implements Exception {
+  final String message;
+  const UsernameNotFoundException([this.message = 'Usuario no encontrado']);
+  @override
+  String toString() => message;
+}
+
+// La excepcion se lanza cuando la contraseña es incorrecta para el usuario encontrado.
+class WrongPasswordException implements Exception {
+  final String message;
+  const WrongPasswordException([this.message = 'Contraseña incorrecta']);
+  @override
+  String toString() => message;
+}
 
 final authStateProvider = StreamProvider<User?>((ref) {
   return FirebaseAuth.instance.authStateChanges();
@@ -53,6 +69,16 @@ class AuthService {
        if (role == UserRole.security) {   //
         await _checkSecurityUserLimit();
       }
+      // para verificar que no exista otro documento con el mismo username
+      final existing = await _firestore
+    .collection('users')
+    .where('username', isEqualTo: username)
+    .limit(1)
+    .get();
+
+if (existing.docs.isNotEmpty) {
+  throw 'El nombre de usuario ya está en uso';
+}
 
       final UserCredential credential = await _auth.createUserWithEmailAndPassword(
         email: email,
@@ -107,39 +133,109 @@ class AuthService {
     }
   }
 
-  // Iniciar sesión
-  Future<UserModel?> signIn({
-    required String email,
+  // Iniciar sesión con nombre de usurio
+  Future<UserModel?> signInWithUsername({
+    required String username,
     required String password,
   }) async {
     try {
-      final UserCredential credential = await _auth.signInWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
+      // Busca el documento del usuario por su username en Firestore
+      final QuerySnapshot querySnapshot = await _firestore
+          .collection('users')
+          .where('username', isEqualTo: username)
+          .limit(1)
+          .get();
 
-      final User? firebaseUser = credential.user;
-      if (firebaseUser != null) {
-        final DocumentSnapshot doc = await _firestore
-            .collection('users')
-            .doc(firebaseUser.uid)
-            .get();
-        
-        if (doc.exists) {
-          
-          await _notificationService.saveUserToken(firebaseUser.uid);
-          return UserModel.fromFirestore(doc);
-        } else {
-          throw 'Datos del usuario no encontrados';
-        }
+      // Si no se encontró ningún documento, el username no existe
+      if (querySnapshot.docs.isEmpty) {
+        throw const UsernameNotFoundException();
       }
-    } on FirebaseAuthException catch (e) {
-      throw _handleAuthException(e);
+
+      // Obtener el email guardado en Firestore para ese username
+      final userDoc = querySnapshot.docs.first;
+      final data = userDoc.data() as Map<String, dynamic>;
+      final String email = data['email'] ?? '';
+
+      if (email.isEmpty) {
+        throw const UsernameNotFoundException('Usuario sin email registrado');
+      }
+
+      // Autenticar en Firebase Auth usando el email resuelto
+      try {
+        final UserCredential credential = await _auth.signInWithEmailAndPassword(
+          email: email,
+          password: password,
+        );
+
+        final User? firebaseUser = credential.user;
+        if (firebaseUser != null) {
+          // Obtener el UserModel completo desde Firestore
+          final DocumentSnapshot doc = await _firestore
+              .collection('users')
+              .doc(firebaseUser.uid)
+              .get();
+
+          if (doc.exists) {
+            await _notificationService.saveUserToken(firebaseUser.uid);
+            return UserModel.fromFirestore(doc);
+          } else {
+            throw 'Datos del usuario no encontrados';
+          }
+        }
+      } on FirebaseAuthException catch (e) {
+        // Mapear el error de Firebase a excepciones propias
+        if (e.code == 'wrong-password' ||
+            e.code == 'invalid-credential' ||
+            e.code == 'invalid-login-credentials') {
+          // Contraseña incorrecta mensaje 
+          throw const WrongPasswordException();
+        }
+        // Cualquier otro error de Firebase Auth (cuenta deshabilitada, etc.)
+        throw _handleAuthException(e);
+      }
+    } on UsernameNotFoundException {
+      rethrow; 
+    } on WrongPasswordException {
+      rethrow; 
+    } on FirebaseException catch (e) {
+      throw 'Error de conexión: ${e.message}';
     } catch (e) {
-      throw 'Error inesperado: $e';
+      rethrow;
     }
     return null;
   }
+ // metodo para ingresar con email
+  // Future<UserModel?> signIn({
+  //   required String email,
+  //   required String password,
+  // }) async {
+  //   try {
+  //     final UserCredential credential = await _auth.signInWithEmailAndPassword(
+  //       email: email,
+  //       password: password,
+  //     );
+
+  //     final User? firebaseUser = credential.user;
+  //     if (firebaseUser != null) {
+  //       final DocumentSnapshot doc = await _firestore
+  //           .collection('users')
+  //           .doc(firebaseUser.uid)
+  //           .get();
+
+  //       if (doc.exists) {
+  //         await _notificationService.saveUserToken(firebaseUser.uid);
+  //         return UserModel.fromFirestore(doc);
+  //       } else {
+  //         throw 'Datos del usuario no encontrados';
+  //       }
+  //     }
+  //   } on FirebaseAuthException catch (e) {
+  //     throw _handleAuthException(e);
+  //   } catch (e) {
+  //     throw 'Error inesperado: $e';
+  //   }
+  //   return null;
+  // }
 
   // Cerrar sesión
   Future<void> signOut() async {
@@ -206,7 +302,7 @@ class AuthService {
     }
   }
 }
-
+ 
 
 
 

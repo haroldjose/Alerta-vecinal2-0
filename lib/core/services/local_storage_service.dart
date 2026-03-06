@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:path_provider/path_provider.dart';
 import '../../models/local_models.dart';
-import '../../models/report_model.dart';
+import '../../models/report_model.dart'; 
 
 /// Servicio para manejar el almacenamiento local con Hive
 class LocalStorageService {
@@ -10,7 +10,7 @@ class LocalStorageService {
   factory LocalStorageService() => _instance;
   LocalStorageService._internal();
 
-  // Nombres de las cajas de Hive
+  // Nombres de las cajas de Hive 
   static const String _reportsBox = 'reports';
   static const String _pendingOpsBox = 'pending_operations';
   static const String _usersBox = 'users';

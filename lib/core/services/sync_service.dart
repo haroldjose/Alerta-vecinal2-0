@@ -6,7 +6,7 @@ import '../../models/report_model.dart';
 import 'local_storage_service.dart';
 import 'connectivity_service.dart';
 import 'image_service.dart';
-import 'notification_service.dart';
+import 'notification_service.dart'; 
 
 // Servicio para sincronizar datos entre local y Firebase
 class SyncService {

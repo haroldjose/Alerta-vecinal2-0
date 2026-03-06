@@ -14,7 +14,7 @@ class AppTheme {
     required this.primary,
     required this.secondary,
     required this.accent,
-  });
+  }); 
 
   static const List<AppTheme> themes = [
     AppTheme(

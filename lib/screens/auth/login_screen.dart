@@ -8,9 +8,7 @@ import '../../widgets/custom_button.dart';
 import '../../widgets/custom_text_field.dart';
 import '../../providers/auth_provider.dart';
 import '../home/home_screen.dart';
-import 'register_screen.dart';
 import '../security/security_home_screen.dart';
-import 'register_screen.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -20,11 +18,11 @@ class LoginScreen extends ConsumerStatefulWidget {
 }
 
 class _LoginScreenState extends ConsumerState<LoginScreen> {
-  final _emailController = TextEditingController();
+  final _usernameController = TextEditingController(); //renombrado
   final _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   
-  String? _emailError;
+  String? _usernameError; //
   String? _passwordError;
   bool _isLoading = false;
 
@@ -33,13 +31,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     super.initState();
     
     // Agrega validación en tiempo real
-    _emailController.addListener(_onFieldChanged);
+    _usernameController.addListener(_onFieldChanged); //
     _passwordController.addListener(_onFieldChanged);
   }
 
   @override
   void dispose() {
-    _emailController.dispose();
+    _usernameController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
@@ -48,8 +46,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   void _onFieldChanged() {
     setState(() {
       // valida si hay texto en el campo
-      _emailError = _emailController.text.isNotEmpty 
-          ? Validators.validateEmail(_emailController.text) 
+      _usernameError = _usernameController.text.isNotEmpty   //
+          ? Validators.validateUsername(_usernameController.text) 
           : null;
       
       _passwordError = _passwordController.text.isNotEmpty 
@@ -62,16 +60,16 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   // Validación antes del envío
   void _validateForSubmission() {
     setState(() {
-      _emailError = Validators.validateEmail(_emailController.text);
+      _usernameError = Validators.validateUsername(_usernameController.text); //
       _passwordError = Validators.validatePassword(_passwordController.text);
     });
   }
 
   bool get _isFormValid {
-    final hasRequiredFields = _emailController.text.isNotEmpty && 
+    final hasRequiredFields = _usernameController.text.isNotEmpty &&  //
                              _passwordController.text.isNotEmpty;
     
-    final hasNoErrors = _emailError == null && _passwordError == null;
+    final hasNoErrors = _usernameError == null && _passwordError == null; //
     
     return hasRequiredFields && hasNoErrors;
   }
@@ -91,8 +89,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     try {
       final authService = ref.read(authServiceProvider);
       
-      final user = await authService.signIn(
-        email: _emailController.text.trim(),
+      //el servicio buscará el email asociado a el username en Firestore y luego autenticará con Firebase Auth
+      final user = await authService.signInWithUsername(
+        username: _usernameController.text.trim(),
         password: _passwordController.text,
       );
 
@@ -106,6 +105,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         }
       } else {
         _showErrorMessage('Error al iniciar sesión. Intenta nuevamente.');
+      }
+    } on UsernameNotFoundException { //
+      if (mounted) {
+        _showErrorMessage('El nombre de usuario no existe. Verifica e intenta nuevamente.');
+      }
+    } on WrongPasswordException {   //
+      if (mounted) {
+        _showErrorMessage('Contraseña incorrecta. Intenta nuevamente.');
       }
     } catch (e) {
       if (mounted) {
@@ -232,10 +239,23 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   children: [
                     
                     CustomTextField(
-                      hintText: 'Email',
-                      controller: _emailController,
+                      hintText: 'Nombre de usuario', //
+                      controller: _usernameController,
                       keyboardType: TextInputType.emailAddress,
-                      errorText: _emailError,
+                      errorText: _usernameError,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 6, left: 4),
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          'Ej: Juan12  (primer nombre + 2 dígitos de cédula)',
+                          style: TextStyle(
+                            color: AppColors.textSecondary,
+                            fontSize: 11,
+                          ),
+                        ),
+                      ),
                     ),
                     
                     const SizedBox(height: 24),
@@ -261,36 +281,36 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     const SizedBox(height: 24),
                     
                     // Enlace de registro
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Text(
-                          '¿No tienes cuenta? ',
-                          style: TextStyle(
-                            color: AppColors.textSecondary,
-                            fontSize: 14,
-                          ),
-                        ),
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const RegisterScreen(),
-                              ),
-                            );
-                          },
-                          child: const Text(
-                            'Registrarse',
-                            style: TextStyle(
-                              color: AppColors.primary,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
+                    // Row(
+                    //   mainAxisAlignment: MainAxisAlignment.center,
+                    //   children: [
+                    //     const Text(
+                    //       '¿No tienes cuenta? ',
+                    //       style: TextStyle(
+                    //         color: AppColors.textSecondary,
+                    //         fontSize: 14,
+                    //       ),
+                    //     ),
+                    //     GestureDetector(
+                    //       onTap: () {
+                    //         Navigator.push(
+                    //           context,
+                    //           MaterialPageRoute(
+                    //             builder: (context) => const RegisterScreen(),
+                    //           ),
+                    //         );
+                    //       },
+                    //       child: const Text(
+                    //         'Registrarse',
+                    //         style: TextStyle(
+                    //           color: AppColors.primary,
+                    //           fontSize: 14,
+                    //           fontWeight: FontWeight.w600,
+                    //         ),
+                    //       ),
+                    //     ),
+                    //   ],
+                    // ),
                     
                     const SizedBox(height: 24),
                     

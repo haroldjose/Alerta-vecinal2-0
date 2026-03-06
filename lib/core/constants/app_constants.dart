@@ -13,7 +13,7 @@ class AppConstants {
   static const int minDescriptionLength = 10;
   static const int maxDescriptionPreview = 100;
   
-  // Firebase Collections
+  // Firebase Collections  
   static const String usersCollection = 'users';
   static const String reportsCollection = 'reports';
   

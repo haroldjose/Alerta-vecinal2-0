@@ -176,7 +176,7 @@ class LocalUserModelAdapter extends TypeAdapter<LocalUserModel> {
       ..write(obj.username)
       ..writeByte(9)
       ..write(obj.celular);
-  }
+  } 
 
   @override
   int get hashCode => typeId.hashCode;
