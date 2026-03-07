@@ -144,5 +144,70 @@ async function cleanupInvalidTokens(failedTokens) {
     console.error('Error al limpiar tokens:', error);
   }
 
+  ///////////////////////////////////////////////
+// Se ejecuta cada 5 minutos y reprocesa notificaciones pendientes
+ exports.retryPendingNotifications = functions.pubsub
+  .schedule('every 5 minutes')
+  .onRun(async (context) => {
+    const db = getFirestore();
+    
+    // Buscar documentos pending de más de 2 minutos
+    const twoMinutesAgo = new Date(Date.now() - 2 * 60 * 1000);
+    
+    const pendingDocs = await db.collection('notifications')
+      .where('status', '==', 'pending')
+      .where('createdAt', '<=', twoMinutesAgo)
+      .get();
+
+    if (pendingDocs.empty) {
+      console.log('No hay notificaciones pendientes');
+      return null;
+    }
+
+    console.log(`Reintentando ${pendingDocs.size} notificaciones pendientes...`);
+
+    for (const doc of pendingDocs.docs) {
+      const notification = doc.data();
+      const { tokens, title, body, reportId, reportType } = notification;
+
+      if (!tokens || tokens.length === 0) {
+        await doc.ref.update({ status: 'skipped', reason: 'No tokens' });
+        continue;
+      }
+
+      try {
+        const messaging = getMessaging();
+        const response = await messaging.sendEachForMulticast({
+          tokens,
+          notification: { title, body },
+          data: {
+            reportId: reportId || '',
+            reportType: reportType || '',
+            click_action: 'FLUTTER_NOTIFICATION_CLICK',
+          },
+          android: {
+            priority: 'high',
+            notification: { channelId: 'reports_channel', sound: 'default', color: '#D63031' },
+          },
+          apns: { payload: { aps: { sound: 'default', badge: 1 } } },
+        });
+
+        await doc.ref.update({
+          status: 'sent',
+          sentAt: FieldValue.serverTimestamp(),
+          successCount: response.successCount,
+          failureCount: response.failureCount,
+          retriedAt: FieldValue.serverTimestamp(),
+        });
+
+        console.log(`Reintento exitoso para ${doc.id}: ${response.successCount}/${tokens.length}`);
+      } catch (error) {
+        console.error(`Error reintentando ${doc.id}:`, error);
+      }
+    }
+
+    return null;
+  });
+
 }
 
