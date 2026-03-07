@@ -13,7 +13,7 @@ exports.sendReportNotification = onDocumentCreated(
     const snapshot = event.data;
     
     if (!snapshot) {
-      console.log('❌ No hay datos en el snapshot');
+      console.log(' No hay datos en el snapshot');
       return null;
     }
 
@@ -21,15 +21,15 @@ exports.sendReportNotification = onDocumentCreated(
     
     // Solo procesar notificaciones pendientes
     if (notification.status !== 'pending') {
-      console.log('⏭️ Notificación ya procesada, saltando...');
+      console.log(' Notificación ya procesada, saltando...');
       return null;
     }
 
-    const { tokens, title, body, reportId } = notification;
+    const { tokens, title, body, reportId, reportType } = notification;
 
     // Validar que hay tokens
     if (!tokens || tokens.length === 0) {
-      console.log('⚠️ No hay tokens para enviar notificaciones');
+      console.log(' No hay tokens para enviar notificaciones');
       await snapshot.ref.update({
         status: 'skipped',
         reason: 'No tokens available',
@@ -37,19 +37,8 @@ exports.sendReportNotification = onDocumentCreated(
       return null;
     }
 
-    console.log(`📤 Enviando notificación a ${tokens.length} dispositivos...`);
+    console.log(`📤 Enviando notificación [${reportType ?? 'sin categoría'}] a ${tokens.length} dispositivo(s)...`);
 
-    // Preparar el mensaje
-    const message = {
-      notification: {
-        title: title,
-        body: body,
-      },
-      data: {
-        reportId: reportId || '',
-        click_action: 'FLUTTER_NOTIFICATION_CLICK',
-      },
-    };
 
     try {
       const messaging = getMessaging();
@@ -57,8 +46,15 @@ exports.sendReportNotification = onDocumentCreated(
       // Enviar notificación a múltiples dispositivos
       const response = await messaging.sendEachForMulticast({
         tokens: tokens,
-        notification: message.notification,
-        data: message.data,
+        notification: {
+          title: title,
+          body: body,
+        },
+        data: {
+          reportId: reportId || '',
+          reportType: reportType || '',
+          click_action: 'FLUTTER_NOTIFICATION_CLICK',
+        },
         android: {
           priority: 'high',
           notification: {
@@ -77,11 +73,11 @@ exports.sendReportNotification = onDocumentCreated(
         },
       });
 
-      console.log(`✅ Notificaciones enviadas: ${response.successCount}/${tokens.length}`);
+      console.log(` Notificaciones enviadas: ${response.successCount}/${tokens.length}`);
       
       // Log de errores si los hay
       if (response.failureCount > 0) {
-        console.log(`❌ Notificaciones fallidas: ${response.failureCount}`);
+        console.log(` Notificaciones fallidas: ${response.failureCount}`);
         
         const failedTokens = [];
         response.responses.forEach((resp, idx) => {
@@ -107,7 +103,7 @@ exports.sendReportNotification = onDocumentCreated(
 
       return null;
     } catch (error) {
-      console.error('❌ Error al enviar notificaciones:', error);
+      console.error(' Error al enviar notificaciones:', error);
       
       // Marcar como error
       await snapshot.ref.update({
@@ -142,44 +138,11 @@ async function cleanupInvalidTokens(failedTokens) {
       });
       
       await writeBatch.commit();
-      console.log(`🧹 ${snapshot.size} tokens inválidos eliminados (lote ${i / 10 + 1})`);
+      console.log(` ${snapshot.size} tokens inválidos eliminados (lote ${i / 10 + 1})`);
     }
   } catch (error) {
     console.error('Error al limpiar tokens:', error);
   }
+
 }
 
-
-
-/**
-//  * Import function triggers from their respective submodules:
-//  *
-//  * const {onCall} = require("firebase-functions/v2/https");
-//  * const {onDocumentWritten} = require("firebase-functions/v2/firestore");
-//  *
-//  * See a full list of supported triggers at https://firebase.google.com/docs/functions
-//  */
-
-// const {setGlobalOptions} = require("firebase-functions");
-// const {onRequest} = require("firebase-functions/https");
-// const logger = require("firebase-functions/logger");
-
-// // For cost control, you can set the maximum number of containers that can be
-// // running at the same time. This helps mitigate the impact of unexpected
-// // traffic spikes by instead downgrading performance. This limit is a
-// // per-function limit. You can override the limit for each function using the
-// // `maxInstances` option in the function's options, e.g.
-// // `onRequest({ maxInstances: 5 }, (req, res) => { ... })`.
-// // NOTE: setGlobalOptions does not apply to functions using the v1 API. V1
-// // functions should each use functions.runWith({ maxInstances: 10 }) instead.
-// // In the v1 API, each function can only serve one request per container, so
-// // this will be the maximum concurrent request count.
-// setGlobalOptions({ maxInstances: 10 });
-
-// // Create and deploy your first functions
-// // https://firebase.google.com/docs/functions/get-started
-
-// // exports.helloWorld = onRequest((request, response) => {
-// //   logger.info("Hello logs!", {structuredData: true});
-// //   response.send("Hello from Firebase!");
-// // });

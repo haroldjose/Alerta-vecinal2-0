@@ -136,7 +136,7 @@ class NotificationService {
       });
       
     } catch (e) {
-      '❌ Error al eliminar token: $e';
+      ' Error al eliminar token: $e';
     }
   }
 
@@ -204,13 +204,46 @@ class NotificationService {
 
       final List<String> tokens = [];
       for (var doc in usersSnapshot.docs) {
-        if (doc.id != creatorId && doc.data()['fcmToken'] != null) {
-          tokens.add(doc.data()['fcmToken'] as String);
+        if (doc.id == creatorId) continue;
+
+        final data = doc.data();
+        final token = data['fcmToken'] as String?;
+
+        if (token == null || token.isEmpty) continue;
+        
+        // solo vecinos y admin reciben notificaciones
+        final role = data['role'] as String? ?? 'vecino';
+        if (role == 'security') continue;
+
+        final prefsMap =
+            data['notificationPreferences'] as Map<String, dynamic>?;
+        // si no tiene preferencias se asume habilitadas todas las categorias
+        if (prefsMap == null) {
+          tokens.add(token);
+          continue;
+        }   
+        
+        final enabled = prefsMap['enabled'] as bool? ?? true;
+        if (!enabled) continue;
+
+        final allCategories = prefsMap['allCategories'] as bool? ?? true;
+        if (allCategories) {
+          tokens.add(token);
+        } else {
+          // Verificar si la categoría del reporte está en su lista
+          final selectedCategories =
+              (prefsMap['selectedCategories'] as List<dynamic>? ?? [])
+                  .cast<String>();
+          if (selectedCategories.contains(reportType)) {
+            tokens.add(token);
+          }
         }
       }
 
+
+
       if (tokens.isEmpty) {
-        
+        'No hay destinatarios para este reporte (categoría: $reportType)';
         return;
       }
 
@@ -219,6 +252,7 @@ class NotificationService {
         'reportId': reportId,
         'title': 'Nuevo Reporte: $reportType',
         'body': reportTitle,
+        'reportType': reportType,  //
         'tokens': tokens,
         'createdAt': FieldValue.serverTimestamp(),
         'status': 'pending',

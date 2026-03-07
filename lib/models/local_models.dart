@@ -235,6 +235,16 @@ class LocalUserModel extends HiveObject {
 
   @HiveField(9)
   final String? celular;   //
+  
+  @HiveField(10)
+  final bool notificationsEnabled; //switch maestro de notificaciones
+
+  
+  @HiveField(11)
+  final bool notificationsAllCategories; // el usuario recibe notificaciones de todas las categorías.
+
+  @HiveField(12)
+  final List<String> notificationCategories; // lista de Strings con los values de las categorías seleccionadas.
 
   LocalUserModel({
     required this.id,
@@ -247,6 +257,9 @@ class LocalUserModel extends HiveObject {
     this.cedula,    // 
     this.username,  // 
     this.celular,   //
+    this.notificationsEnabled = true,    //
+    this.notificationsAllCategories = true, //
+    this.notificationCategories = const [],  //
   });
 
   factory LocalUserModel.fromUserModel(UserModel user) {
@@ -261,6 +274,12 @@ class LocalUserModel extends HiveObject {
       cedula: user.cedula,       // 
       username: user.username,   // 
       celular: user.celular,     //
+      notificationsEnabled: user.notificationPreferences.enabled, //
+      notificationsAllCategories:
+          user.notificationPreferences.allCategories,  //
+      notificationCategories: user.notificationPreferences.selectedCategories
+          .map((c) => c.value)
+          .toList(),  //
     );
   }
 
@@ -276,6 +295,13 @@ class LocalUserModel extends HiveObject {
       cedula: cedula,     // 
       username: username, // 
       celular: celular,   //
+      notificationPreferences: NotificationPreferences(   //
+        enabled: notificationsEnabled,
+        allCategories: notificationsAllCategories,
+        selectedCategories: notificationCategories
+            .map((s) => NotificationCategoryExtension.fromString(s))
+            .toSet(),
+      ),
     );
   }
 }

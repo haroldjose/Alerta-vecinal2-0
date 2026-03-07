@@ -93,10 +93,16 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 const SizedBox(height: 24),
 
                 // Sección: Notificaciones
-                _buildSectionTitle('Notificaciones'),
-                _buildNotificationSettings(settings.notificationsEnabled, currentTheme),
-
-                const SizedBox(height: 24),
+                if (user.role == UserRole.vecino ||
+                    user.role == UserRole.admin) ...[
+                  _buildSectionTitle('Notificaciones'),
+                  _buildNotificationSettings(
+                    settings.notificationPreferences,
+                    currentTheme,
+                    user.id,
+                  ),
+                  const SizedBox(height: 24),
+                ],
 
                 // Sección: Usuarios Activos 
                 if (user.role == UserRole.admin) ...[
@@ -110,7 +116,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
                 const SizedBox(height: 24),
 
-                _buildResetButton(currentTheme),
+                _buildResetButton(currentTheme, user.id),
 
                 const SizedBox(height: 32),
               ],
@@ -502,7 +508,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   }
 
   // Configuración de notificaciones
-  Widget _buildNotificationSettings(bool enabled, AppTheme theme) {
+  Widget _buildNotificationSettings(
+    NotificationPreferences prefs,
+    AppTheme theme,
+    String userId,
+  ) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
@@ -516,42 +526,212 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           ),
         ],
       ),
-      child: SwitchListTile(
-        value: enabled,
-        onChanged: (value) {
-          ref.read(settingsProvider.notifier).setNotificationsEnabled(value);
-        },
-        title: const Text(
-          'Notificaciones push',
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-            color: AppColors.textPrimary,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SwitchListTile(
+            value: prefs.enabled,
+            onChanged: (value) {
+              ref
+                  .read(settingsProvider.notifier)
+                  .setNotificationsEnabled(value, userId: userId);
+            },
+            title: const Text('Notificaciones push',
+                style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textPrimary)),
+            subtitle: Text(
+              prefs.enabled
+                  ? 'Recibirás alertas de nuevos reportes'
+                  : 'No recibirás alertas de reportes',
+              style: const TextStyle(
+                  fontSize: 13, color: AppColors.textSecondary),
+            ),
+            secondary: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: theme.primary.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(
+                prefs.enabled
+                    ? Icons.notifications_active
+                    : Icons.notifications_off,
+                color: theme.primary,
+                size: 24,
+              ),
+            ),
+            activeThumbColor: theme.primary,
           ),
-        ),
-        subtitle: const Text(
-          'Recibir alertas de nuevos reportes',
-          style: TextStyle(
-            fontSize: 13,
-            color: AppColors.textSecondary,
-          ),
-        ),
-        secondary: Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: theme.primary.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Icon(
-            Icons.notifications,
-            color: theme.primary,
-            size: 24,
-          ),
-        ),
-        activeThumbColor: theme.primary,
+
+          if (prefs.enabled) ...[
+            const Divider(height: 1, color: AppColors.border),
+
+            // Selector todas o específicas
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+              child: Text(
+                'Recibir notificaciones de:',
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.grey[700],
+                ),
+              ),
+            ),
+
+            //Todas las categorías
+            RadioListTile<bool>(
+              value: true,
+              groupValue: prefs.allCategories,
+              onChanged: (value) {
+                if (value == null) return;
+                ref
+                    .read(settingsProvider.notifier)
+                    .setAllCategories(value, userId: userId);
+              },
+              title: const Text('Todas las categorías',
+                  style: TextStyle(
+                      fontSize: 15, color: AppColors.textPrimary)),
+              subtitle: const Text('Recibe alertas de cualquier reporte',
+                  style: TextStyle(
+                      fontSize: 12, color: AppColors.textSecondary)),
+              activeColor: theme.primary,
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 16),
+            ),
+
+            // Categorías específicas
+            RadioListTile<bool>(
+              value: false,
+              groupValue: prefs.allCategories,
+              onChanged: (value) {
+                if (value == null) return;
+                ref
+                    .read(settingsProvider.notifier)
+                    .setAllCategories(value, userId: userId);
+              },
+              title: const Text('Categorías específicas',
+                  style: TextStyle(
+                      fontSize: 15, color: AppColors.textPrimary)),
+              subtitle: const Text(
+                  'Elige de qué tipos de reporte recibir alertas',
+                  style: TextStyle(
+                      fontSize: 12, color: AppColors.textSecondary)),
+              activeColor: theme.primary,
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 16),
+            ),
+
+            // Checkboxes de categoría
+            if (!prefs.allCategories) ...[
+              const Divider(height: 1, color: AppColors.border),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 10, 16, 4),
+                child: Row(
+                  children: [
+                    Icon(Icons.info_outline,
+                        size: 14, color: Colors.grey[500]),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: Text(
+                        'Selecciona al menos una categoría',
+                        style: TextStyle(
+                            fontSize: 12, color: Colors.grey[500]),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              ...NotificationCategory.values.map((category) {
+                final isSelected =
+                    prefs.selectedCategories.contains(category);
+                return CheckboxListTile(
+                  value: isSelected,
+                  onChanged: (_) {
+                    ref
+                        .read(settingsProvider.notifier)
+                        .toggleCategory(category, userId: userId);
+                  },
+                  title: Row(
+                    children: [
+                      Icon(
+                        _categoryIcon(category),
+                        size: 18,
+                        color: isSelected
+                            ? theme.primary
+                            : Colors.grey[400],
+                      ),
+                      const SizedBox(width: 10),
+                      Text(
+                        category.label,
+                        style: TextStyle(
+                          fontSize: 15,
+                          color: isSelected
+                              ? AppColors.textPrimary
+                              : AppColors.textSecondary,
+                          fontWeight: isSelected
+                              ? FontWeight.w600
+                              : FontWeight.normal,
+                        ),
+                      ),
+                    ],
+                  ),
+                  activeColor: theme.primary,
+                  checkColor: Colors.white,
+                  contentPadding:
+                      const EdgeInsets.symmetric(horizontal: 20),
+                  dense: true,
+                  // Advertencia visual si no hay ninguna seleccionada
+                  tileColor: prefs.selectedCategories.isEmpty
+                      ? Colors.red.withValues(alpha: 0.03)
+                      : null,
+                );
+              }),
+              // Advertencia si no seleccionó ninguna
+              if (prefs.selectedCategories.isEmpty)
+                Padding(
+                  padding:
+                      const EdgeInsets.fromLTRB(16, 4, 16, 12),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.warning_amber_rounded,
+                          size: 16, color: Colors.orange),
+                      const SizedBox(width: 6),
+                      Expanded(
+                        child: Text(
+                          'Debes seleccionar al menos una categoría para recibir notificaciones.',
+                          style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.orange[800]),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              const SizedBox(height: 8),
+            ],
+          ],
+        ],
       ),
     );
   }
+
+  // icono para las categorias
+  IconData _categoryIcon(NotificationCategory category) {
+    switch (category) {
+      case NotificationCategory.inseguridad:
+        return Icons.security;
+      case NotificationCategory.serviciosBasicos:
+        return Icons.build;
+      case NotificationCategory.contaminacion:
+        return Icons.eco;
+      case NotificationCategory.convivencia:
+        return Icons.people;
+    }
+  }
+
 
 
 // Lista de usuarios activos
@@ -874,6 +1054,19 @@ Widget _buildActiveUsersList(AppTheme theme) {
 
   // Sección de información
   Widget _buildInfoSection(UserModel user, AppTheme theme) {
+      String roleLabel;
+    switch (user.role) {
+      case UserRole.admin:
+        roleLabel = 'Administrador';
+        break;
+      case UserRole.security:
+        roleLabel = 'Seguridad';
+        break;
+      case UserRole.vecino:
+      default:
+        roleLabel = 'Vecino';
+    }
+
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
@@ -958,7 +1151,7 @@ Widget _buildActiveUsersList(AppTheme theme) {
               ),
             ),
             subtitle: Text(
-              user.role == UserRole.admin ? 'Administrador' : 'Usuario',
+              roleLabel,
               style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
@@ -972,7 +1165,7 @@ Widget _buildActiveUsersList(AppTheme theme) {
   }
 
   // Botón de restablecer configuración
-  Widget _buildResetButton(AppTheme theme) {
+  Widget _buildResetButton(AppTheme theme, String userId) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
       width: double.infinity,
@@ -1001,6 +1194,12 @@ Widget _buildActiveUsersList(AppTheme theme) {
 
           if (confirm == true) {
             await ref.read(settingsProvider.notifier).resetSettings();
+            await ref
+                .read(settingsProvider.notifier)
+                .saveNotificationPrefsToFirestore(
+                  userId,
+                  const NotificationPreferences(),
+                );
             if (mounted) {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(

@@ -149,6 +149,10 @@ class LocalUserModelAdapter extends TypeAdapter<LocalUserModel> {
       cedula: fields[7] as String?,
       username: fields[8] as String?,
       celular: fields[9] as String?,
+      notificationsEnabled: fields[10] as bool? ?? true,
+      notificationsAllCategories: fields[11] as bool? ?? true,
+      notificationCategories:
+          (fields[12] as List<dynamic>?)?.cast<String>() ?? [],
     );
   }
 
@@ -171,11 +175,17 @@ class LocalUserModelAdapter extends TypeAdapter<LocalUserModel> {
       ..writeByte(6)
       ..write(obj.createdAt)
       ..writeByte(7)
-      ..write(obj.cedula)
+      ..write(obj.cedula)       //
       ..writeByte(8)
-      ..write(obj.username)
+      ..write(obj.username)    //
       ..writeByte(9)
-      ..write(obj.celular);
+      ..write(obj.celular)    //
+      ..writeByte(10)
+      ..write(obj.notificationsEnabled)    //
+      ..writeByte(11)
+      ..write(obj.notificationsAllCategories)   //
+      ..writeByte(12)
+      ..write(obj.notificationCategories);   // 
   } 
 
   @override

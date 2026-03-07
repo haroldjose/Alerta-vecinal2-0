@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import '../models/user_model.dart';
 
 // Lista de temas predefinidos
 class AppTheme {
@@ -59,20 +61,22 @@ class AppTheme {
 // Estado de configuración
 class SettingsState {
   final int selectedThemeIndex;
-  final bool notificationsEnabled;
+  final NotificationPreferences notificationPreferences;   //
 
   const SettingsState({
     this.selectedThemeIndex = 0,
-    this.notificationsEnabled = true,
+    this.notificationPreferences = const NotificationPreferences(), //
   });
+  bool get notificationsEnabled => notificationPreferences.enabled;
 
   SettingsState copyWith({
     int? selectedThemeIndex,
-    bool? notificationsEnabled,
+    NotificationPreferences? notificationPreferences, //
   }) {
     return SettingsState(
       selectedThemeIndex: selectedThemeIndex ?? this.selectedThemeIndex,
-      notificationsEnabled: notificationsEnabled ?? this.notificationsEnabled,
+      notificationPreferences:
+          notificationPreferences ?? this.notificationPreferences,  //
     );
   }
 
@@ -86,17 +90,31 @@ class SettingsNotifier extends StateNotifier<SettingsState> {
   }
 
   static const String _themeKey = 'selected_theme_index';
-  static const String _notificationsKey = 'notifications_enabled';
+  static const String _notifEnabledKey = 'notifications_enabled';  //
+  static const String _notifAllCategoriesKey = 'notifications_all_categories'; //
+  static const String _notifCategoriesKey = 'notifications_categories';   //
 
   Future<void> _loadSettings() async {
     try {
       final prefs = await SharedPreferences.getInstance();
       final themeIndex = prefs.getInt(_themeKey) ?? 0;
-      final notificationsEnabled = prefs.getBool(_notificationsKey) ?? true;
+      final notifEnabled = prefs.getBool(_notifEnabledKey) ?? true;
+      final notifAllCategories =
+          prefs.getBool(_notifAllCategoriesKey) ?? true;
+      final rawCategories =
+          prefs.getStringList(_notifCategoriesKey) ?? [];
+      final selectedCategories = rawCategories
+          .map((s) => NotificationCategoryExtension.fromString(s))
+          .toSet();
+      
 
       state = SettingsState(
         selectedThemeIndex: themeIndex,
-        notificationsEnabled: notificationsEnabled,
+        notificationPreferences: NotificationPreferences(
+          enabled: notifEnabled,
+          allCategories: notifAllCategories,
+          selectedCategories: selectedCategories,
+        ),
       );
     } catch (e) {
       'Error loading settings: $e';
@@ -115,27 +133,126 @@ class SettingsNotifier extends StateNotifier<SettingsState> {
     }
   }
 
-  Future<void> setNotificationsEnabled(bool enabled) async {
+// activa / desactiva el switchde notificaciones
+   Future<void> setNotificationsEnabled(bool enabled,
+      {String? userId}) async {
     try {
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setBool(_notificationsKey, enabled);
-      state = state.copyWith(notificationsEnabled: enabled);
+      final updated =
+          state.notificationPreferences.copyWith(enabled: enabled);
+      await _persistPrefs(updated);
+      state = state.copyWith(notificationPreferences: updated);
+      if (userId != null) {
+        await saveNotificationPrefsToFirestore(userId, updated);
+      }
     } catch (e) {
-      'Error saving notifications setting: $e';
+      'Error saving notifications enabled: $e';
     }
+  }
+ 
+ // cambia entre todas las categorias y categorias especificas
+  Future<void> setAllCategories(bool allCategories,
+      {String? userId}) async {
+    try {
+      final updated =
+          state.notificationPreferences.copyWith(allCategories: allCategories);
+      await _persistPrefs(updated);
+      state = state.copyWith(notificationPreferences: updated);
+      if (userId != null) {
+        await saveNotificationPrefsToFirestore(userId, updated);
+      }
+    } catch (e) {
+      'Error saving allCategories: $e';
+    }
+  }
+
+ // alterna una categoria especifica
+  Future<void> toggleCategory(NotificationCategory category,
+      {String? userId}) async {
+    try {
+      final current =
+          Set<NotificationCategory>.from(
+              state.notificationPreferences.selectedCategories);
+      if (current.contains(category)) {
+        current.remove(category);
+      } else {
+        current.add(category);
+      }
+      final updated = state.notificationPreferences
+          .copyWith(selectedCategories: current);
+      await _persistPrefs(updated);
+      state = state.copyWith(notificationPreferences: updated);
+      if (userId != null) {
+        await saveNotificationPrefsToFirestore(userId, updated);
+      }
+    } catch (e) {
+      'Error toggling category: $e';
+    }
+  }
+
+  // carga las preferencias desde Firestore
+  Future<void> loadNotificationPrefsFromFirestore(String userId) async {
+    try {
+      final doc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .get();
+      if (!doc.exists) return;
+      final data = doc.data() as Map<String, dynamic>;
+      final prefs = NotificationPreferences.fromMap(
+        data['notificationPreferences'] as Map<String, dynamic>?,
+      );
+      // Persistir localmente también
+      await _persistPrefs(prefs);
+      state = state.copyWith(notificationPreferences: prefs);
+    } catch (e) {
+      'Error loading prefs from Firestore: $e';
+    }
+  }
+
+ // guarda las preferencias en Firestore
+ Future<void> saveNotificationPrefsToFirestore(
+      String userId, NotificationPreferences prefs) async {
+    try {
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .update({'notificationPreferences': prefs.toMap()});
+    } catch (e) {
+      'Error saving prefs to Firestore (will retry on reconnect): $e';
+    }
+  }
+
+ // guarda la tres clves de notificación 
+  Future<void> _persistPrefs(NotificationPreferences prefs) async {
+    final sp = await SharedPreferences.getInstance();
+    await sp.setBool(_notifEnabledKey, prefs.enabled);
+    await sp.setBool(_notifAllCategoriesKey, prefs.allCategories);
+    await sp.setStringList(
+      _notifCategoriesKey,
+      prefs.selectedCategories.map((c) => c.value).toList(),
+    );
+  }
+
+  Future<void> setNotificationsEnabledSimple(bool enabled) async {
+    await setNotificationsEnabled(enabled);
   }
 
   Future<void> resetSettings() async {
     try {
       final prefs = await SharedPreferences.getInstance();
       await prefs.remove(_themeKey);
-      await prefs.remove(_notificationsKey);
+      await prefs.remove(_notifEnabledKey);   //
+      await prefs.remove(_notifAllCategoriesKey);  //
+      await prefs.remove(_notifCategoriesKey);   //
+
       state = const SettingsState();
     } catch (e) {
       'Error resetting settings: $e';
     }
   }
 }
+
+
 
 final settingsProvider = StateNotifierProvider<SettingsNotifier, SettingsState>((ref) {
   return SettingsNotifier();

@@ -287,7 +287,7 @@ class ReportService {
     _notificationService.sendReportNotificationToAll(
       reportId: reportId,
       reportTitle: title,
-      reportType: problemType.displayName,
+      reportType: problemType.value,
       creatorId: userId,
     ).catchError((error) {
       'Error al enviar notificación: $error';

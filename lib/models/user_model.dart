@@ -2,6 +2,118 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 enum UserRole { vecino, admin, security } 
 
+//
+enum NotificationCategory {
+  inseguridad,
+  serviciosBasicos,
+  contaminacion,
+  convivencia,
+}
+// Categorias de reportes disponible para suscripción notificaciones
+extension NotificationCategoryExtension on NotificationCategory {
+  // Nombre legible para mostrar en UI
+  String get label {
+    switch (this) {
+      case NotificationCategory.inseguridad:
+        return 'Inseguridad';
+      case NotificationCategory.serviciosBasicos:
+        return 'Servicios Básicos';
+      case NotificationCategory.contaminacion:
+        return 'Contaminación';
+      case NotificationCategory.convivencia:
+        return 'Convivencia';
+    }
+  }
+
+   // Valor String que se guarda en Firestore / Hive
+  String get value {
+    switch (this) {
+      case NotificationCategory.inseguridad:
+        return 'inseguridad';
+      case NotificationCategory.serviciosBasicos:
+        return 'servicios_basicos';
+      case NotificationCategory.contaminacion:
+        return 'contaminacion';
+      case NotificationCategory.convivencia:
+        return 'convivencia';
+    }
+  }
+   // Icono representativo para la UI
+  static NotificationCategory fromString(String value) {
+    switch (value) {
+      case 'servicios_basicos':
+        return NotificationCategory.serviciosBasicos;
+      case 'contaminacion':
+        return NotificationCategory.contaminacion;
+      case 'convivencia':
+        return NotificationCategory.convivencia;
+      case 'inseguridad':
+      default:
+        return NotificationCategory.inseguridad;
+    }
+  }
+}
+
+//encapsula las preferencias de notificaciones
+class NotificationPreferences {
+  final bool enabled;
+  final bool allCategories;
+  final Set<NotificationCategory> selectedCategories;
+
+  const NotificationPreferences({
+    this.enabled = true,
+    this.allCategories = true,
+    this.selectedCategories = const {},
+  });
+
+  // Retorna true si el usuario debe recibir notificación para [category].
+  bool shouldReceive(String categoryValue) {
+    if (!enabled) return false;
+    if (allCategories) return true;
+    return selectedCategories
+        .any((c) => c.value == categoryValue);
+  }
+
+  // Serializar a Map para Firestore
+  Map<String, dynamic> toMap() {
+    return {
+      'enabled': enabled,
+      'allCategories': allCategories,
+      'selectedCategories':
+          selectedCategories.map((c) => c.value).toList(),
+    };
+  }
+
+  // Deserializar desde Firestore
+  factory NotificationPreferences.fromMap(Map<String, dynamic>? map) {
+    if (map == null) {
+      return const NotificationPreferences();
+    }
+    final rawCategories =
+        (map['selectedCategories'] as List<dynamic>? ?? [])
+            .map((e) => NotificationCategoryExtension.fromString(e as String))
+            .toSet();
+    return NotificationPreferences(
+      enabled: map['enabled'] as bool? ?? true,
+      allCategories: map['allCategories'] as bool? ?? true,
+      selectedCategories: rawCategories,
+    );
+  }
+
+  NotificationPreferences copyWith({
+    bool? enabled,
+    bool? allCategories,
+    Set<NotificationCategory>? selectedCategories,
+  }) {
+    return NotificationPreferences(
+      enabled: enabled ?? this.enabled,
+      allCategories: allCategories ?? this.allCategories,
+      selectedCategories: selectedCategories ?? this.selectedCategories,
+    );
+  }
+}
+
+
 class UserModel {
   final String id;
   final String name;
@@ -13,6 +125,7 @@ class UserModel {
   final String? cargo;
   final String? profileImage;
   final DateTime createdAt;
+  final NotificationPreferences notificationPreferences; //
 
   UserModel({
     required this.id,
@@ -25,6 +138,7 @@ class UserModel {
     this.cargo,
     this.profileImage,
     required this.createdAt,
+    this.notificationPreferences = const NotificationPreferences(), //
   });
 
   factory UserModel.fromFirestore(DocumentSnapshot doc) {
@@ -40,6 +154,9 @@ class UserModel {
       cargo: data['cargo'],
       profileImage: data['profileImage'],
       createdAt: (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      notificationPreferences: NotificationPreferences.fromMap(
+        data['notificationPreferences'] as Map<String, dynamic>?,
+        ),  //
     );
   }
 
@@ -79,6 +196,7 @@ class UserModel {
       'cargo': cargo,
       'profileImage': profileImage,
       'createdAt': Timestamp.fromDate(createdAt),
+      'notificationPreferences': notificationPreferences.toMap(), //
     };
   }
 
@@ -93,6 +211,7 @@ class UserModel {
     String? cargo,
     String? profileImage,
     DateTime? createdAt,
+    NotificationPreferences? notificationPreferences,
   }) {
     return UserModel(
       id: id ?? this.id,
@@ -105,6 +224,8 @@ class UserModel {
       cargo: cargo ?? this.cargo,
       profileImage: profileImage ?? this.profileImage,
       createdAt: createdAt ?? this.createdAt,
+      notificationPreferences:
+          notificationPreferences ?? this.notificationPreferences,
     );
   }
 }
