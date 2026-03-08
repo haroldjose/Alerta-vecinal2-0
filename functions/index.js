@@ -1,10 +1,237 @@
 const { onDocumentCreated } = require('firebase-functions/v2/firestore');
+const { onRequest } = require('firebase-functions/v2/https'); //
+const { defineSecret } = require('firebase-functions/params'); //
 const { initializeApp } = require('firebase-admin/app');
 const { getMessaging } = require('firebase-admin/messaging');
 const { getFirestore, FieldValue } = require('firebase-admin/firestore');
 
 // Inicializar Firebase Admin
 initializeApp();
+
+const hfApiKey = defineSecret('HF_API_KEY');
+
+const KEYWORDS = {
+  inseguridad: [
+    'borracho', 'borrachos', 'ebrio', 'ebrios', 'drogado', 'drogados',
+    'ladrón', 'ladron', 'ladrones', 'robo', 'robando', 'robaron',
+    'asalto', 'asaltaron', 'asaltando', 'asaltante',
+    'pelea', 'peleando', 'pelearon', 'golpes', 'golpeando',
+    'violencia', 'violento', 'agresion', 'agresivo',
+    'cuchillo', 'arma', 'disparo', 'pistola',
+    'sospechoso', 'intruso', 'vandalismo',
+    'acoso', 'amenaza', 'amenazas', 'intimidando',
+    'piedras', 'botando piedras', 'tirando piedras',
+    'peligroso', 'peligro', 'peligrosa',
+  ],
+  serviciosBasicos: [
+    'agua', 'tuberia', 'tubería', 'caño', 'fuga', 'derrame',
+    'sin agua', 'corte de agua', 'agua cortada',
+    'luz', 'electricidad', 'poste', 'apagon', 'apagón', 'sin luz',
+    'cable suelto', 'cortocircuito', 'transformador',
+    'gas', 'fuga de gas', 'olor a gas',
+    'bache', 'hoyo', 'hueco', 'calle rota', 'asfalto',
+    'semaforo', 'semáforo', 'señal de transito',
+    'alcantarilla', 'drenaje', 'desague', 'inundacion',
+    'basura no recogen', 'no recogen basura', 'recoleccion',
+  ],
+  contaminacion: [
+    'basura acumulada', 'basura tirada', 'mucha basura', 'montón de basura',
+    'basura en la calle', 'basura en la esquina',
+    'mal olor', 'hedor', 'pestilencia', 'apesta', 'huele mal',
+    'humo', 'quemando', 'quema', 'fogata',
+    'contaminacion', 'contaminación', 'toxico', 'tóxico',
+    'rio contaminado', 'río contaminado', 'agua contaminada',
+    'desechos', 'vertido', 'aceite derramado',
+    'ruido excesivo', 'musica muy alta', 'música muy alta',
+  ],
+  convivencia: [
+    'vecino molesta', 'vecinos molestan', 'conflicto con vecino',
+    'fiesta ruidosa', 'fiesta hasta tarde', 'borrachera en casa',
+    'perro suelto', 'perros sueltos', 'perro agresivo', 'perro muerde',
+    'animal suelto', 'animales sueltos',
+    'bloqueando entrada', 'bloqueando paso', 'doble fila',
+    'mal estacionado', 'grafiti', 'graffiti', 'rayando pared',
+  ],
+};
+
+function normalize(text) {
+  return text.toLowerCase()
+    .replace(/á/g, 'a').replace(/é/g, 'e').replace(/í/g, 'i')
+    .replace(/ó/g, 'o').replace(/ú/g, 'u').replace(/ü/g, 'u')
+    .replace(/ñ/g, 'n');
+}
+
+function classifyByKeywords(text) {
+  const normalized = normalize(text);
+  const scores = {};
+
+  for (const [type, keywords] of Object.entries(KEYWORDS)) {
+    let score = 0;
+    for (const kw of keywords) {
+      if (normalized.includes(normalize(kw))) {
+        score += kw.split(' ').length > 1 ? 3 : 1;
+      }
+    }
+    if (score > 0) scores[type] = score;
+  }
+
+  if (Object.keys(scores).length === 0) return null;
+
+  const sorted = Object.entries(scores).sort((a, b) => b[1] - a[1]);
+  const winner = sorted[0];
+  const total = Object.values(scores).reduce((a, b) => a + b, 0);
+  const dominance = winner[1] / total;
+
+  return { type: winner[0], score: winner[1], dominance };
+}
+
+const LABEL_TO_TYPE = {
+  'inseguridad y delincuencia':           'inseguridad',
+  'servicios básicos e infraestructura':  'serviciosBasicos',
+  'contaminación y medio ambiente':       'contaminacion',
+  'convivencia vecinal':                  'convivencia',
+};
+
+//Sugereecia de tipo de problema con IA 
+exports.suggestProblemType = onRequest(
+  {
+    cors: true,
+    timeoutSeconds: 60,
+    region: 'us-central1',
+    secrets: [hfApiKey],
+  },
+  async (req, res) => {
+    if (req.method !== 'POST') {
+      return res.status(405).json({ error: 'Método no permitido. Use POST.' });
+    }
+
+    const { title = '', description = '' } = req.body;
+    const combinedText = `${title} ${description}`.trim();
+
+    if (combinedText.length < 5) {
+      return res.status(400).json({ error: 'Texto insuficiente.' });
+    }
+
+    // clasificar por palabras clave
+    const kwResult = classifyByKeywords(combinedText);
+
+    if (kwResult && kwResult.dominance >= 0.6 && kwResult.score >= 2) {
+      const confidence = kwResult.score >= 5 ? 'alta' : kwResult.dominance >= 0.75 ? 'alta' : 'media';
+      console.log(`[suggestProblemType] ✅ Keywords: "${combinedText.substring(0, 40)}..." → ${kwResult.type} (${confidence})`);
+      return res.status(200).json({
+        suggestion: kwResult.type,
+        confidence,
+        reason: `Detectado por palabras clave con ${Math.round(kwResult.dominance * 100)}% de certeza.`,
+      });
+    }
+
+    const apiKey = hfApiKey.value();
+    if (!apiKey) {
+      if (kwResult) {
+        return res.status(200).json({
+          suggestion: kwResult.type,
+          confidence: 'baja',
+          reason: 'Clasificación aproximada por palabras clave.',
+        });
+      }
+      return res.status(500).json({ error: 'Servicio de IA no configurado.' });
+    }
+
+    try {
+      const hfUrl = 'https://router.huggingface.co/hf-inference/models/joeddav/xlm-roberta-large-xnli';
+
+      const hfBody = JSON.stringify({
+        inputs: combinedText,
+        parameters: {
+          candidate_labels: [
+            'inseguridad y delincuencia',
+            'servicios básicos e infraestructura',
+            'contaminación y medio ambiente',
+            'convivencia vecinal',
+          ],
+          multi_label: false,
+        },
+      });
+
+      const fetchHF = () => fetch(hfUrl, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: hfBody,
+      });
+
+      let response = await fetchHF();
+
+      if (response.status === 503) {
+        const body = await response.json();
+        const waitTime = Math.min((body.estimated_time || 20) * 1000, 20000);
+        await new Promise(resolve => setTimeout(resolve, waitTime));
+        response = await fetchHF();
+      }
+
+      if (!response.ok) {
+        const errText = await response.text();
+        console.error('[suggestProblemType] Error HF:', errText);
+        if (kwResult) {
+          return res.status(200).json({
+            suggestion: kwResult.type,
+            confidence: 'baja',
+            reason: 'Clasificación por palabras clave (IA no disponible).',
+          });
+        }
+        return res.status(502).json({ error: 'Error al consultar el servicio de IA.' });
+      }
+
+      const hfData = await response.json();
+      const labels = hfData.labels || [];
+      const scores = hfData.scores || [];
+
+      if (labels.length === 0) {
+        return res.status(502).json({ error: 'Respuesta vacía del servicio de IA.' });
+      }
+
+      const hfType = LABEL_TO_TYPE[labels[0]] || 'inseguridad';
+      const hfScore = scores[0];
+
+      let finalType = hfType;
+      let confidence;
+      let reason;
+
+      if (kwResult && kwResult.type !== hfType) {
+        if (kwResult.dominance >= 0.7) {
+          finalType = kwResult.type;
+          confidence = 'media';
+          reason = `Palabras clave sugieren "${finalType}" con alta certeza.`;
+        } else {
+          finalType = hfType;
+          confidence = hfScore >= 0.45 ? 'media' : 'baja';
+          reason = `Clasificado como "${labels[0]}" con ${Math.round(hfScore * 100)}% de certeza.`;
+        }
+      } else {
+        confidence = hfScore >= 0.45 || (kwResult && kwResult.score >= 3) ? 'alta' : 'media';
+        reason = `Clasificado como "${labels[0]}" con ${Math.round(hfScore * 100)}% de certeza.`;
+      }
+
+      console.log(`[suggestProblemType] ✅ Híbrido: "${combinedText.substring(0, 40)}..." → ${finalType} (${confidence})`);
+      return res.status(200).json({ suggestion: finalType, confidence, reason });
+
+    } catch (error) {
+      console.error('[suggestProblemType] Error inesperado:', error);
+      if (kwResult) {
+        return res.status(200).json({
+          suggestion: kwResult.type,
+          confidence: 'baja',
+          reason: 'Clasificación por palabras clave (error de IA).',
+        });
+      }
+      return res.status(500).json({ error: 'Error interno del servidor.' });
+    }
+  }
+);
+
+
 
 // Función que se ejecuta cuando se crea un documento en 'notifications'
 exports.sendReportNotification = onDocumentCreated(

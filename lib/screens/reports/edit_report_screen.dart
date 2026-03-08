@@ -1,18 +1,21 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/constants/colors.dart';
 import '../../core/services/image_service.dart';
+import '../../core/services/ai_suggestion_service.dart';
 import '../../models/report_model.dart';
 import '../../providers/reports_provider.dart';
 import '../../widgets/custom_text_field.dart';
 import '../../widgets/custom_button.dart';
+import '../../widgets/ai_problem_suggestion_widget.dart';
 
 class EditReportScreen extends ConsumerStatefulWidget {
   final ReportModel report;
   
   const EditReportScreen({
-    super.key,
+    super.key, 
     required this.report,
   });
 
@@ -32,6 +35,12 @@ class _EditReportScreenState extends ConsumerState<EditReportScreen> {
   bool _isLoadingLocation = false;
   bool _imageRemoved = false;
 
+  // Estado de la sugerencia de IA
+  AiSuggestionState _suggestionState = AiSuggestionState.idle;
+  AiSuggestion? _currentSuggestion;
+  Timer? _debounceTimer;                          
+  final AiSuggestionService _aiService = AiSuggestionService();
+
   @override
   void initState() {
     super.initState();
@@ -40,13 +49,85 @@ class _EditReportScreenState extends ConsumerState<EditReportScreen> {
     _descriptionController.text = widget.report.description;
     _selectedProblemType = widget.report.problemType;
     _selectedLocation = widget.report.location;
+
+    _titleController.addListener(_onTextChanged);
+    _descriptionController.addListener(_onTextChanged);
   }
 
   @override
   void dispose() {
+    _debounceTimer?.cancel();
+    _titleController.removeListener(_onTextChanged);
+    _descriptionController.removeListener(_onTextChanged);
+
     _titleController.dispose();
     _descriptionController.dispose();
     super.dispose();
+  }
+
+   // Callback disparado cuando se escribe en título o descripción.
+  void _onTextChanged() {
+    final title = _titleController.text.trim();
+    final description = _descriptionController.text.trim();
+
+    if (title.length + description.length < 5) {
+      if (_suggestionState != AiSuggestionState.idle) {
+        setState(() {
+          _suggestionState = AiSuggestionState.idle;
+          _currentSuggestion = null;
+        });
+      }
+      _debounceTimer?.cancel();
+      return;
+    }
+    _debounceTimer?.cancel();
+    _debounceTimer = Timer(const Duration(milliseconds: 1200), () {
+      _fetchAiSuggestion(title, description);
+    });
+  }
+
+  // Llama al servicio de IA y actualiza el estado de la sugerencia
+  Future<void> _fetchAiSuggestion(String title, String description) async {
+    if (!mounted) return;
+
+    setState(() {
+      _suggestionState = AiSuggestionState.loading;
+      _currentSuggestion = null;
+    });
+
+    final suggestion = await _aiService.getSuggestion(
+      title: title,
+      description: description,
+    );
+
+    if (!mounted) return;
+
+    setState(() {
+  if (suggestion != null) {
+    _suggestionState = AiSuggestionState.success;
+    _currentSuggestion = suggestion;
+  } else {
+    _suggestionState = AiSuggestionState.error;
+  }
+});
+  }
+
+  // Aplica la sugerencia al selector de tipo de problema
+  void _acceptSuggestion() {
+    if (_currentSuggestion == null) return;
+    setState(() {
+      _selectedProblemType = _currentSuggestion!.problemType;
+      _suggestionState = AiSuggestionState.idle;
+      _currentSuggestion = null;
+    });
+  }
+
+  // Descarta la sugerencia sin cambiar el tipo
+  void _dismissSuggestion() {
+    setState(() {
+      _suggestionState = AiSuggestionState.idle;
+      _currentSuggestion = null;
+    });
   }
 
   Future<void> _pickImage() async {
@@ -194,9 +275,34 @@ class _EditReportScreenState extends ConsumerState<EditReportScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Tipo de problema
+              // Titulo del reporte
               const Text(
-                'Tipo de problema',
+                'Título del reporte',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+              const SizedBox(height: 8),
+              CustomTextField(
+                hintText: 'Ingrese un título descriptivo',
+                controller: _titleController,
+                validator: (value) {
+                  if (value == null || value.trim().isEmpty) {
+                    return 'El título es requerido';
+                  }
+                  if (value.trim().length < 5) {
+                    return 'El título debe tener al menos 5 caracteres';
+                  }
+                  return null;
+                },
+              ),
+
+              const SizedBox(height: 24),
+              // Descripción
+              const Text(
+                'Descripción',
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
@@ -206,9 +312,72 @@ class _EditReportScreenState extends ConsumerState<EditReportScreen> {
               const SizedBox(height: 8),
               Container(
                 width: double.infinity,
-                padding: const EdgeInsets.symmetric(horizontal: 16),
                 decoration: BoxDecoration(
                   border: Border.all(color: AppColors.border, width: 1.5),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: TextFormField(
+                  controller: _descriptionController,
+                  maxLines: 4,
+                  decoration: const InputDecoration(
+                    hintText: 'Describe detalladamente el problema...',
+                    border: InputBorder.none,
+                    contentPadding: EdgeInsets.all(16),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.trim().isEmpty) {
+                      return 'La descripción es requerida';
+                    }
+                    if (value.trim().length < 10) {
+                      return 'La descripción debe tener al menos 10 caracteres';
+                    }
+                    return null;
+                  },
+                ),
+              ),
+
+              // sugerencia
+              AiProblemSuggestionWidget(
+                state: _suggestionState,
+                suggestion: _currentSuggestion,
+                onAccept: _acceptSuggestion,
+                onDismiss: _dismissSuggestion,
+              ),
+
+              const SizedBox(height: 24),
+
+              // Tipo de problema
+              Row(
+                children: [
+                  const Text(
+                    'Tipo de problema',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+              
+                  Tooltip(
+                    message: 'La IA sugiere el tipo según tu título y descripción',
+                    child: Icon(
+                      Icons.auto_awesome,
+                      size: 16,
+                      color: Colors.amber.shade700,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: Color(_selectedProblemType.borderColor),
+                    width: 1.5,
+                  ),
                   borderRadius: BorderRadius.circular(8),
                   color: Colors.white,
                 ),
@@ -220,13 +389,28 @@ class _EditReportScreenState extends ConsumerState<EditReportScreen> {
                     items: ProblemType.values.map((type) {
                       return DropdownMenuItem(
                         value: type,
-                        child: Text(type.displayName),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 10,
+                              height: 10,
+                              margin: const EdgeInsets.only(right: 8),
+                              decoration: BoxDecoration(
+                                color: Color(type.borderColor),
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                            Text(type.displayName),
+                          ],
+                        ),
                       );
                     }).toList(),
                     onChanged: (ProblemType? newValue) {
                       if (newValue != null) {
                         setState(() {
                           _selectedProblemType = newValue;
+                          _suggestionState = AiSuggestionState.idle;
+                          _currentSuggestion = null;
                         });
                       }
                     },
@@ -236,7 +420,7 @@ class _EditReportScreenState extends ConsumerState<EditReportScreen> {
 
               const SizedBox(height: 24),
 
-              // Fecha de creación 
+              // Fecha de creación
               const Text(
                 'Fecha de creación',
                 style: TextStyle(
@@ -267,7 +451,7 @@ class _EditReportScreenState extends ConsumerState<EditReportScreen> {
 
               const SizedBox(height: 24),
 
-              // Estado actual 
+              // Estado actual
               const Text(
                 'Estado actual',
                 style: TextStyle(
@@ -307,32 +491,6 @@ class _EditReportScreenState extends ConsumerState<EditReportScreen> {
                   color: Colors.grey[600],
                   fontStyle: FontStyle.italic,
                 ),
-              ),
-
-              const SizedBox(height: 24),
-
-              // Título
-              const Text(
-                'Título del reporte',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.textPrimary,
-                ),
-              ),
-              const SizedBox(height: 8),
-              CustomTextField(
-                hintText: 'Ingrese un título descriptivo',
-                controller: _titleController,
-                validator: (value) {
-                  if (value == null || value.trim().isEmpty) {
-                    return 'El título es requerido';
-                  }
-                  if (value.trim().length < 5) {
-                    return 'El título debe tener al menos 5 caracteres';
-                  }
-                  return null;
-                },
               ),
 
               const SizedBox(height: 24),
@@ -474,7 +632,7 @@ class _EditReportScreenState extends ConsumerState<EditReportScreen> {
 
               const SizedBox(height: 24),
 
-              // Ubicación 
+              // Ubicación
               const Text(
                 'Ubicación',
                 style: TextStyle(
@@ -500,8 +658,8 @@ class _EditReportScreenState extends ConsumerState<EditReportScreen> {
                         Icon(
                           Icons.location_on,
                           size: 20,
-                          color: _selectedLocation != null 
-                              ? AppColors.primary 
+                          color: _selectedLocation != null
+                              ? AppColors.primary
                               : AppColors.textSecondary,
                         ),
                         const SizedBox(width: 8),
@@ -534,8 +692,8 @@ class _EditReportScreenState extends ConsumerState<EditReportScreen> {
                               )
                             : const Icon(Icons.my_location, size: 18),
                         label: Text(
-                          _isLoadingLocation 
-                              ? 'Obteniendo ubicación...' 
+                          _isLoadingLocation
+                              ? 'Obteniendo ubicación...'
                               : 'Actualizar ubicación',
                         ),
                         style: OutlinedButton.styleFrom(
@@ -549,47 +707,9 @@ class _EditReportScreenState extends ConsumerState<EditReportScreen> {
                 ),
               ),
 
-              const SizedBox(height: 24),
-
-              // Descripción
-              const Text(
-                'Descripción',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.textPrimary,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Container(
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  border: Border.all(color: AppColors.border, width: 1.5),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: TextFormField(
-                  controller: _descriptionController,
-                  maxLines: 4,
-                  decoration: const InputDecoration(
-                    hintText: 'Describe detalladamente el problema...',
-                    border: InputBorder.none,
-                    contentPadding: EdgeInsets.all(16),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.trim().isEmpty) {
-                      return 'La descripción es requerida';
-                    }
-                    if (value.trim().length < 10) {
-                      return 'La descripción debe tener al menos 10 caracteres';
-                    }
-                    return null;
-                  },
-                ),
-              ),
-
               const SizedBox(height: 32),
 
-              // Botón actualizar reporte
+              // Botón guardar cambios
               Center(
                 child: CustomButton(
                   text: 'Guardar Cambios',
@@ -609,4 +729,3 @@ class _EditReportScreenState extends ConsumerState<EditReportScreen> {
     return '${date.day}/${date.month}/${date.year} - ${date.hour}:${date.minute.toString().padLeft(2, '0')}';
   }
 }
-
