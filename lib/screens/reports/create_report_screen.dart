@@ -43,8 +43,8 @@ class _CreateReportScreenState extends ConsumerState<CreateReportScreen> {
   Timer? _debounceTimer;   
   final AiSuggestionService _aiService = AiSuggestionService(); 
 
-
-
+   // bandera indica si se verifica el lenguaje
+   bool _isCheckingOffensive = false;
 
   @override
   void initState() {
@@ -130,7 +130,82 @@ class _CreateReportScreenState extends ConsumerState<CreateReportScreen> {
     });
   }
 
-
+  // muestra la deteccion del lenguaje ofensivo
+  void _showOffensiveWordsDialog(List<String> offensiveWords) {
+    showDialog(
+      context: context,
+      barrierDismissible: false, 
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        title: Row(
+          children: [
+            const Icon(Icons.warning_amber_rounded, color: Colors.orange, size: 28),
+            const SizedBox(width: 8),
+            const Expanded(
+              child: Text(
+                'Lenguaje inapropiado detectado',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+            ),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Tu reporte contiene palabras que no están permitidas. '
+              'Por favor, modifica el contenido antes de continuar.',
+              style: TextStyle(fontSize: 14),
+            ),
+            const SizedBox(height: 16),
+            // palabras ofensivas
+            const Text(
+              'Palabras detectadas:',
+              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+            ),
+            const SizedBox(height: 8),
+            // Mostrar cada palabra en un chip rojo
+            Wrap(
+              spacing: 6,
+              runSpacing: 6,
+              children: offensiveWords.map((word) {
+                return Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.red.shade50,
+                    border: Border.all(color: Colors.red.shade300),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    word,
+                    style: TextStyle(
+                      color: Colors.red.shade700,
+                      fontWeight: FontWeight.w500,
+                      fontSize: 13,
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
+          ],
+        ),
+        actions: [
+          ElevatedButton(
+            onPressed: () => Navigator.of(context).pop(),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            ),
+            child: const Text(
+              'Entendido, lo corregiré',
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
 
   Future<void> _pickImage() async {
@@ -201,6 +276,38 @@ class _CreateReportScreenState extends ConsumerState<CreateReportScreen> {
   Future<void> _createReport() async {
     if (!_formKey.currentState!.validate()) return;
 
+    final title = _titleController.text.trim();
+    final description = _descriptionController.text.trim();
+
+    setState(() => _isCheckingOffensive = true);
+
+    // LOG DIAGNÓSTICO — quitar después de confirmar que funciona
+    print('[OFFENSIVE_CHECK] ▶ Iniciando verificación...');
+    print('[OFFENSIVE_CHECK] Título: "$title"');
+    print('[OFFENSIVE_CHECK] Descripción: "$description"');
+
+
+    final offensiveResult = await _aiService.checkOffensiveContent(
+      title: title,
+      description: description,
+    );
+
+
+    // LOG DIAGNÓSTICO — quitar después de confirmar que funciona
+    print('[OFFENSIVE_CHECK] ◀ Resultado recibido:');
+    print('[OFFENSIVE_CHECK]   isOffensive = ${offensiveResult.isOffensive}');
+    print('[OFFENSIVE_CHECK]   offensiveWords = ${offensiveResult.offensiveWords}');
+
+
+
+    if (!mounted) return;
+    setState(() => _isCheckingOffensive = false);
+
+    if (offensiveResult.isOffensive) {
+      _showOffensiveWordsDialog(offensiveResult.offensiveWords);
+      return; 
+    }
+
     final createReportNotifier = ref.read(createReportProvider.notifier);
     await createReportNotifier.createReport(
       problemType: _selectedProblemType,
@@ -216,6 +323,8 @@ class _CreateReportScreenState extends ConsumerState<CreateReportScreen> {
     final currentUser = ref.watch(currentUserProvider);
     final createReportState = ref.watch(createReportProvider);
     final isAdmin = currentUser.value?.role == UserRole.admin;
+
+    final bool isButtonDisabled = createReportState.isLoading || _isCheckingOffensive;
 
     ref.listen<AsyncValue<void>>(createReportProvider, (previous, next) {
   
@@ -637,9 +746,11 @@ class _CreateReportScreenState extends ConsumerState<CreateReportScreen> {
               // Botón crear reporte
               Center(
                 child: CustomButton(
-                  text: 'Crear Reporte',
-                  onPressed: createReportState.isLoading ? null : _createReport,
-                  isLoading: createReportState.isLoading,
+                  text: _isCheckingOffensive
+                      ? 'Verificando contenido...'
+                      : 'Crear Reporte',
+                  onPressed: isButtonDisabled ? null : _createReport,
+                  isLoading: isButtonDisabled,
                   width: double.infinity,
                 ),
               ),

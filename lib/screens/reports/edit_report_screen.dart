@@ -41,6 +41,9 @@ class _EditReportScreenState extends ConsumerState<EditReportScreen> {
   Timer? _debounceTimer;                          
   final AiSuggestionService _aiService = AiSuggestionService();
 
+//bandera
+  bool _isCheckingOffensive = false;
+
   @override
   void initState() {
     super.initState();
@@ -130,6 +133,84 @@ class _EditReportScreenState extends ConsumerState<EditReportScreen> {
     });
   }
 
+
+  // Muestra cuando detecta lenguaje ofensivo
+  void _showOffensiveWordsDialog(List<String> offensiveWords) {
+    showDialog(
+      context: context,
+      barrierDismissible: false, 
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        title: Row(
+          children: [
+            const Icon(Icons.warning_amber_rounded, color: Colors.orange, size: 28),
+            const SizedBox(width: 8),
+            const Expanded(
+              child: Text(
+                'Lenguaje inapropiado detectado',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+            ),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Tu reporte contiene palabras que no están permitidas. '
+              'Por favor, modifica el contenido antes de continuar.',
+              style: TextStyle(fontSize: 14),
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              'Palabras detectadas:',
+              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+            ),
+            const SizedBox(height: 8),
+            // Mostrar cada palabra en un chip rojo
+            Wrap(
+              spacing: 6,
+              runSpacing: 6,
+              children: offensiveWords.map((word) {
+                return Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.red.shade50,
+                    border: Border.all(color: Colors.red.shade300),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    word,
+                    style: TextStyle(
+                      color: Colors.red.shade700,
+                      fontWeight: FontWeight.w500,
+                      fontSize: 13,
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
+          ],
+        ),
+        actions: [
+          ElevatedButton(
+            onPressed: () => Navigator.of(context).pop(),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            ),
+            child: const Text(
+              'Entendido, lo corregiré',
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+
   Future<void> _pickImage() async {
     setState(() {
       _isLoadingImage = true;
@@ -196,8 +277,27 @@ class _EditReportScreenState extends ConsumerState<EditReportScreen> {
     }
   }
 
+ // 
   Future<void> _updateReport() async {
     if (!_formKey.currentState!.validate()) return;
+
+    final title = _titleController.text.trim();
+    final description = _descriptionController.text.trim();
+
+    setState(() => _isCheckingOffensive = true);
+
+    final offensiveResult = await _aiService.checkOffensiveContent(
+      title: title,
+      description: description,
+    );
+
+    if (!mounted) return;
+    setState(() => _isCheckingOffensive = false);
+
+    if (offensiveResult.isOffensive) {
+      _showOffensiveWordsDialog(offensiveResult.offensiveWords);
+      return; 
+    }
 
     final editReportNotifier = ref.read(editReportProvider.notifier);
     await editReportNotifier.updateReport(
@@ -230,6 +330,8 @@ class _EditReportScreenState extends ConsumerState<EditReportScreen> {
   @override
   Widget build(BuildContext context) {
     final editReportState = ref.watch(editReportProvider);
+
+    final bool isButtonDisabled = editReportState.isLoading || _isCheckingOffensive;
 
     ref.listen<AsyncValue<void>>(editReportProvider, (previous, next) {
       
@@ -712,9 +814,11 @@ class _EditReportScreenState extends ConsumerState<EditReportScreen> {
               // Botón guardar cambios
               Center(
                 child: CustomButton(
-                  text: 'Guardar Cambios',
-                  onPressed: editReportState.isLoading ? null : _updateReport,
-                  isLoading: editReportState.isLoading,
+                  text: _isCheckingOffensive
+                      ? 'Verificando contenido...'
+                      : 'Guardar Cambios',
+                  onPressed: isButtonDisabled ? null : _updateReport,
+                  isLoading: isButtonDisabled,
                   width: double.infinity,
                 ),
               ),
