@@ -54,6 +54,33 @@ const KEYWORDS = {
   ],
 };
 
+const OFFENSIVE_WORDS = [
+  // Insultos directos
+  'idiota', 'imbécil', 'imbecil', 'estupido', 'estúpido', 'estupida', 'estúpida',
+  'mierda', 'mierdas', 'puta', 'putas', 'puto', 'putos', 'pendejo', 'pendejos',
+  'pendeja', 'pendejas', 'cabron', 'cabrón', 'cabrona', 'cabrones',
+  'culo', 'culos', 'culero', 'culera', 'culeros',
+  'joder', 'coño', 'coño', 'marica', 'maricon', 'maricón',
+  'hdp', 'hijo de puta', 'hija de puta', 'hijos de puta',
+  'chinga', 'chingada', 'chingado', 'chingados', 'chingar',
+  'carajo', 'carajos', 'maldito', 'maldita', 'malditos', 'malditas',
+  'asco', 'asqueroso', 'asquerosa', 'asquerosos',
+  'verga', 'vergon', 'vergones',
+  'pinche', 'pinches',
+  'weon', 'weón', 'weona', 'weonas',
+  'conchetumadre', 'ctm',
+  'bastardo', 'bastarda', 'bastardos',
+  'gil', 'giles', 'gila',
+  'boludo', 'boluda', 'boludos',
+  'pelotudo', 'pelotuda',
+  'tarado', 'tarada', 'tarados',
+  'bruta', 'bruto', 'brutos', 'brutas',
+  'burro', 'burra', 'burros', 'burras',
+  'inutil', 'inútil', 'inutiles', 'inútiles',
+  'animal', 'animales', // en contexto de insulto
+  'bestia', 'bestias',
+];
+
 function normalize(text) {
   return text.toLowerCase()
     .replace(/á/g, 'a').replace(/é/g, 'e').replace(/í/g, 'i')
@@ -85,12 +112,136 @@ function classifyByKeywords(text) {
   return { type: winner[0], score: winner[1], dominance };
 }
 
+// Detecta palabras ofensivas
+function detectOffensiveWordsLocally(text) {
+  const normalizedText = normalize(text);
+  const found = [];
+
+  for (const word of OFFENSIVE_WORDS) {
+    const normalizedWord = normalize(word);
+    const regex = new RegExp(`(^|\\s|[^a-záéíóúüñ])${normalizedWord}([^a-záéíóúüñ]|$)`, 'i');
+    if (regex.test(normalizedText) && !found.includes(word)) {
+      found.push(word);
+    }
+  }
+
+  return found;
+}
+
+
+
 const LABEL_TO_TYPE = {
   'inseguridad y delincuencia':           'inseguridad',
   'servicios básicos e infraestructura':  'serviciosBasicos',
   'contaminación y medio ambiente':       'contaminacion',
   'convivencia vecinal':                  'convivencia',
 };
+
+// analiza el lenguaje ofensivo
+exports.checkOffensiveContent = onRequest(
+  {
+    cors: true,
+    timeoutSeconds: 60,
+    region: 'us-central1',
+    secrets: [hfApiKey],
+  },
+  async (req, res) => {
+    if (req.method !== 'POST') {
+      return res.status(405).json({ error: 'Método no permitido. Use POST.' });
+    }
+
+    const { title = '', description = '' } = req.body;
+    const combinedText = `${title} ${description}`.trim();
+
+    if (combinedText.length < 2) {
+      return res.status(400).json({ error: 'Texto insuficiente.' });
+    }
+
+    const localOffensive = detectOffensiveWordsLocally(combinedText);
+
+    if (localOffensive.length > 0) {
+      console.log(`[checkOffensiveContent] 🚨 Local: ofensivo → ${localOffensive.join(', ')}`);
+      return res.status(200).json({
+        isOffensive: true,
+        offensiveWords: localOffensive,
+        source: 'local',
+      });
+    }
+
+    // Análisis con Hugging Face usando el modelo multilingüe de clasificación de toxicidad
+    const apiKey = hfApiKey.value();
+
+    if (!apiKey) {
+      console.warn('[checkOffensiveContent] HF_API_KEY no configurada, usando solo detección local.');
+      return res.status(200).json({ isOffensive: false });
+    }
+
+    try {
+      
+      const hfUrl = 'https://router.huggingface.co/hf-inference/models/s-nlp/roberta_toxicity_classifier';
+
+      const fetchHF = () => fetch(hfUrl, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ inputs: combinedText }),
+      });
+
+      let response = await fetchHF();
+
+      if (response.status === 503) {
+        const body = await response.json().catch(() => ({}));
+        const waitTime = Math.min((body.estimated_time || 15) * 1000, 15000);
+        console.log(`[checkOffensiveContent] Modelo cargando, esperando ${waitTime}ms...`);
+        await new Promise(resolve => setTimeout(resolve, waitTime));
+        response = await fetchHF();
+      }
+
+      if (!response.ok) {
+        const errText = await response.text();
+        console.error('[checkOffensiveContent] Error HF:', errText);
+        
+        return res.status(200).json({ isOffensive: false });
+      }
+
+      const hfData = await response.json();
+
+      const results = Array.isArray(hfData[0]) ? hfData[0] : hfData;
+      const toxicResult = results.find(r => r.label === 'toxic');
+      const toxicScore = toxicResult ? toxicResult.score : 0;
+
+      console.log(`[checkOffensiveContent] HF score tóxico: ${toxicScore.toFixed(3)} para: "${combinedText.substring(0, 50)}..."`);
+
+      // Umbral: si supera 0.75 de confianza, es ofensivo
+      if (toxicScore >= 0.75) {
+        
+        const suspectWords = detectOffensiveWordsLocally(combinedText);
+
+        return res.status(200).json({
+          isOffensive: true,
+          offensiveWords: suspectWords.length > 0 ? suspectWords : ['contenido inapropiado'],
+          source: 'hf',
+          toxicScore,
+        });
+      }
+
+      // No es ofensivo
+      return res.status(200).json({ isOffensive: false });
+
+    } catch (error) {
+      console.error('[checkOffensiveContent] Error inesperado:', error);
+      // En caso de error de red u otro, no bloqueamos al usuario
+      return res.status(200).json({ isOffensive: false });
+    }
+  }
+);
+
+
+
+
+
 
 //Sugereecia de tipo de problema con IA 
 exports.suggestProblemType = onRequest(
