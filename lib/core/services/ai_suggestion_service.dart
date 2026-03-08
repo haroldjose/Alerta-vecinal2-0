@@ -24,6 +24,60 @@ class OffensiveContentResult {
   }
 }
 
+// Encapsula el resultado de la detección de reportes duplicados.
+
+class DuplicateCheckResult {
+  final bool isDuplicate;
+  final SimilarReportData? similarReport;
+
+  const DuplicateCheckResult({
+    required this.isDuplicate,
+    this.similarReport,
+  });
+
+
+  const DuplicateCheckResult.noDuplicate()
+      : isDuplicate = false,
+        similarReport = null;
+}
+
+// Datos del reporte similar devuelto por la Cloud Function.
+class SimilarReportData {
+  final String id;
+  final String title;
+  final String description;
+  final String problemType;
+  final String createdAt;
+  final String userName;
+  final String status;
+  final int similarity; 
+
+  const SimilarReportData({
+    required this.id,
+    required this.title,
+    required this.description,
+    required this.problemType,
+    required this.createdAt,
+    required this.userName,
+    required this.status,
+    required this.similarity,
+  });
+
+  factory SimilarReportData.fromMap(Map<String, dynamic> map) {
+    return SimilarReportData(
+      id:          map['id']          as String? ?? '',
+      title:       map['title']       as String? ?? '',
+      description: map['description'] as String? ?? '',
+      problemType: map['problemType'] as String? ?? '',
+      createdAt:   map['createdAt']   as String? ?? '',
+      userName:    map['userName']    as String? ?? 'Usuario',
+      status:      map['status']      as String? ?? 'pendiente',
+      similarity:  (map['similarity'] as num?)?.toInt() ?? 0,
+    );
+  }
+}
+
+
 
 
 class AiSuggestionService {
@@ -34,6 +88,10 @@ class AiSuggestionService {
   // lenguaje ofensivo
   static const String _offensiveFunctionUrl =
       'https://us-central1-alerta-vecinal-297eb.cloudfunctions.net/checkOffensiveContent';    
+
+  // duplicado
+   static const String _duplicateFunctionUrl =
+      'https://us-central1-alerta-vecinal-297eb.cloudfunctions.net/checkDuplicateReport';    
 
 
   // Llama a la Cloud Function y devuelve una [AiSuggestion] o null si falla.
@@ -132,4 +190,76 @@ class AiSuggestionService {
       return const OffensiveContentResult.clean();
     }
   }
+
+  // Verifica si el reporte que se está creando o editando es similar a alguno de los últimos 48 horas en Firestore.
+  Future<DuplicateCheckResult> checkDuplicateReport({
+    required String title,
+    required String description,
+    LocationData? location,
+    String? excludeReportId,
+  }) async {
+    final combinedText = '${title.trim()} ${description.trim()}'.trim();
+    if (combinedText.length < 5) {
+      return const DuplicateCheckResult.noDuplicate();
+    }
+
+    print('[checkDuplicate] ▶ Verificando duplicados...');
+    print('[checkDuplicate]   Título: "$title"');
+
+    try {
+      final body = <String, dynamic>{
+        'title': title,
+        'description': description,
+      };
+
+      if (location != null) {
+        body['location'] = {
+          'latitude':  location.latitude,
+          'longitude': location.longitude,
+        };
+      }
+
+      if (excludeReportId != null) {
+        body['excludeReportId'] = excludeReportId;
+      }
+
+      final response = await http
+          .post(
+            Uri.parse(_duplicateFunctionUrl),
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode(body),
+          )
+          .timeout(const Duration(seconds: 50));
+
+      print('[checkDuplicate] ◀ Status: ${response.statusCode}');
+      print('[checkDuplicate] ◀ Body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body) as Map<String, dynamic>;
+        final isDuplicate = data['isDuplicate'] as bool? ?? false;
+
+        if (!isDuplicate) return const DuplicateCheckResult.noDuplicate();
+
+        // Parsear los datos del reporte similar
+        final similarMap = data['similarReport'] as Map<String, dynamic>?;
+        final similarReport =
+            similarMap != null ? SimilarReportData.fromMap(similarMap) : null;
+
+        return DuplicateCheckResult(
+          isDuplicate: true,
+          similarReport: similarReport,
+        );
+      } else {
+        print('[checkDuplicate] Error HTTP ${response.statusCode}');
+        return const DuplicateCheckResult.noDuplicate();
+      }
+    } catch (e) {
+      print('[checkDuplicate] Excepción: $e');
+      // Ante cualquier error (timeout, sin red) no bloqueamos al usuario
+      return const DuplicateCheckResult.noDuplicate();
+    }
+  }
+
+
+
 }
