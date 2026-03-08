@@ -292,7 +292,7 @@ class LocalUserModel extends HiveObject {
       cargo: cargo,
       profileImage: profileImage,
       createdAt: createdAt,
-      cedula: cedula,     // 
+      cedula: cedula,     //  
       username: username, // 
       celular: celular,   //
       notificationPreferences: NotificationPreferences(   //

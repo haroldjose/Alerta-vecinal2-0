@@ -293,7 +293,7 @@ class ReportService {
       'Error al enviar notificación: $error';
     });
 
-  }
+  }  
 
   Future<void> _savePendingCreateOperation(
     LocalReportModel report,

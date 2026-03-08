@@ -13,7 +13,7 @@ import 'edit_report_screen.dart';
 class ReportDetailScreen extends ConsumerStatefulWidget {
   final ReportModel report;
 
-  const ReportDetailScreen({
+  const ReportDetailScreen({ 
     super.key,
     required this.report,
   });

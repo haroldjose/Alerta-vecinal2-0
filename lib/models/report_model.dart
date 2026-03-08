@@ -5,7 +5,7 @@ enum ProblemType {
   serviciosBasicos,
   contaminacion,
   convivencia,
-}
+} 
 
 enum ReportStatus {
   pendiente,

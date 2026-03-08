@@ -2,7 +2,7 @@ import 'package:alerta_vecinal/core/constants/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../providers/auth_provider.dart';
-import '../../providers/reports_provider.dart';
+import '../../providers/reports_provider.dart'; 
 import '../../widgets/report_card.dart';
 import '../../widgets/custom_button.dart';
 import '../reports/create_report_screen.dart';
