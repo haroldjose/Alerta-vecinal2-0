@@ -1,11 +1,10 @@
 const { onDocumentCreated } = require('firebase-functions/v2/firestore');
-const { onRequest } = require('firebase-functions/v2/https'); //
-const { defineSecret } = require('firebase-functions/params'); //
+const { onRequest } = require('firebase-functions/v2/https');
+const { defineSecret } = require('firebase-functions/params');
 const { initializeApp } = require('firebase-admin/app');
 const { getMessaging } = require('firebase-admin/messaging');
 const { getFirestore, FieldValue } = require('firebase-admin/firestore');
 
-// Inicializar Firebase Admin
 initializeApp();
 
 const hfApiKey = defineSecret('HF_API_KEY');
@@ -55,12 +54,11 @@ const KEYWORDS = {
 };
 
 const OFFENSIVE_WORDS = [
-  // Insultos directos
   'idiota', 'imbécil', 'imbecil', 'estupido', 'estúpido', 'estupida', 'estúpida',
   'mierda', 'mierdas', 'puta', 'putas', 'puto', 'putos', 'pendejo', 'pendejos',
   'pendeja', 'pendejas', 'cabron', 'cabrón', 'cabrona', 'cabrones',
   'culo', 'culos', 'culero', 'culera', 'culeros',
-  'joder', 'coño', 'coño', 'marica', 'maricon', 'maricón',
+  'joder', 'coño', 'marica', 'maricon', 'maricón',
   'hdp', 'hijo de puta', 'hija de puta', 'hijos de puta',
   'chinga', 'chingada', 'chingado', 'chingados', 'chingar',
   'carajo', 'carajos', 'maldito', 'maldita', 'malditos', 'malditas',
@@ -77,7 +75,7 @@ const OFFENSIVE_WORDS = [
   'bruta', 'bruto', 'brutos', 'brutas',
   'burro', 'burra', 'burros', 'burras',
   'inutil', 'inútil', 'inutiles', 'inútiles',
-  'animal', 'animales', // en contexto de insulto
+  'animal', 'animales',
   'bestia', 'bestias',
 ];
 
@@ -91,7 +89,6 @@ function normalize(text) {
 function classifyByKeywords(text) {
   const normalized = normalize(text);
   const scores = {};
-
   for (const [type, keywords] of Object.entries(KEYWORDS)) {
     let score = 0;
     for (const kw of keywords) {
@@ -101,22 +98,17 @@ function classifyByKeywords(text) {
     }
     if (score > 0) scores[type] = score;
   }
-
   if (Object.keys(scores).length === 0) return null;
-
   const sorted = Object.entries(scores).sort((a, b) => b[1] - a[1]);
   const winner = sorted[0];
   const total = Object.values(scores).reduce((a, b) => a + b, 0);
   const dominance = winner[1] / total;
-
   return { type: winner[0], score: winner[1], dominance };
 }
 
-// Detecta palabras ofensivas
 function detectOffensiveWordsLocally(text) {
   const normalizedText = normalize(text);
   const found = [];
-
   for (const word of OFFENSIVE_WORDS) {
     const normalizedWord = normalize(word);
     const regex = new RegExp(`(^|\\s|[^a-záéíóúüñ])${normalizedWord}([^a-záéíóúüñ]|$)`, 'i');
@@ -124,11 +116,237 @@ function detectOffensiveWordsLocally(text) {
       found.push(word);
     }
   }
-
   return found;
 }
 
+//
+const STOPWORDS = new Set([
+  'para', 'como', 'pero', 'este', 'esta', 'esto', 'estos', 'estas',
+  'tiene', 'hace', 'desde', 'hasta', 'entre', 'sobre',
+  'porque', 'cuando', 'donde', 'mientras', 'aunque', 'tambien',
+  'muy', 'mas', 'por', 'que', 'con', 'una', 'uno', 'los', 'las',
+  'del', 'hay', 'han', 'sido', 'estan', 'cada', 'todo',
+  'sigue', 'deja', 'vuelve', 'tiene', 'tenia', 'habia',
+  'son', 'fue', 'ser', 'sus', 'nos', 'les', 'les', 'mis',
+  'dia', 'vez', 'aun', 'asi', 'tan', 'sin', 'bien',
+  'otro', 'otra', 'unos', 'unas', 'ese', 'esa', 'esos', 'esas',
+]);
 
+function tokenize(text) {
+  return normalize(text)
+    .replace(/[^a-z0-9\s]/g, ' ')
+    .split(/\s+/)
+    .filter(w => w.length >= 3 && !STOPWORDS.has(w));
+}
+
+function jaccardSimilarity(textA, textB) {
+  const setA = new Set(tokenize(textA));
+  const setB = new Set(tokenize(textB));
+
+  if (setA.size === 0 && setB.size === 0) return 0;
+
+  const intersection = new Set([...setA].filter(w => setB.has(w)));
+  const union = new Set([...setA, ...setB]);
+
+  return intersection.size / union.size;
+}
+
+
+// Llama al pipeline SentenceSimilarity de HF.
+async function getSimilarityScores(sourceSentence, sentences, apiKey) {
+  const url = 'https://router.huggingface.co/hf-inference/models/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2';
+
+  const fetchHF = () => fetch(url, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${apiKey}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      inputs: {
+        source_sentence: sourceSentence,
+        sentences: sentences,
+      },
+    }),
+  });
+
+  let response = await fetchHF();
+
+  if (response.status === 503) {
+    const body = await response.json().catch(() => ({}));
+    const wait = Math.min((body.estimated_time || 20) * 1000, 20000);
+    console.log(`[getSimilarityScores] Modelo cargando, esperando ${wait}ms...`);
+    await new Promise(r => setTimeout(r, wait));
+    response = await fetchHF();
+  }
+
+  if (!response.ok) {
+    const err = await response.text();
+    throw new Error(`HF similarity error ${response.status}: ${err}`);
+  }
+
+  const data = await response.json();
+
+  if (!Array.isArray(data)) throw new Error('Respuesta inesperada de HF similarity');
+  return data;
+}
+
+function cosineSimilarity(vecA, vecB) {
+  let dot = 0, normA = 0, normB = 0;
+  for (let i = 0; i < vecA.length; i++) {
+    dot   += vecA[i] * vecB[i];
+    normA += vecA[i] * vecA[i];
+    normB += vecB[i] * vecB[i];
+  }
+  if (normA === 0 || normB === 0) return 0;
+  return dot / (Math.sqrt(normA) * Math.sqrt(normB));
+}
+
+// Umbrales ajustables.
+const JACCARD_THRESHOLD = 0.10;  
+const COSINE_THRESHOLD  = 0.70;
+
+exports.checkDuplicateReport = onRequest(
+  {
+    cors: true,
+    timeoutSeconds: 60,
+    region: 'us-central1',
+    secrets: [hfApiKey],
+  },
+  async (req, res) => {
+    if (req.method !== 'POST') {
+      return res.status(405).json({ error: 'Método no permitido. Use POST.' });
+    }
+
+    const {
+      title = '',
+      description = '',
+      location = null,
+      excludeReportId = null,  
+    } = req.body;
+
+    const newText = `${title.trim()} ${description.trim()}`.trim();
+
+    if (newText.length < 5) {
+      return res.status(400).json({ error: 'Texto insuficiente.' });
+    }
+
+    const db = getFirestore();
+
+    const cutoff = new Date(Date.now() - 48 * 60 * 60 * 1000);
+
+    let snapshot;
+    try {
+      snapshot = await db.collection('reports')
+        .where('createdAt', '>=', cutoff)
+        .orderBy('createdAt', 'desc')
+        .limit(100)
+        .get();
+    } catch (err) {
+      console.error('[checkDuplicate] Error Firestore:', err);
+      
+      return res.status(200).json({ isDuplicate: false });
+    }
+
+    
+    const existingReports = snapshot.docs
+      .filter(doc => doc.id !== excludeReportId)
+      .map(doc => {
+        const d = doc.data();
+        return {
+          id:          doc.id,
+          title:       d.title       || '',
+          description: d.description || '',
+          problemType: d.problemType || '',
+          createdAt:   d.createdAt?.toDate?.()?.toISOString() || '',
+          location:    d.location    || null,
+          userName:    d.userName    || 'Usuario',
+          status:      d.status      || 'pendiente',
+        };
+      });
+
+    console.log(`[checkDuplicate] Reportes en las últimas 48 h: ${existingReports.length}`);
+
+    if (existingReports.length === 0) {
+      return res.status(200).json({ isDuplicate: false });
+    }
+
+    
+    const candidates = existingReports
+      .map(r => ({
+        report:    r,
+        jaccard:   jaccardSimilarity(newText, `${r.title} ${r.description}`),
+      }))
+      .filter(c => c.jaccard >= JACCARD_THRESHOLD)
+      .sort((a, b) => b.jaccard - a.jaccard)
+      .slice(0, 10);  
+
+    console.log(`[checkDuplicate] Candidatos tras pre-filtro Jaccard (≥${JACCARD_THRESHOLD}): ${candidates.length}`);
+
+    if (candidates.length === 0) {
+      return res.status(200).json({ isDuplicate: false });
+    }
+
+    const apiKey = hfApiKey.value();
+
+    if (!apiKey) {
+      console.warn('[checkDuplicate] HF_API_KEY no configurada. Usando score Jaccard.');
+      const best = candidates[0];
+      if (best.jaccard >= 0.45) {
+        return res.status(200).json({
+          isDuplicate: true,
+          similarReport: { ...best.report, similarity: Math.round(best.jaccard * 100) },
+        });
+      }
+      return res.status(200).json({ isDuplicate: false });
+    }
+
+    const candidateSentences = candidates.map(
+      c => `${c.report.title} ${c.report.description}`
+    );
+
+    let scores;
+    try {
+      scores = await getSimilarityScores(newText, candidateSentences, apiKey);
+      console.log(`[checkDuplicate] Scores HF: ${scores.map(s => s.toFixed(3)).join(', ')}`);
+    } catch (err) {
+      console.error('[checkDuplicate] Error HF similarity:', err.message);
+      
+      return res.status(200).json({ isDuplicate: false });
+    }
+
+    let bestMatch = null;
+    let bestScore = 0;
+
+    scores.forEach((score, i) => {
+      if (score > bestScore) {
+        bestScore = score;
+        bestMatch = candidates[i].report;
+      }
+    });
+
+    console.log(`[checkDuplicate] Mejor score HF: ${bestScore.toFixed(3)} (umbral: ${COSINE_THRESHOLD})`);
+
+    // Devolver resultado
+    if (bestMatch && bestScore >= COSINE_THRESHOLD) {
+      return res.status(200).json({
+        isDuplicate: true,
+        similarReport: {
+          id:          bestMatch.id,
+          title:       bestMatch.title,
+          description: bestMatch.description,
+          problemType: bestMatch.problemType,
+          createdAt:   bestMatch.createdAt,
+          userName:    bestMatch.userName,
+          status:      bestMatch.status,
+          similarity:  Math.round(bestScore * 100),
+        },
+      });
+    }
+
+    return res.status(200).json({ isDuplicate: false });
+  }
+);
 
 const LABEL_TO_TYPE = {
   'inseguridad y delincuencia':           'inseguridad',
@@ -137,7 +355,6 @@ const LABEL_TO_TYPE = {
   'convivencia vecinal':                  'convivencia',
 };
 
-// analiza el lenguaje ofensivo
 exports.checkOffensiveContent = onRequest(
   {
     cors: true,
@@ -160,7 +377,7 @@ exports.checkOffensiveContent = onRequest(
     const localOffensive = detectOffensiveWordsLocally(combinedText);
 
     if (localOffensive.length > 0) {
-      console.log(`[checkOffensiveContent] 🚨 Local: ofensivo → ${localOffensive.join(', ')}`);
+      console.log(`[checkOffensiveContent] Local ofensivo → ${localOffensive.join(', ')}`);
       return res.status(200).json({
         isOffensive: true,
         offensiveWords: localOffensive,
@@ -168,16 +385,14 @@ exports.checkOffensiveContent = onRequest(
       });
     }
 
-    // Análisis con Hugging Face usando el modelo multilingüe de clasificación de toxicidad
     const apiKey = hfApiKey.value();
 
     if (!apiKey) {
-      console.warn('[checkOffensiveContent] HF_API_KEY no configurada, usando solo detección local.');
+      console.warn('[checkOffensiveContent] HF_API_KEY no configurada.');
       return res.status(200).json({ isOffensive: false });
     }
 
     try {
-      
       const hfUrl = 'https://router.huggingface.co/hf-inference/models/s-nlp/roberta_toxicity_classifier';
 
       const fetchHF = () => fetch(hfUrl, {
@@ -202,23 +417,18 @@ exports.checkOffensiveContent = onRequest(
       if (!response.ok) {
         const errText = await response.text();
         console.error('[checkOffensiveContent] Error HF:', errText);
-        
         return res.status(200).json({ isOffensive: false });
       }
 
       const hfData = await response.json();
-
       const results = Array.isArray(hfData[0]) ? hfData[0] : hfData;
       const toxicResult = results.find(r => r.label === 'toxic');
       const toxicScore = toxicResult ? toxicResult.score : 0;
 
-      console.log(`[checkOffensiveContent] HF score tóxico: ${toxicScore.toFixed(3)} para: "${combinedText.substring(0, 50)}..."`);
+      console.log(`[checkOffensiveContent] HF score tóxico: ${toxicScore.toFixed(3)}`);
 
-      // Umbral: si supera 0.75 de confianza, es ofensivo
       if (toxicScore >= 0.75) {
-        
         const suspectWords = detectOffensiveWordsLocally(combinedText);
-
         return res.status(200).json({
           isOffensive: true,
           offensiveWords: suspectWords.length > 0 ? suspectWords : ['contenido inapropiado'],
@@ -227,23 +437,15 @@ exports.checkOffensiveContent = onRequest(
         });
       }
 
-      // No es ofensivo
       return res.status(200).json({ isOffensive: false });
 
     } catch (error) {
       console.error('[checkOffensiveContent] Error inesperado:', error);
-      // En caso de error de red u otro, no bloqueamos al usuario
       return res.status(200).json({ isOffensive: false });
     }
   }
 );
 
-
-
-
-
-
-//Sugereecia de tipo de problema con IA 
 exports.suggestProblemType = onRequest(
   {
     cors: true,
@@ -263,12 +465,10 @@ exports.suggestProblemType = onRequest(
       return res.status(400).json({ error: 'Texto insuficiente.' });
     }
 
-    // clasificar por palabras clave
     const kwResult = classifyByKeywords(combinedText);
 
     if (kwResult && kwResult.dominance >= 0.6 && kwResult.score >= 2) {
       const confidence = kwResult.score >= 5 ? 'alta' : kwResult.dominance >= 0.75 ? 'alta' : 'media';
-      console.log(`[suggestProblemType] ✅ Keywords: "${combinedText.substring(0, 40)}..." → ${kwResult.type} (${confidence})`);
       return res.status(200).json({
         suggestion: kwResult.type,
         confidence,
@@ -365,7 +565,6 @@ exports.suggestProblemType = onRequest(
         reason = `Clasificado como "${labels[0]}" con ${Math.round(hfScore * 100)}% de certeza.`;
       }
 
-      console.log(`[suggestProblemType] ✅ Híbrido: "${combinedText.substring(0, 40)}..." → ${finalType} (${confidence})`);
       return res.status(200).json({ suggestion: finalType, confidence, reason });
 
     } catch (error) {
@@ -382,52 +581,39 @@ exports.suggestProblemType = onRequest(
   }
 );
 
-
-
-// Función que se ejecuta cuando se crea un documento en 'notifications'
 exports.sendReportNotification = onDocumentCreated(
   'notifications/{notificationId}',
   async (event) => {
     const snapshot = event.data;
-    
+
     if (!snapshot) {
-      console.log(' No hay datos en el snapshot');
+      console.log('No hay datos en el snapshot');
       return null;
     }
 
     const notification = snapshot.data();
-    
-    // Solo procesar notificaciones pendientes
+
     if (notification.status !== 'pending') {
-      console.log(' Notificación ya procesada, saltando...');
+      console.log('Notificación ya procesada, saltando...');
       return null;
     }
 
     const { tokens, title, body, reportId, reportType } = notification;
 
-    // Validar que hay tokens
     if (!tokens || tokens.length === 0) {
-      console.log(' No hay tokens para enviar notificaciones');
-      await snapshot.ref.update({
-        status: 'skipped',
-        reason: 'No tokens available',
-      });
+      console.log('No hay tokens para enviar notificaciones');
+      await snapshot.ref.update({ status: 'skipped', reason: 'No tokens available' });
       return null;
     }
 
-    console.log(`📤 Enviando notificación [${reportType ?? 'sin categoría'}] a ${tokens.length} dispositivo(s)...`);
-
+    console.log(`Enviando notificación [${reportType ?? 'sin categoría'}] a ${tokens.length} dispositivo(s)...`);
 
     try {
       const messaging = getMessaging();
-      
-      // Enviar notificación a múltiples dispositivos
+
       const response = await messaging.sendEachForMulticast({
         tokens: tokens,
-        notification: {
-          title: title,
-          body: body,
-        },
+        notification: { title: title, body: body },
         data: {
           reportId: reportId || '',
           reportType: reportType || '',
@@ -435,28 +621,14 @@ exports.sendReportNotification = onDocumentCreated(
         },
         android: {
           priority: 'high',
-          notification: {
-            channelId: 'reports_channel',
-            sound: 'default',
-            color: '#D63031',
-          },
+          notification: { channelId: 'reports_channel', sound: 'default', color: '#D63031' },
         },
-        apns: {
-          payload: {
-            aps: {
-              sound: 'default',
-              badge: 1,
-            },
-          },
-        },
+        apns: { payload: { aps: { sound: 'default', badge: 1 } } },
       });
 
-      console.log(` Notificaciones enviadas: ${response.successCount}/${tokens.length}`);
-      
-      // Log de errores si los hay
+      console.log(`Notificaciones enviadas: ${response.successCount}/${tokens.length}`);
+
       if (response.failureCount > 0) {
-        console.log(` Notificaciones fallidas: ${response.failureCount}`);
-        
         const failedTokens = [];
         response.responses.forEach((resp, idx) => {
           if (!resp.success) {
@@ -464,14 +636,11 @@ exports.sendReportNotification = onDocumentCreated(
             failedTokens.push(tokens[idx]);
           }
         });
-
-        // Limpiar tokens inválidos de la base de datos
         if (failedTokens.length > 0) {
           await cleanupInvalidTokens(failedTokens);
         }
       }
 
-      // Marcar notificación como enviada
       await snapshot.ref.update({
         status: 'sent',
         sentAt: FieldValue.serverTimestamp(),
@@ -481,111 +650,36 @@ exports.sendReportNotification = onDocumentCreated(
 
       return null;
     } catch (error) {
-      console.error(' Error al enviar notificaciones:', error);
-      
-      // Marcar como error
+      console.error('Error al enviar notificaciones:', error);
       await snapshot.ref.update({
         status: 'error',
         error: error.message,
         errorAt: FieldValue.serverTimestamp(),
       });
-      
       return null;
     }
   }
 );
 
-// Función auxiliar para limpiar tokens inválidos
 async function cleanupInvalidTokens(failedTokens) {
   const db = getFirestore();
   const usersRef = db.collection('users');
-  
+
   try {
-    // Procesar tokens en lotes de 10 (límite de Firestore para 'in')
     for (let i = 0; i < failedTokens.length; i += 10) {
       const batch = failedTokens.slice(i, i + 10);
-      const snapshot = await usersRef
-        .where('fcmToken', 'in', batch)
-        .get();
-      
+      const snapshot = await usersRef.where('fcmToken', 'in', batch).get();
+
       const writeBatch = db.batch();
       snapshot.docs.forEach(doc => {
-        writeBatch.update(doc.ref, {
-          fcmToken: FieldValue.delete(),
-        });
+        writeBatch.update(doc.ref, { fcmToken: FieldValue.delete() });
       });
-      
+
       await writeBatch.commit();
-      console.log(` ${snapshot.size} tokens inválidos eliminados (lote ${i / 10 + 1})`);
+      console.log(`${snapshot.size} tokens inválidos eliminados`);
     }
   } catch (error) {
     console.error('Error al limpiar tokens:', error);
   }
-
-  ///////////////////////////////////////////////
-// Se ejecuta cada 5 minutos y reprocesa notificaciones pendientes
- exports.retryPendingNotifications = functions.pubsub
-  .schedule('every 5 minutes')
-  .onRun(async (context) => {
-    const db = getFirestore();
-    
-    // Buscar documentos pending de más de 2 minutos
-    const twoMinutesAgo = new Date(Date.now() - 2 * 60 * 1000);
-    
-    const pendingDocs = await db.collection('notifications')
-      .where('status', '==', 'pending')
-      .where('createdAt', '<=', twoMinutesAgo)
-      .get();
-
-    if (pendingDocs.empty) {
-      console.log('No hay notificaciones pendientes');
-      return null;
-    }
-
-    console.log(`Reintentando ${pendingDocs.size} notificaciones pendientes...`);
-
-    for (const doc of pendingDocs.docs) {
-      const notification = doc.data();
-      const { tokens, title, body, reportId, reportType } = notification;
-
-      if (!tokens || tokens.length === 0) {
-        await doc.ref.update({ status: 'skipped', reason: 'No tokens' });
-        continue;
-      }
-
-      try {
-        const messaging = getMessaging();
-        const response = await messaging.sendEachForMulticast({
-          tokens,
-          notification: { title, body },
-          data: {
-            reportId: reportId || '',
-            reportType: reportType || '',
-            click_action: 'FLUTTER_NOTIFICATION_CLICK',
-          },
-          android: {
-            priority: 'high',
-            notification: { channelId: 'reports_channel', sound: 'default', color: '#D63031' },
-          },
-          apns: { payload: { aps: { sound: 'default', badge: 1 } } },
-        });
-
-        await doc.ref.update({
-          status: 'sent',
-          sentAt: FieldValue.serverTimestamp(),
-          successCount: response.successCount,
-          failureCount: response.failureCount,
-          retriedAt: FieldValue.serverTimestamp(),
-        });
-
-        console.log(`Reintento exitoso para ${doc.id}: ${response.successCount}/${tokens.length}`);
-      } catch (error) {
-        console.error(`Error reintentando ${doc.id}:`, error);
-      }
-    }
-
-    return null;
-  });
-
 }
 

@@ -43,6 +43,8 @@ class _EditReportScreenState extends ConsumerState<EditReportScreen> {
 
 //bandera
   bool _isCheckingOffensive = false;
+   //  bandera duplicado
+  bool _isCheckingDuplicate = false;
 
   @override
   void initState() {
@@ -211,6 +213,167 @@ class _EditReportScreenState extends ConsumerState<EditReportScreen> {
   }
 
 
+ // Dialogo  duplicado
+  void _showDuplicateDialog(
+    SimilarReportData similarReport,
+    VoidCallback onConfirmNotDuplicate,
+  ) {
+  
+    String formattedDate = similarReport.createdAt;
+    try {
+      final dt = DateTime.parse(similarReport.createdAt).toLocal();
+      formattedDate =
+          '${dt.day.toString().padLeft(2, '0')}/${dt.month.toString().padLeft(2, '0')}/${dt.year} '
+          '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
+    } catch (_) {}
+
+    final problemTypeLabels = {
+      'inseguridad':      'Inseguridad',
+      'serviciosBasicos': 'Servicios Básicos',
+      'contaminacion':    'Contaminación',
+      'convivencia':      'Convivencia',
+    };
+    final problemLabel =
+        problemTypeLabels[similarReport.problemType] ?? similarReport.problemType;
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.orange.shade50,
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(Icons.content_copy_rounded,
+                  color: Colors.orange, size: 26),
+            ),
+            const SizedBox(width: 10),
+            const Expanded(
+              child: Text(
+                'Reporte similar encontrado',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+            ),
+          ],
+        ),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              
+              RichText(
+                text: TextSpan(
+                  style: const TextStyle(fontSize: 14, color: Colors.black87),
+                  children: [
+                    const TextSpan(
+                        text: 'Los cambios que estás guardando resultan '),
+                    TextSpan(
+                      text: '${similarReport.similarity}% similares',
+                      style: const TextStyle(
+                          fontWeight: FontWeight.bold, color: Colors.orange),
+                    ),
+                    const TextSpan(
+                      text: ' a otro reporte registrado en las últimas 48 horas. '
+                          'Los cambios no se guardarán si describen el mismo problema.',
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 16),
+              //
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.orange.shade50,
+                  border: Border.all(color: Colors.orange.shade200),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      similarReport.title,
+                      style: const TextStyle(
+                          fontWeight: FontWeight.w700, fontSize: 14),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      similarReport.description.length > 120
+                          ? '${similarReport.description.substring(0, 117)}...'
+                          : similarReport.description,
+                      style: const TextStyle(
+                          fontSize: 13, color: Colors.black87),
+                    ),
+                    const Divider(height: 16),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 6,
+                      children: [
+                        _InfoChip(
+                            icon: Icons.category_outlined,
+                            label: problemLabel),
+                        _InfoChip(
+                            icon: Icons.person_outline,
+                            label: similarReport.userName),
+                        _InfoChip(
+                            icon: Icons.access_time_outlined,
+                            label: formattedDate),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 12),
+
+              Text(
+                'Si tus cambios describen un problema diferente o en otro lugar, '
+                'puedes continuar guardando.',
+                style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey.shade600,
+                    fontStyle: FontStyle.italic),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text(
+              'Cancelar cambios',
+              style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              onConfirmNotDuplicate();
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8)),
+            ),
+            child: const Text(
+              'No es el mismo',
+              style: TextStyle(color: Colors.white, fontSize: 13),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+
   Future<void> _pickImage() async {
     setState(() {
       _isLoadingImage = true;
@@ -299,16 +462,42 @@ class _EditReportScreenState extends ConsumerState<EditReportScreen> {
       return; 
     }
 
+    setState(() => _isCheckingDuplicate = true);
+
+    final duplicateResult = await _aiService.checkDuplicateReport(
+      title:           title,
+      description:     description,
+      location:        _selectedLocation,
+      excludeReportId: widget.report.id, 
+    );
+
+    if (!mounted) return;
+    setState(() => _isCheckingDuplicate = false);
+
+    if (duplicateResult.isDuplicate && duplicateResult.similarReport != null) {
+      _showDuplicateDialog(
+        duplicateResult.similarReport!,
+        _saveChanges, 
+      );
+      return;
+    }
+
+    await _saveChanges();
+
+    
+  }
+
+  Future<void> _saveChanges() async {
     final editReportNotifier = ref.read(editReportProvider.notifier);
     await editReportNotifier.updateReport(
-      reportId: widget.report.id,
-      userId: widget.report.userId,
-      problemType: _selectedProblemType,
-      title: _titleController.text.trim(),
-      description: _descriptionController.text.trim(),
-      imageFile: _newImage,
+      reportId:         widget.report.id,
+      userId:           widget.report.userId,
+      problemType:      _selectedProblemType,
+      title:            _titleController.text.trim(),
+      description:      _descriptionController.text.trim(),
+      imageFile:        _newImage,
       existingImageUrl: _imageRemoved ? null : widget.report.imageUrl,
-      location: _selectedLocation,
+      location:         _selectedLocation,
     );
   }
 
@@ -327,11 +516,15 @@ class _EditReportScreenState extends ConsumerState<EditReportScreen> {
     return locationService.formatLocation(_selectedLocation!);
   }
 
+
+
+
   @override
   Widget build(BuildContext context) {
     final editReportState = ref.watch(editReportProvider);
 
-    final bool isButtonDisabled = editReportState.isLoading || _isCheckingOffensive;
+    final bool isButtonDisabled =
+        editReportState.isLoading || _isCheckingOffensive || _isCheckingDuplicate;
 
     ref.listen<AsyncValue<void>>(editReportProvider, (previous, next) {
       
@@ -816,7 +1009,9 @@ class _EditReportScreenState extends ConsumerState<EditReportScreen> {
                 child: CustomButton(
                   text: _isCheckingOffensive
                       ? 'Verificando contenido...'
-                      : 'Guardar Cambios',
+                      : _isCheckingDuplicate
+                          ? 'Verificando duplicados...' 
+                          : 'Guardar Cambios',
                   onPressed: isButtonDisabled ? null : _updateReport,
                   isLoading: isButtonDisabled,
                   width: double.infinity,
@@ -831,5 +1026,37 @@ class _EditReportScreenState extends ConsumerState<EditReportScreen> {
 
   String _formatDate(DateTime date) {
     return '${date.day}/${date.month}/${date.year} - ${date.hour}:${date.minute.toString().padLeft(2, '0')}';
+  }
+}
+
+// Mostrar chip de información
+class _InfoChip extends StatelessWidget {
+  final IconData icon;
+  final String label;
+
+  const _InfoChip({required this.icon, required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border.all(color: Colors.orange.shade200),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 13, color: Colors.orange.shade700),
+          const SizedBox(width: 4),
+          Text(label,
+              style: TextStyle(
+                  fontSize: 11,
+                  color: Colors.orange.shade800,
+                  fontWeight: FontWeight.w500)),
+        ],
+      ),
+    );
   }
 }
