@@ -1,3 +1,4 @@
+import 'package:alerta_vecinal/screens/security/security_home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -207,14 +208,14 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       );
 
       if (user != null && mounted) {
-        _showSuccessMessage('¡Registro exitoso! Bienvenido ${user.name}');
+        _showSuccessMessage('¡Usuario ${user.name} registrado exitosamente!');
         
         await Future.delayed(const Duration(milliseconds: 1500));
         
         if (mounted) {
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => const HomeScreen()),
+            MaterialPageRoute(builder: (context) => const SecurityHomeScreen()),
           );
         }
       }

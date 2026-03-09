@@ -119,10 +119,13 @@ class NotificationService {
     if (_fcmToken == null) return;
 
     try {
-      await _firestore.collection('users').doc(userId).update({
-        'fcmToken': _fcmToken,
-        'tokenUpdatedAt': FieldValue.serverTimestamp(),
-      });
+      await _firestore.collection('users').doc(userId).set(
+        {
+          'fcmToken': _fcmToken,
+          'tokenUpdatedAt': FieldValue.serverTimestamp(),
+        },
+        SetOptions(merge: true), // CLAVE: no sobreescribe el documento completo
+      );
     } catch (e) {
       'Error al guardar token: $e';
     }
@@ -131,12 +134,12 @@ class NotificationService {
   // Eliminar token al cerrar sesión
   Future<void> removeUserToken(String userId) async {
     try {
-      await _firestore.collection('users').doc(userId).update({
-        'fcmToken': FieldValue.delete(),
-      });
-      
+      await _firestore.collection('users').doc(userId).set(
+        {'fcmToken': FieldValue.delete()},
+        SetOptions(merge: true),
+      );
     } catch (e) {
-      ' Error al eliminar token: $e';
+      'Error al eliminar token: $e';
     }
   }
 
