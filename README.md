@@ -1,146 +1,288 @@
-# 🛡️ Proyecto: Alerta Vecinal
+# Sistema de Reportes Comunitarios
 
-El presente proyecto consiste en el desarrollo de una aplicación movil Full Stack diseñada para fortalecer la seguridad comunitaria mediante la gestion inteligente de reportes. La solución utiliza una arquitectura basada en **Flutter** para el fronted y Firebase como núcleo del backend, permitiendo una sincronización en tiempo real y una alta escalabilidad. 
+Aplicación móvil desarrollada con Flutter y Firebase que permite a los ciudadanos reportar problemas comunitarios como inseguridad, contaminación, convivencia y servicios básicos.
 
-## Objetivo general
+El sistema integra Inteligencia Artificial para mejorar la calidad de los reportes mediante:
 
-Desarrollar una aplicación móvil full stack durante la gestión 2026 que permita a los vecinos la organización de reportes vecinales, incorporando mejoras en seguridad y modelos de inteligencia artificial destinados a la moderación de lenguaje ofensivo y detección de reportes duplicados.
+* clasificación automática de incidencias
 
-## Objetivos especificos
+* detección de lenguaje ofensivo
 
-* Optimización de rendimiento Multimedia
-  * Implementación de flujo de procesamiento que reduzca el peso de archivos multimedia en al menos un 30% mediante compresión automática en la nube, reflejado en la visualización fluida en la aplicación.
-* Rediseñar la experiencia de usuario
-  * Intefaz de usuario renovada que proporcione retroalimentación visual inmediata y mensajes de estado claros basados en la respuesta lógica del sistema ante cada acción del usuario.
-* Mejorar la seguridad de la aplicación
-  * Sistema de acceso que valide credenciales bajo politicas de complejidad en tiempo real y ejecute bloqueo temporal tras 5 intentos fallidos de inicio de sesión detectados por el sistema.
-* Cambiar el sistema de notificaciones 
-  * Modulo de alertas inteligentes que permita al usuario suscribirse a categorias especificas y recibir notificaciones push personalizados mediante la segmentación de topicos en tiempo real.
-* Integrar módulos de inteligencia artificial
-  * Flujo de creación de reportes automatizado que analice el contenido mediante APIs externas, bloqueando la publicación que contenga lenguaje ofensivo o que sean identificadas como duplicadas.          
-
-### ¿Que hace el sistema?
-
-* Los usuarios admin y vecino pueden crear reportes. 
-* Los usuarios vecinos pueden editar su propios reportes y no pueden eliminar.
-* El usuario admin edita el estado del reporte y puede eliminar los reportes.
-* El formulario de reportes tienen los campos titulo, tipo del problema, estado, fecha, imagen, ubicación y descripción.
-* La IA controlará si existe lenguaje ofensivo o no.
-* La IA controlará duplicados en los reportes.
-* Los reportes no se podrán guardar ni mostrar si  existe de lenguaje ofensivo o reportes duplicados.
+* detección de reportes duplicados
 
 
-## Tecnologias
+# Objetivo del proyecto
 
-* Flutter, dark, Riverpod
-* Firebase auth, Firebase Storage, Firebase Cloud Messaging y Hive
-* Google NLP, Perspective, OpenAI
+Desarrollar una aplicación móvil Full Stack soportada por Inteligencia Artificial y basada en una arquitectura de software Serverless, escalable y modular, que permita a los vecinos y administradores de comunidades gestionar reportes de seguridad ciudadana de manera estructurada, garantizando la integridad de la información mediante herramientas digitales inteligentes de moderación de contenido y detección de duplicidad. 
 
-## Entidades principales
+# Tecnologías utilizadas
 
-### 👤 Entidad: Users
-- `name`
-- `role`
-- `cargo`
-- `email`
-- `createdAt`
-- `lastActive`
+**Frontend**
 
-### 📄 Entidad: Reports
-- `title`
-- `userId`
-- `userName`
-- `status`
-- `problemType`
-- `imageUrl`
-- `description`
-- `createdAt`
+* Flutter
 
-## Flujo del sistema
+* Riverpod (gestión de estado)
 
-1. El usuario inicia sesión
-1. el backend verifica credenciales y devuelve confirmación si es válido o denegado.
-1.  El usuario llena el formulario de reporte.
-1. La IA analiza el lenguaje para detectar lenguaje ofensivo.
-1. El usuario debe modificar el lenguaje para poder crear el reporte en caso de lenguaje ofensivo.
-1. La IA verifica reportes existentes para ver duplicidad.
-1. El usuario debe modificar su reporte para poder crear o cancelar la creación del reporte.
+* Hive (almacenamiento local)
 
-## Arquitectura 
+* Material Design
+
+**Backend / Cloud**
+
+* Firebase Authentication
+
+* Cloud Firestore
+
+* Firebase Cloud Functions
+
+* Firebase Storage
+
+* Firebase Cloud Messaging
+
+**Inteligencia Artificial**
+
+* API de Hugging Face
+
+* Modelos de análisis semántico
+
+* Clasificación de texto
+
+* Detección de similitud textual
+
+# Funcionalidades con Inteligencia Artificial
+
+**1. Sugerencia automática del tipo de problema**
+
+Mientras el usuario escribe un reporte, la IA analiza el texto y sugiere automáticamente la categoría correspondiente:
+
+* Inseguridad
+
+* Contaminación
+
+* Servicios Básicos
+
+* Convivencia
+
+Esto mejora la clasificación de los reportes.
+
+**2. Detección de lenguaje ofensivo**
+
+Antes de guardar un reporte, el sistema analiza el contenido y detecta palabras ofensivas.
+
+Si se detecta lenguaje inapropiado:
+
+* el sistema bloquea el envío
+
+* se muestran las palabras detectadas
+
+* el usuario debe corregir el texto
+
+**3. Detección de reportes duplicados**
+
+El sistema evita que se registren reportes repetidos.
+
+Proceso:
+
+1. Se aplica un filtro de similitud textual (Jaccard)
+
+1. Si hay coincidencia alta, se usa IA para calcular similitud semántica
+
+1. Si el reporte es similar, se muestra una advertencia al usuario
+
+# Funcionalidades principales
+
+✔ Registro de usuarios
+
+✔ Inicio de sesión seguro
+
+✔ Roles de usuario (Vecino, Administrador, Seguridad)
+
+✔ Creación de reportes comunitarios
+
+✔ Edición de reportes
+
+✔ Visualización de reportes
+
+✔ Notificaciones push
+
+✔ Funcionamiento parcial offline
+
+✔ Sincronización automática
+
+✔ Detección de duplicados mediante IA
+
+✔ Detección de lenguaje ofensivo
+
+✔ Clasificación automática de reportes
+
+# Estructura del Proyecto
+```
+functions
+ ┣ 📂node_modules
+ ┣ 📜.gitignore
+ ┣ 📜index.js
+ ┣ 📜package-lock.json
+ ┣ 📜package.json
+
+lib
+ ┣ 📂core
+ ┃ ┣ 📂constants
+ ┃ ┃ ┣ 📜app_constants.dart
+ ┃ ┃ ┗ 📜colors.dart
+ ┃ ┣ 📂services
+ ┃ ┃ ┣ 📜ai_suggestion_service.dart
+ ┃ ┃ ┣ 📜connectivity_service.dart
+ ┃ ┃ ┣ 📜image_service.dart
+ ┃ ┃ ┣ 📜local_storage_service.dart
+ ┃ ┃ ┣ 📜location_service.dart
+ ┃ ┃ ┣ 📜notification_service.dart
+ ┃ ┃ ┗ 📜sync_service.dart
+ ┃ ┗ 📂utils
+ ┃ ┃ ┗ 📜validators.dart
+ ┣ 📂models
+ ┃ ┣ 📜local_models.dart
+ ┃ ┣ 📜local_models.g.dart
+ ┃ ┣ 📜report_model.dart
+ ┃ ┗ 📜user_model.dart
+ ┣ 📂providers
+ ┃ ┣ 📜active_users_provider.dart
+ ┃ ┣ 📜auth_provider.dart
+ ┃ ┣ 📜reports_provider.dart
+ ┃ ┣ 📜settings_provider.dart
+ ┃ ┗ 📜user_provider.dart
+ ┣ 📂screens
+ ┃ ┣ 📂auth
+ ┃ ┃ ┣ 📜login_screen.dart
+ ┃ ┃ ┗ 📜register_screen.dart
+ ┃ ┣ 📂home
+ ┃ ┃ ┗ 📜home_screen.dart
+ ┃ ┣ 📂problems
+ ┃ ┃ ┗ 📜problem_type_screen.dart
+ ┃ ┣ 📂reports
+ ┃ ┃ ┣ 📜create_report_screen.dart
+ ┃ ┃ ┣ 📜edit_report_screen.dart
+ ┃ ┃ ┣ 📜my_reports_screen.dart
+ ┃ ┃ ┗ 📜report_detail_screen.dart
+ ┃ ┣ 📂security
+ ┃ ┃ ┗ 📜security_home_screen.dart
+ ┃ ┗ 📂settings
+ ┃ ┃ ┗ 📜settings_screen.dart
+ ┣ 📂widgets
+ ┃ ┣ 📜ai_problem_suggestion_widget.dart
+ ┃ ┣ 📜custom_button.dart
+ ┃ ┣ 📜custom_drawer.dart
+ ┃ ┣ 📜custom_text_field.dart
+ ┃ ┣ 📜location_widget.dart
+ ┃ ┣ 📜report_card.dart
+ ┃ ┗ 📜sync_status_widget.dart
+ ┗ 📜main.dart
 
 ```
-App Flutter
-    │
-Firebase Auth  →  genera token JWT
-    │
-Firestore  ←→  Storage
-    │
-Cloud Functions (lógica segura)
+
+# Arquitectura del sistema
+
+El sistema utiliza una arquitectura basada en servicios cloud y componentes desacoplados.
+```
+Flutter App
+     │
+     │
+Firebase SDK
+     │
+     ├── Firebase Authentication
+     ├── Cloud Firestore
+     ├── Firebase Storage
+     │
+Cloud Functions
+     │
+     └── Hugging Face API (IA)
 ```
 
+# Sistema de notificaciones
 
-## Endpoints core
+El sistema utiliza **Firebase Cloud Messaging (FCM)** para enviar notificaciones cuando se crea un nuevo reporte.
+
+Los usuarios pueden:
+
+* recibir todas las notificaciones
+
+* recibir solo categorías específicas
+
+* desactivar notificaciones
+
+
+# Sincronización offline
+
+La aplicación permite registrar información incluso sin conexión.
+
+Cuando el dispositivo pierde conexión:
+
+los datos se guardan localmente, cuando vuelve la conexión, el sistema sincroniza automáticamente con Firestore.
+
+# Pruebas del sistema
+
+El sistema fue validado mediante pruebas de aceptación, evaluando:
+
+* registro de usuarios
+
+* validación de formularios
+
+* autenticación
+
+* creación de reportes
+
+* detección de lenguaje ofensivo
+
+* detección de duplicados
+
+* sistema de notificaciones
+
+Todos los casos de prueba obtuvieron resultados satisfactorios.
+
+# Seguridad
+
+El sistema implementa múltiples mecanismos de seguridad:
+
+* autenticación segura con Firebase
+
+* validación de datos en cliente
+
+* reglas de seguridad en Firestore
+
+* detección de lenguaje ofensivo mediante IA
+
+* control de acceso por roles
+
+# Instalación
+
+**1️⃣ Clonar el repositorio**
+```
+git clone https://github.com/tu-usuario/tu-repositorio.git
+```
+**2️⃣ Instalar dependencias**
 
 ```
-createUserWithEmailAndPassword    // registra un nuevo usuario en Firebase Auth
-signInWithEmailAndPassword      // inicia sesión verificando email y contraseña
-signOut                       // cierra la sesión del usuario
+flutter pub get
+```
+**3️⃣ Configurar Firebase**
 
-collection('users').doc(uid).set()    // crea el documento del usuario en Firestore
-collection('users').doc(uid).get()    // obtiene los datos del usuario desde Firestore
-
-
-collection('reports').snapshots()     // escucha en tiempo real todos los reportes
-collection('reports').where('userId')    // filtra reportes por usuario
-collection('reports').where('problemType')  // filtra reportes por tipo de problema
-collection('reports').doc(id).set()     // crea/guarda un reporte nuevo
-collection('reports').doc(id).update()    // actualiza campos del reporte
-collection('reports').doc(id).update({status}) // actualiza solo el estado del reporte
-collection('reports').doc(id).delete()      // elimina el reporte
-
-
-``` 
-
-## Ejecutar el proyecto
-
-1. Clona el proyecto 
-1. instala dependencias dentro del proyecto ` flutter pub get`
-1. verifica configuración de Firebase en ` android/app/google-services.json`
-1. selecciona el dispositivo ` flutter devices`
-1. ejecut el proyecto `flutter run`
-
-## Variables de entorno 
+Agregar el archivo:
+```
+google-services.json
+```
+en:
 
 ```
-{
-  "project_info": {
-    "project_number": "400213109312",
-    "project_id": "",
-    "storage_bucket": "alerta-vecinal-297eb.firebasestorage.app"
-  },
-  "client": [
-    {
-      "client_info": {
-        "mobilesdk_app_id": "",
-        "android_client_info": {
-          "package_name": "com.example.alerta_vecinal"
-        }
-      },
-      "oauth_client": [],
-      "api_key": [
-        {
-          "current_key": ""
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": []
-        }
-      }
-    }
-  ],
-  "configuration_version": "1"
-}
+android/app/
+```
+**4️⃣ Ejecutar la aplicación**
+```
+flutter run
 ```
 
+# Autor
 
+**Harold Joseph Sanchez Nogales**
+
+Desarrollador Flutter
+
+Proyecto académico enfocado en desarrollo Full Stack y sistemas inteligentes para gestión comunitaria.
