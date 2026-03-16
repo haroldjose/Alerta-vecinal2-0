@@ -149,6 +149,89 @@ class AuthService {
     rethrow;
   }
 } 
+<<<<<<< HEAD
+=======
+  // Future<UserModel?> registerUser({
+  //   required String name,
+  //   required String email,
+  //   required String password,
+  //   required UserRole role,
+  //   required String cedula,    // 
+  //   required String username,  // 
+  //   required String celular,   //
+  //   String? cargo,
+  // }) async {
+
+  //   final currentUser = _auth.currentUser;
+
+
+  // try {
+  //   if (role == UserRole.security) {
+  //     await _checkSecurityUserLimit();
+  //   }
+
+  //   final existing = await _firestore
+  //       .collection('users')
+  //       .where('username', isEqualTo: username)
+  //       .limit(1)
+  //       .get();
+
+  //   if (existing.docs.isNotEmpty) {
+  //     throw 'El nombre de usuario ya está en uso';
+  //   }
+
+  //   // segunda instancia para no afectar la sesión actual
+  //   final secondaryApp = await Firebase.initializeApp(
+  //     name: 'secondaryApp',
+  //     options: Firebase.app().options,
+  //   );
+
+  //   final secondaryAuth = FirebaseAuth.instanceFor(app: secondaryApp);
+
+  //   final UserCredential credential = await secondaryAuth
+  //       .createUserWithEmailAndPassword(email: email, password: password);
+
+  //   final User? firebaseUser = credential.user;
+
+  //   if (firebaseUser != null) {
+  //     final userModel = UserModel(
+  //       id: firebaseUser.uid,
+  //       name: name,
+  //       email: email,
+  //       role: role,
+  //       cedula: cedula,
+  //       username: username,
+  //       celular: celular,
+  //       cargo: cargo,
+  //       createdAt: DateTime.now(),
+  //     );
+
+  //     await _firestore
+  //         .collection('users')
+  //         .doc(firebaseUser.uid)
+  //         .set(userModel.toFirestore());
+
+  //     await firebaseUser.updateDisplayName(name);
+
+  //     // Cerrar sesión en la instancia secundaria y eliminarla
+  //     await secondaryAuth.signOut();
+  //     await secondaryApp.delete();
+
+  //     await _notificationService.saveUserToken(firebaseUser.uid);
+
+  //     return userModel;
+  //   } else {
+  //     throw 'No se pudo obtener los datos del usuario creado';
+  //   }
+  // } on FirebaseAuthException catch (e) {
+  //   throw _handleAuthException(e);
+  // } on FirebaseException catch (e) {
+  //   throw 'Error de Firebase: ${e.message}';
+  // } catch (e) {
+  //   rethrow;
+  // }
+  // }
+>>>>>>> 92d7d03074a0ed4fae19711758ac3e99be6224cb
 
    // Verifica que no existan ya 2 usuarios con rol 'security' en Firestore
   Future<void> _checkSecurityUserLimit() async {
