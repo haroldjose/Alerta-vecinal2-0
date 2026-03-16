@@ -149,6 +149,8 @@ class AuthService {
     rethrow;
   }
 } 
+<<<<<<< HEAD
+=======
   // Future<UserModel?> registerUser({
   //   required String name,
   //   required String email,
@@ -229,6 +231,7 @@ class AuthService {
   //   rethrow;
   // }
   // }
+>>>>>>> 92d7d03074a0ed4fae19711758ac3e99be6224cb
 
    // Verifica que no existan ya 2 usuarios con rol 'security' en Firestore
   Future<void> _checkSecurityUserLimit() async {
