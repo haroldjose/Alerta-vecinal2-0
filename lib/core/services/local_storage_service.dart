@@ -4,7 +4,7 @@ import 'package:path_provider/path_provider.dart';
 import '../../models/local_models.dart';
 import '../../models/report_model.dart'; 
 
-/// Servicio para manejar el almacenamiento local con Hive
+// Servicio para manejar el almacenamiento local con Hive
 class LocalStorageService {
   static final LocalStorageService _instance = LocalStorageService._internal();
   factory LocalStorageService() => _instance;
@@ -18,7 +18,7 @@ class LocalStorageService {
 
   bool _initialized = false;
 
-  /// Inicializar Hive y registrar adaptadores
+  // Inicializar Hive y registrar adaptadores
   Future<void> initialize() async {
     if (_initialized) return;
 

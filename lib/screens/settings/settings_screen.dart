@@ -1201,10 +1201,21 @@ Widget _buildActiveUsersList(AppTheme theme) {
                   const NotificationPreferences(),
                 );
             if (mounted) {
+              // Confirmación visual al restablecer la configuración correctamente
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
-                  content: Text('Configuración restablecida'),
+                  content: Row(
+                    children: [
+                      Icon(Icons.check_circle_outline, color: Colors.white),
+                      SizedBox(width: 8),
+                      Expanded(child: Text('Configuración restablecida correctamente')),
+                    ],
+                  ),
                   backgroundColor: AppColors.success,
+                  behavior: SnackBarBehavior.floating,
+                  margin: EdgeInsets.all(16),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(8))),
+                  duration: Duration(seconds: 3),
                 ),
               );
             }

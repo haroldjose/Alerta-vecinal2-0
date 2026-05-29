@@ -30,6 +30,7 @@ dependencies:
   
   # Image & Location
   image_picker: ^1.1.2
+  flutter_image_compress: ^2.3.0
   
   # Location & Maps
   geolocator: ^14.0.2

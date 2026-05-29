@@ -67,7 +67,7 @@ class SyncService {
     }
   }
 
-  /// Suscribirse a cambios en Firebase
+  // Suscribirse a cambios en Firebase
   void _subscribeToFirebaseChanges() {
     
     if (!_connectivity.hasConnection) {
@@ -164,7 +164,7 @@ class SyncService {
     }
   }
 
-  /// Ejecutar una operación pendiente
+  // Ejecutar una operación pendiente
   Future<void> _executePendingOperation(PendingOperation operation) async {
     switch (operation.type) {
       case 'create':

@@ -23,7 +23,7 @@ void main() async {
   // 1. Inicializar Firebase
   await Firebase.initializeApp();
 
-  // Configurar Firestore para modo offline (reducir warnings)
+  // Configurar Firestore para modo offline 
   FirebaseFirestore.instance.settings = const Settings(
     persistenceEnabled: true, 
     cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED,

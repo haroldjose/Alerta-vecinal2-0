@@ -387,13 +387,43 @@ class _EditReportScreenState extends ConsumerState<EditReportScreen> {
           _newImage = imageFile;
           _imageRemoved = false;
         });
+        // Confirmación visual al seleccionar imagen correctamente
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Row(
+                children: [
+                  Icon(Icons.check_circle_outline, color: Colors.white),
+                  SizedBox(width: 8),
+                  Expanded(child: Text('Imagen seleccionada correctamente')),
+                ],
+              ),
+              backgroundColor: AppColors.success,
+              behavior: SnackBarBehavior.floating,
+              margin: EdgeInsets.all(16),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(8))),
+              duration: Duration(seconds: 2),
+            ),
+          );
+        }
       }
     } catch (e) {
       if (mounted) {
+        // Mensaje de error al fallar la selección de imagen
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error al seleccionar imagen: $e'),
+            content: Row(
+              children: [
+                const Icon(Icons.error_outline, color: Colors.white),
+                const SizedBox(width: 8),
+                Expanded(child: Text('Error al seleccionar imagen: $e')),
+              ],
+            ),
             backgroundColor: AppColors.error,
+            behavior: SnackBarBehavior.floating,
+            margin: const EdgeInsets.all(16),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            duration: const Duration(seconds: 4),
           ),
         );
       }
@@ -417,19 +447,41 @@ class _EditReportScreenState extends ConsumerState<EditReportScreen> {
       });
       
       if (mounted) {
+        // Confirmación visual al actualizar ubicación correctamente
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Ubicación actualizada correctamente'),
+            content: Row(
+              children: [
+                Icon(Icons.check_circle_outline, color: Colors.white),
+                SizedBox(width: 8),
+                Expanded(child: Text('Ubicación actualizada correctamente')),
+              ],
+            ),
             backgroundColor: AppColors.success,
+            behavior: SnackBarBehavior.floating,
+            margin: EdgeInsets.all(16),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(8))),
+            duration: Duration(seconds: 2),
           ),
         );
       }
     } catch (e) {
       if (mounted) {
+        // Mensaje de error al fallar la obtención de ubicación
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error al obtener ubicación: $e'),
+            content: Row(
+              children: [
+                const Icon(Icons.error_outline, color: Colors.white),
+                const SizedBox(width: 8),
+                Expanded(child: Text('Error al obtener ubicación: $e')),
+              ],
+            ),
             backgroundColor: AppColors.error,
+            behavior: SnackBarBehavior.floating,
+            margin: const EdgeInsets.all(16),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            duration: const Duration(seconds: 4),
           ),
         );
       }
@@ -440,7 +492,7 @@ class _EditReportScreenState extends ConsumerState<EditReportScreen> {
     }
   }
 
- // 
+ //
   Future<void> _updateReport() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -532,23 +584,45 @@ class _EditReportScreenState extends ConsumerState<EditReportScreen> {
         next.when(
           data: (_) {
             if (mounted) {
+              // Confirmación visual al guardar cambios correctamente
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
-                  content: Text('Reporte actualizado exitosamente'),
+                  content: Row(
+                    children: [
+                      Icon(Icons.check_circle_outline, color: Colors.white),
+                      SizedBox(width: 8),
+                      Expanded(child: Text('Reporte actualizado exitosamente')),
+                    ],
+                  ),
                   backgroundColor: AppColors.success,
+                  behavior: SnackBarBehavior.floating,
+                  margin: EdgeInsets.all(16),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(8))),
+                  duration: Duration(seconds: 3),
                 ),
               );
-              
+
               Navigator.pop(context, true);
             }
           },
-          loading: () {}, 
+          loading: () {},
           error: (error, stack) {
             if (mounted) {
+              // Mensaje de error al fallar la actualización del reporte
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text('Error: $error'),
+                  content: Row(
+                    children: [
+                      const Icon(Icons.error_outline, color: Colors.white),
+                      const SizedBox(width: 8),
+                      Expanded(child: Text('Error: $error')),
+                    ],
+                  ),
                   backgroundColor: AppColors.error,
+                  behavior: SnackBarBehavior.floating,
+                  margin: const EdgeInsets.all(16),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  duration: const Duration(seconds: 4),
                 ),
               );
             }

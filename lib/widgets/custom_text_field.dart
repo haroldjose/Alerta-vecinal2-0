@@ -10,7 +10,8 @@ class CustomTextField extends StatefulWidget {
   final String? errorText;
   final TextInputType keyboardType;
   final bool enabled;
-  final List<TextInputFormatter>? inputFormatters; //
+  final List<TextInputFormatter>? inputFormatters;
+  final bool showPasswordToggle;
 
   const CustomTextField({
     super.key,
@@ -21,7 +22,8 @@ class CustomTextField extends StatefulWidget {
     this.errorText,
     this.keyboardType = TextInputType.text,
     this.enabled = true,
-     this.inputFormatters,
+    this.inputFormatters,
+    this.showPasswordToggle = false,
   });
 
   @override
@@ -30,6 +32,13 @@ class CustomTextField extends StatefulWidget {
 
 class _CustomTextFieldState extends State<CustomTextField> {
   bool _isFocused = false;
+  bool _isObscured = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _isObscured = widget.obscureText;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -49,16 +58,17 @@ class _CustomTextFieldState extends State<CustomTextField> {
               ),
             ),
           ),
-        
+
         // Campo de texto
         Container(
           width: 335,
           height: 48,
           decoration: BoxDecoration(
             border: Border.all(
-              color: widget.errorText != null && widget.errorText!.isNotEmpty
-                  ? AppColors.error
-                  : _isFocused
+              color:
+                  widget.errorText != null && widget.errorText!.isNotEmpty
+                      ? AppColors.error
+                      : _isFocused
                       ? AppColors.primary
                       : AppColors.border,
               width: 1.5,
@@ -74,7 +84,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
             },
             child: TextFormField(
               controller: widget.controller,
-              obscureText: widget.obscureText,
+              obscureText: _isObscured,
               keyboardType: widget.keyboardType,
               enabled: widget.enabled,
               inputFormatters: widget.inputFormatters, //
@@ -84,6 +94,23 @@ class _CustomTextFieldState extends State<CustomTextField> {
                   color: AppColors.textSecondary,
                   fontSize: 14,
                 ),
+                suffixIcon:
+                    widget.showPasswordToggle
+                        ? IconButton(
+                          icon: Icon(
+                            _isObscured
+                                ? Icons.visibility_off
+                                : Icons.visibility,
+                            color: AppColors.textSecondary,
+                            size: 20,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _isObscured = !_isObscured;
+                            });
+                          },
+                        )
+                        : null,
                 border: InputBorder.none,
                 contentPadding: const EdgeInsets.symmetric(
                   horizontal: 16,

@@ -112,13 +112,10 @@ class ReportCard extends ConsumerWidget {
                   Expanded(
                     child: Row(
                       children: [
-                        if (report.imageUrl != null) ...[
-                          _ReportImageThumbnail(
-                            reportId: report.id,
-                            imageUrl: report.imageUrl!,
-                          ),
-                          const SizedBox(width: 12),
-                        ],
+                        _ReportImageThumbnail(
+                          reportId: report.id,
+                          imageUrl: report.imageUrl,
+                        ),
                         
                         // Nombre del usuario
                         Expanded(
@@ -207,10 +204,13 @@ class ReportCard extends ConsumerWidget {
   }
 }
 
-//Widget para manejar imágenes en modo offline
+// Widget que muestra la imagen del reporte:
+// 1. Si hay imagen local en disco → la muestra de inmediato
+// 2. Si hay imageUrl de Firebase → la carga de red
+// 3. Si no hay ninguna → no muestra nada
 class _ReportImageThumbnail extends StatelessWidget {
   final String reportId;
-  final String imageUrl;
+  final String? imageUrl;
 
   const _ReportImageThumbnail({
     required this.reportId,
@@ -221,28 +221,45 @@ class _ReportImageThumbnail extends StatelessWidget {
   Widget build(BuildContext context) {
     final localStorage = LocalStorageService();
     final localReport = localStorage.getReport(reportId);
-    
+
+    // Prioridad 1: imagen local en disco (disponible inmediatamente tras crear)
     if (localReport?.localImagePath != null) {
       final localFile = File(localReport!.localImagePath!);
-      
-      return ClipRRect(
-        borderRadius: BorderRadius.circular(6),
-        child: Image.file(
-          localFile,
-          width: 40,
-          height: 40,
-          fit: BoxFit.cover,
-          errorBuilder: (context, error, stackTrace) {
-            return _buildPlaceholder();
-          },
-        ),
+      if (localFile.existsSync()) {
+        return Padding(
+          padding: const EdgeInsets.only(right: 12),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(6),
+            child: Image.file(
+              localFile,
+              width: 40,
+              height: 40,
+              fit: BoxFit.cover,
+              errorBuilder: (_, __, ___) =>
+                  imageUrl != null ? _buildNetworkImage() : const SizedBox.shrink(),
+            ),
+          ),
+        );
+      }
+    }
+
+    // Prioridad 2: imagen en Firebase Storage
+    if (imageUrl != null) {
+      return Padding(
+        padding: const EdgeInsets.only(right: 12),
+        child: _buildNetworkImage(),
       );
     }
-    
+
+    // Sin imagen
+    return const SizedBox.shrink();
+  }
+
+  Widget _buildNetworkImage() {
     return ClipRRect(
       borderRadius: BorderRadius.circular(6),
       child: Image.network(
-        imageUrl,
+        imageUrl!,
         width: 40,
         height: 40,
         fit: BoxFit.cover,
@@ -250,9 +267,7 @@ class _ReportImageThumbnail extends StatelessWidget {
           if (loadingProgress == null) return child;
           return _buildPlaceholder();
         },
-        errorBuilder: (context, error, stackTrace) {
-          return _buildPlaceholder();
-        },
+        errorBuilder: (_, __, ___) => _buildPlaceholder(),
       ),
     );
   }
@@ -273,5 +288,4 @@ class _ReportImageThumbnail extends StatelessWidget {
     );
   }
 }
-
 

@@ -156,7 +156,7 @@ class UserModel {
       createdAt: (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
       notificationPreferences: NotificationPreferences.fromMap(
         data['notificationPreferences'] as Map<String, dynamic>?,
-        ),  //
+        ),  
     );
   }
 

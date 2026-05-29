@@ -78,7 +78,7 @@ class _CustomDrawerState extends ConsumerState<CustomDrawer> {
             final fileSize = await imageFile.length();
 
             if (fileSize > 0) {
-              // Subir imagen usando el provider
+              // Subir imagen usando el provider 
               await ref
                   .read(profileImageProvider.notifier)
                   .uploadProfileImage(imageFile, user.id);
@@ -86,10 +86,21 @@ class _CustomDrawerState extends ConsumerState<CustomDrawer> {
               ref.invalidate(currentUserProvider);
 
               if (mounted) {
+                // Confirmación visual al actualizar la foto de perfil correctamente
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
-                    content: Text('Imagen actualizada correctamente'),
+                    content: Row(
+                      children: [
+                        Icon(Icons.check_circle_outline, color: Colors.white),
+                        SizedBox(width: 8),
+                        Expanded(child: Text('Imagen de perfil actualizada correctamente')),
+                      ],
+                    ),
                     backgroundColor: AppColors.success,
+                    behavior: SnackBarBehavior.floating,
+                    margin: EdgeInsets.all(16),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(8))),
+                    duration: Duration(seconds: 3),
                   ),
                 );
               }
@@ -99,11 +110,7 @@ class _CustomDrawerState extends ConsumerState<CustomDrawer> {
           } else {
             throw 'No se pudo acceder al archivo seleccionado';
           }
-        } else {
-          'No se seleccionó ninguna imagen del picker';
         }
-      } else {
-        'No se seleccionó ninguna fuente';
       }
     } catch (e, stackTrace) {
       'Error en _changeProfileImage: $e, StackTrace: $stackTrace';
@@ -121,10 +128,21 @@ class _CustomDrawerState extends ConsumerState<CustomDrawer> {
           errorMessage = 'Error: $e';
         }
 
+        // Mensaje de error al fallar la actualización de foto de perfil
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(errorMessage),
+            content: Row(
+              children: [
+                const Icon(Icons.error_outline, color: Colors.white),
+                const SizedBox(width: 8),
+                Expanded(child: Text(errorMessage)),
+              ],
+            ),
             backgroundColor: AppColors.error,
+            behavior: SnackBarBehavior.floating,
+            margin: const EdgeInsets.all(16),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            duration: const Duration(seconds: 4),
           ),
         );
       }
