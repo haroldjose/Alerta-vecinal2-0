@@ -10,6 +10,8 @@ import '../../providers/settings_provider.dart';
 import '../../providers/active_users_provider.dart';
 import '../../models/user_model.dart';
 
+import 'image_benchmark_screen.dart';
+
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
 
@@ -110,6 +112,32 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   _buildActiveUsersList(currentTheme),
                   const SizedBox(height: 24),
                 ],
+                   
+                  //seccion prueba de rendimiento solo para administrador 
+                 if (user.role == UserRole.admin) ...[
+                  _buildSectionTitle('Pruebas de rendimiento'),
+                  Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 16),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: ListTile(
+                      leading: const Icon(Icons.speed),
+                      title: const Text('Prueba de carga de imágenes'),
+                      subtitle: const Text('Con y sin compresión'),
+                      trailing: const Icon(Icons.chevron_right),
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const ImageBenchmarkScreen(),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                ],
+
 
                 _buildSectionTitle('Información'),
                 _buildInfoSection(user, currentTheme),

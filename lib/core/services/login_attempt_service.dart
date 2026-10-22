@@ -1,5 +1,5 @@
 import 'package:shared_preferences/shared_preferences.dart';
-
+//control de intentos fallidos al inicio de sesion y bloquea la cuenta temporalmente
 class LoginAttemptService {
   static const String _keyFailedAttempts = 'login_failed_attempts';
   static const String _keyLockoutUntil = 'login_lockout_until';

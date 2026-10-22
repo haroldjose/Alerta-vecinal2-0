@@ -11,7 +11,7 @@ class ImageService {
   final ImagePicker _picker = ImagePicker();
 
   // Comprime la imagen con flutter_image_compress antes de subir a Firebase Storage.
-  Future<File> _compressForUpload(
+  Future<File> compressForUpload(
     File imageFile, {
     int minWidth = 1024,
     int minHeight = 1024,
@@ -62,15 +62,20 @@ class ImageService {
   // Subir imagen de perfil a Firebase Storage.
   Future<String?> uploadProfileImage(File imageFile, String userId) async {
     try {
+      
+
       // Segunda pasada de compresión para optimizar tamaño antes de subir
-      final compressedFile = await _compressForUpload(
+      final compressedFile = await compressForUpload(
         imageFile,
         minWidth: 800,
         minHeight: 800,
         quality: 85,
       );
 
+      
+
       final ref = _storage.ref().child('profile_images/$userId');
+
 
       final uploadTask = ref.putFile(compressedFile);
       final snapshot = await uploadTask;
@@ -93,22 +98,42 @@ class ImageService {
       if (user == null) {
         throw 'Usuario no autenticado';
       }
+      final totalSw = Stopwatch()..start();
+      final originalBytes = await imageFile.length();
+
+      final compressSw = Stopwatch()..start();
 
       // Segunda pasada de compresión para optimizar tamaño antes de subir
-      final compressedFile = await _compressForUpload(
+      final compressedFile = await compressForUpload(
         imageFile,
         minWidth: 1024,
         minHeight: 1024,
         quality: 80,
       );
 
+       compressSw.stop();
+       final compressedBytes = await compressedFile.length();
+
       final ref = _storage.ref().child('reports/$reportId');
+
+      final uploadSw = Stopwatch()..start();
 
       final uploadTask = ref.putFile(compressedFile);
       final snapshot = await uploadTask;
 
       if (snapshot.state == TaskState.success) {
         final downloadUrl = await ref.getDownloadURL();
+        uploadSw.stop();
+        totalSw.stop();
+        debugPrint(
+          '[ImageService] reports/$reportId | '
+          'entrada: ${(originalBytes / 1024).toStringAsFixed(1)} KB -> '
+          'subida: ${(compressedBytes / 1024).toStringAsFixed(1)} KB | '
+          'compresión: ${compressSw.elapsedMilliseconds} ms | '
+          'subida: ${uploadSw.elapsedMilliseconds} ms | '
+          'total: ${totalSw.elapsedMilliseconds} ms',
+        );
+
         return downloadUrl;
       }
     } catch (e) {
