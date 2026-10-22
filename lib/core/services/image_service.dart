@@ -1,14 +1,46 @@
 import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:path_provider/path_provider.dart';
 
 class ImageService {
   final FirebaseStorage _storage = FirebaseStorage.instance;
   final ImagePicker _picker = ImagePicker();
 
-  // Seleccionar imagen desde galería o cámara
+  // Comprime la imagen con flutter_image_compress antes de subir a Firebase Storage.
+  Future<File> compressForUpload(
+    File imageFile, {
+    int minWidth = 1024,
+    int minHeight = 1024,
+    int quality = 85,
+  }) async {
+    try {
+      final tempDir = await getTemporaryDirectory();
+      final timestamp = DateTime.now().millisecondsSinceEpoch;
+      final targetPath = '${tempDir.path}/compressed_$timestamp.jpg';
+
+      final XFile? result = await FlutterImageCompress.compressAndGetFile(
+        imageFile.absolute.path,
+        targetPath,
+        minWidth: minWidth,
+        minHeight: minHeight,
+        quality: quality,
+        format: CompressFormat.jpeg,
+        keepExif: false,
+      );
+
+      // Si la compresión falla, retorna el archivo original
+      return result != null ? File(result.path) : imageFile;
+    } catch (_) {
+      // En caso de error inesperado, sube sin compresión adicional
+      return imageFile;
+    }
+  }
+
+  // Seleccionar imagen desde galería o cámara (con compresión inicial de ImagePicker)
   Future<File?> pickImage({ImageSource source = ImageSource.gallery}) async {
     try {
       final XFile? image = await _picker.pickImage(
@@ -27,15 +59,27 @@ class ImageService {
     return null;
   }
 
-  // Subir imagen de perfil a Firebase Storage
+  // Subir imagen de perfil a Firebase Storage.
   Future<String?> uploadProfileImage(File imageFile, String userId) async {
     try {
-      //
+      
+
+      // Segunda pasada de compresión para optimizar tamaño antes de subir
+      final compressedFile = await compressForUpload(
+        imageFile,
+        minWidth: 800,
+        minHeight: 800,
+        quality: 85,
+      );
+
+      
+
       final ref = _storage.ref().child('profile_images/$userId');
-      
-      final uploadTask = ref.putFile(imageFile);
+
+
+      final uploadTask = ref.putFile(compressedFile);
       final snapshot = await uploadTask;
-      
+
       if (snapshot.state == TaskState.success) {
         final downloadUrl = await ref.getDownloadURL();
         return downloadUrl;
@@ -46,22 +90,50 @@ class ImageService {
     return null;
   }
 
-  // Subir imagen de reporte a Firebase Storage
+
+  // Aplica compresión adicional con flutter_image_compress antes de la subida.
   Future<String?> uploadReportImage(File imageFile, String reportId) async {
     try {
       final user = FirebaseAuth.instance.currentUser;
       if (user == null) {
         throw 'Usuario no autenticado';
       }
-      
-      //
+      final totalSw = Stopwatch()..start();
+      final originalBytes = await imageFile.length();
+
+      final compressSw = Stopwatch()..start();
+
+      // Segunda pasada de compresión para optimizar tamaño antes de subir
+      final compressedFile = await compressForUpload(
+        imageFile,
+        minWidth: 1024,
+        minHeight: 1024,
+        quality: 80,
+      );
+
+       compressSw.stop();
+       final compressedBytes = await compressedFile.length();
+
       final ref = _storage.ref().child('reports/$reportId');
-      
-      final uploadTask = ref.putFile(imageFile);
+
+      final uploadSw = Stopwatch()..start();
+
+      final uploadTask = ref.putFile(compressedFile);
       final snapshot = await uploadTask;
-      
+
       if (snapshot.state == TaskState.success) {
         final downloadUrl = await ref.getDownloadURL();
+        uploadSw.stop();
+        totalSw.stop();
+        debugPrint(
+          '[ImageService] reports/$reportId | '
+          'entrada: ${(originalBytes / 1024).toStringAsFixed(1)} KB -> '
+          'subida: ${(compressedBytes / 1024).toStringAsFixed(1)} KB | '
+          'compresión: ${compressSw.elapsedMilliseconds} ms | '
+          'subida: ${uploadSw.elapsedMilliseconds} ms | '
+          'total: ${totalSw.elapsedMilliseconds} ms',
+        );
+
         return downloadUrl;
       }
     } catch (e) {
@@ -72,7 +144,6 @@ class ImageService {
 
   Future<void> deleteProfileImage(String userId) async {
     try {
-      //
       final ref = _storage.ref().child('profile_images/$userId');
       await ref.delete();
     } catch (e) {
@@ -117,4 +188,3 @@ class ImageService {
     return null;
   }
 }
-

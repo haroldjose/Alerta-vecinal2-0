@@ -99,7 +99,7 @@ class AiSuggestionService {
     required String title,
     required String description,
   }) async {
-    // No llamar si no hay suficiente texto
+    
     final combinedLength = title.trim().length + description.trim().length;
     if (combinedLength < 5) return null;
 
@@ -145,8 +145,7 @@ class AiSuggestionService {
       return const OffensiveContentResult.clean();
     }
 
-     // LOG DIAGNÓSTICO
-    print('[checkOffensive] ▶ Llamando a Cloud Function...');
+    print('[checkOffensive] Llamando a Cloud Function...');
     print('[checkOffensive]   URL: $_offensiveFunctionUrl');
     print('[checkOffensive]   title="$title"');
     print('[checkOffensive]   description="$description"');
@@ -160,9 +159,9 @@ class AiSuggestionService {
           )
           .timeout(const Duration(seconds: 30));
 
-          // LOG DIAGNÓSTICO
-      print('[checkOffensive] ◀ statusCode: ${response.statusCode}');
-      print('[checkOffensive] ◀ body: ${response.body}');
+          
+      print('[checkOffensive] statusCode: ${response.statusCode}');
+      print('[checkOffensive] body: ${response.body}');
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body) as Map<String, dynamic>;
@@ -203,7 +202,7 @@ class AiSuggestionService {
       return const DuplicateCheckResult.noDuplicate();
     }
 
-    print('[checkDuplicate] ▶ Verificando duplicados...');
+    print('[checkDuplicate] Verificando duplicados...');
     print('[checkDuplicate]   Título: "$title"');
 
     try {
@@ -231,8 +230,8 @@ class AiSuggestionService {
           )
           .timeout(const Duration(seconds: 50));
 
-      print('[checkDuplicate] ◀ Status: ${response.statusCode}');
-      print('[checkDuplicate] ◀ Body: ${response.body}');
+      print('[checkDuplicate] Status: ${response.statusCode}');
+      print('[checkDuplicate] Body: ${response.body}');
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body) as Map<String, dynamic>;

@@ -10,6 +10,8 @@ import '../../providers/auth_provider.dart';
 import '../home/home_screen.dart';
 import '../security/security_home_screen.dart';
 
+import '../../core/services/login_attempt_service.dart';
+
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
 
@@ -25,6 +27,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   String? _usernameError; //
   String? _passwordError;
   bool _isLoading = false;
+  int _failedAttempts = 0; // contador de intentos fallidos
+  DateTime? _lockoutUntil;
+  final _attemptService = LoginAttemptService(); // servicio para manejar intentos de login
 
   @override
   void initState() {
@@ -33,6 +38,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     // Agrega validación en tiempo real
     _usernameController.addListener(_onFieldChanged); //
     _passwordController.addListener(_onFieldChanged);
+    _loadAttemptState();
   }
 
   @override
@@ -74,7 +80,31 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     return hasRequiredFields && hasNoErrors;
   }
 
+  bool get _isLockedOut {
+    if (_lockoutUntil == null) return false;
+    return DateTime.now().isBefore(_lockoutUntil!);
+  }
+
+  String get _lockoutMessage {
+    if (_lockoutUntil == null) return '';
+    final remaining = _lockoutUntil!.difference(DateTime.now());
+    final minutes = remaining.inMinutes + 1; // redondea hacia arriba
+    return 'Demasiados intentos fallidos. Intenta nuevamente en $minutes minuto(s).';
+  }
+
+  Future<void> _loadAttemptState() async {
+  _failedAttempts = await _attemptService.getFailedAttempts();
+  _lockoutUntil = await _attemptService.getLockoutUntil();
+  if (mounted) setState(() {});
+}
+
   Future<void> _signIn() async {
+
+   if (_isLockedOut) {
+      _showErrorMessage(_lockoutMessage);
+      return;
+    }
+
     _validateForSubmission();
     
     if (!_isFormValid) {
@@ -88,7 +118,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
     try {
       final authService = ref.read(authServiceProvider);
-      
       //el servicio buscará el email asociado a el username en Firestore y luego autenticará con Firebase Auth
       final user = await authService.signInWithUsername(
         username: _usernameController.text.trim(),
@@ -96,6 +125,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       );
 
       if (user != null && mounted) {
+        _failedAttempts = 0; // resetea el contador de intentos fallidos
+        _lockoutUntil = null; // resetea el bloqueo
+        await _attemptService.reset();  
         _showSuccessMessage('¡Bienvenido de nuevo, ${user.name}!');
         
         await Future.delayed(const Duration(milliseconds: 1000));
@@ -108,12 +140,32 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       }
     } on UsernameNotFoundException { //
       if (mounted) {
-        _showErrorMessage('El nombre de usuario no existe. Verifica e intenta nuevamente.');
-      }
+    _failedAttempts++;
+    await _attemptService.setFailedAttempts(_failedAttempts);
+    if (_failedAttempts >= 5) {
+      _lockoutUntil = DateTime.now().add(const Duration(minutes: 5));
+      _failedAttempts = 0;
+      await _attemptService.setLockoutUntil(_lockoutUntil);  // <-- agregar
+await _attemptService.setFailedAttempts(0);
+      _showErrorMessage('Demasiados intentos fallidos. Cuenta bloqueada por 5 minutos.');
+    } else {
+      _showErrorMessage('El nombre de usuario no existe. Intento $_failedAttempts de 5.');
+    }
+  }
     } on WrongPasswordException {   //
       if (mounted) {
-        _showErrorMessage('Contraseña incorrecta. Intenta nuevamente.');
-      }
+    _failedAttempts++;
+    await _attemptService.setFailedAttempts(_failedAttempts);
+    if (_failedAttempts >= 5) {
+      _lockoutUntil = DateTime.now().add(const Duration(minutes: 5));
+      _failedAttempts = 0;
+      await _attemptService.setLockoutUntil(_lockoutUntil);  // <-- agregar
+await _attemptService.setFailedAttempts(0);
+      _showErrorMessage('Demasiados intentos fallidos. Cuenta bloqueada por 5 minutos.');
+    } else {
+      _showErrorMessage('Contraseña incorrecta. Intento $_failedAttempts de 5.');
+    }
+  }
     } catch (e) {
       if (mounted) {
         _showErrorMessage('Usuario no valido, Intenta nuevamente ');
@@ -194,137 +246,108 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Text(
-                'Alerta Vecinal',
-                style: TextStyle(
-                  color: AppColors.primary,
-                  fontSize: 32,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              
-              const SizedBox(height: 8),
-              
-              const Text(
-                'Conectando con los vecinos',
-                style: TextStyle(
-                  color: AppColors.textSecondary,
-                  fontSize: 16,
-                ),
-              ),
-              
-              const SizedBox(height: 60),
-              
-              // Título del formulario
-              const Text(
-                'Iniciar Sesión',
-                style: TextStyle(
-                  color: AppColors.primary,
-                  fontSize: 24,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              
-              const SizedBox(height: 40),
-              
-              // Formulario
-              Form(
-                key: _formKey,
-                child: Column(
-                  children: [
-                    
-                    CustomTextField(
-                      hintText: 'Nombre de usuario', //
-                      controller: _usernameController,
-                      keyboardType: TextInputType.emailAddress,
-                      errorText: _usernameError,
+        child: SingleChildScrollView(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              minHeight: MediaQuery.of(context).size.height -
+                  MediaQuery.of(context).padding.top -
+                  MediaQuery.of(context).padding.bottom,
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text(
+                    'Alerta Vecinal',
+                    style: TextStyle(
+                      color: AppColors.primary,
+                      fontSize: 32,
+                      fontWeight: FontWeight.bold,
                     ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 6, left: 4),
-                      child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          'Ej: Juan12  (primer nombre + 2 dígitos de cédula)',
-                          style: TextStyle(
-                            color: AppColors.textSecondary,
-                            fontSize: 11,
+                  ),
+                  
+                  const SizedBox(height: 8),
+                  
+                  const Text(
+                    'Conectando con los vecinos',
+                    style: TextStyle(
+                      color: AppColors.textSecondary,
+                      fontSize: 16,
+                    ),
+                  ),
+                  
+                  const SizedBox(height: 60),
+                  
+                  // Título del formulario
+                  const Text(
+                    'Iniciar Sesión',
+                    style: TextStyle(
+                      color: AppColors.primary,
+                      fontSize: 24,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  
+                  const SizedBox(height: 40),
+                  
+                  // Formulario
+                  Form(
+                    key: _formKey,
+                    child: Column(
+                      children: [
+                        
+                        CustomTextField(
+                          hintText: 'Nombre de usuario',
+                          controller: _usernameController,
+                          keyboardType: TextInputType.emailAddress,
+                          errorText: _usernameError,
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 6, left: 4),
+                          child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              'Ej: Juan12  (primer nombre + 2 dígitos de cédula)',
+                              style: TextStyle(
+                                color: AppColors.textSecondary,
+                                fontSize: 11,
+                              ),
+                            ),
                           ),
                         ),
-                      ),
+                        
+                        const SizedBox(height: 24),
+                        
+                        // Campo Contraseña
+                        CustomTextField(
+                          hintText: 'Contraseña',
+                          controller: _passwordController,
+                          obscureText: true,
+                          showPasswordToggle: true,
+                          errorText: _passwordError,
+                        ),
+                        
+                        const SizedBox(height: 40),
+                        
+                        // Botón Iniciar Sesión
+                        CustomButton(
+                          text: 'Iniciar Sesión',
+                          onPressed: _isFormValid ? _signIn : null,
+                          isLoading: _isLoading,
+                        ),
+                        
+                        const SizedBox(height: 24),
+                      ],
                     ),
-                    
-                    const SizedBox(height: 24),
-                    
-                    // Campo Contraseña
-                    CustomTextField(
-                      hintText: 'Contraseña',
-                      controller: _passwordController,
-                      obscureText: true,
-                      errorText: _passwordError,
-                    ),
-                    
-                    const SizedBox(height: 40),
-                    
-                    
-                    // Botón Iniciar Sesión
-                    CustomButton(
-                      text: 'Iniciar Sesión',
-                      onPressed: _isFormValid ? _signIn : null,
-                      isLoading: _isLoading,
-                    ),
-                    
-                    const SizedBox(height: 24),
-                    
-                    // Enlace de registro
-                    // Row(
-                    //   mainAxisAlignment: MainAxisAlignment.center,
-                    //   children: [
-                    //     const Text(
-                    //       '¿No tienes cuenta? ',
-                    //       style: TextStyle(
-                    //         color: AppColors.textSecondary,
-                    //         fontSize: 14,
-                    //       ),
-                    //     ),
-                    //     GestureDetector(
-                    //       onTap: () {
-                    //         Navigator.push(
-                    //           context,
-                    //           MaterialPageRoute(
-                    //             builder: (context) => const RegisterScreen(),
-                    //           ),
-                    //         );
-                    //       },
-                    //       child: const Text(
-                    //         'Registrarse',
-                    //         style: TextStyle(
-                    //           color: AppColors.primary,
-                    //           fontSize: 14,
-                    //           fontWeight: FontWeight.w600,
-                    //         ),
-                    //       ),
-                    //     ),
-                    //   ],
-                    // ),
-                    
-                    const SizedBox(height: 24),
-                    
-                  ],
-                ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
         ),
       ),
     );
   }
 }
-
-
-
 

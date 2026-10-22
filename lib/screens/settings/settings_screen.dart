@@ -10,6 +10,8 @@ import '../../providers/settings_provider.dart';
 import '../../providers/active_users_provider.dart';
 import '../../models/user_model.dart';
 
+import 'image_benchmark_screen.dart';
+
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
 
@@ -110,6 +112,32 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   _buildActiveUsersList(currentTheme),
                   const SizedBox(height: 24),
                 ],
+                   
+                  //seccion prueba de rendimiento solo para administrador 
+                 if (user.role == UserRole.admin) ...[
+                  _buildSectionTitle('Pruebas de rendimiento'),
+                  Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 16),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: ListTile(
+                      leading: const Icon(Icons.speed),
+                      title: const Text('Prueba de carga de imágenes'),
+                      subtitle: const Text('Con y sin compresión'),
+                      trailing: const Icon(Icons.chevron_right),
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const ImageBenchmarkScreen(),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                ],
+
 
                 _buildSectionTitle('Información'),
                 _buildInfoSection(user, currentTheme),
@@ -1201,10 +1229,21 @@ Widget _buildActiveUsersList(AppTheme theme) {
                   const NotificationPreferences(),
                 );
             if (mounted) {
+              // Confirmación visual al restablecer la configuración correctamente
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
-                  content: Text('Configuración restablecida'),
+                  content: Row(
+                    children: [
+                      Icon(Icons.check_circle_outline, color: Colors.white),
+                      SizedBox(width: 8),
+                      Expanded(child: Text('Configuración restablecida correctamente')),
+                    ],
+                  ),
                   backgroundColor: AppColors.success,
+                  behavior: SnackBarBehavior.floating,
+                  margin: EdgeInsets.all(16),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(8))),
+                  duration: Duration(seconds: 3),
                 ),
               );
             }

@@ -51,10 +51,21 @@ class _ReportDetailScreenState extends ConsumerState<ReportDetailScreen> {
       }
       
       if (mounted) {
+        // Confirmación visual al actualizar el estado correctamente
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Estado actualizado correctamente'),
+            content: Row(
+              children: [
+                Icon(Icons.check_circle_outline, color: Colors.white),
+                SizedBox(width: 8),
+                Expanded(child: Text('Estado actualizado correctamente')),
+              ],
+            ),
             backgroundColor: AppColors.success,
+            behavior: SnackBarBehavior.floating,
+            margin: EdgeInsets.all(16),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(8))),
+            duration: Duration(seconds: 3),
           ),
         );
         Navigator.pop(context, true);
@@ -64,10 +75,21 @@ class _ReportDetailScreenState extends ConsumerState<ReportDetailScreen> {
         setState(() {
           _isUpdatingStatus = false;
         });
+        // Mensaje de error al fallar la actualización del estado
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error: $e'),
+            content: Row(
+              children: [
+                const Icon(Icons.error_outline, color: Colors.white),
+                const SizedBox(width: 8),
+                Expanded(child: Text('Error: $e')),
+              ],
+            ),
             backgroundColor: AppColors.error,
+            behavior: SnackBarBehavior.floating,
+            margin: const EdgeInsets.all(16),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            duration: const Duration(seconds: 4),
           ),
         );
       }
@@ -111,10 +133,21 @@ class _ReportDetailScreenState extends ConsumerState<ReportDetailScreen> {
         }
         
         if (mounted) {
+          // Confirmación visual al eliminar el reporte correctamente
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('Reporte eliminado correctamente'),
+              content: Row(
+                children: [
+                  Icon(Icons.check_circle_outline, color: Colors.white),
+                  SizedBox(width: 8),
+                  Expanded(child: Text('Reporte eliminado correctamente')),
+                ],
+              ),
               backgroundColor: AppColors.success,
+              behavior: SnackBarBehavior.floating,
+              margin: EdgeInsets.all(16),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(8))),
+              duration: Duration(seconds: 3),
             ),
           );
           Navigator.pop(context, true);
@@ -124,10 +157,21 @@ class _ReportDetailScreenState extends ConsumerState<ReportDetailScreen> {
           setState(() {
             _isDeletingReport = false;
           });
+          // Mensaje de error al fallar la eliminación del reporte
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Error: $e'),
+              content: Row(
+                children: [
+                  const Icon(Icons.error_outline, color: Colors.white),
+                  const SizedBox(width: 8),
+                  Expanded(child: Text('Error: $e')),
+                ],
+              ),
               backgroundColor: AppColors.error,
+              behavior: SnackBarBehavior.floating,
+              margin: const EdgeInsets.all(16),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              duration: const Duration(seconds: 4),
             ),
           );
         }
@@ -471,24 +515,30 @@ class _ReportImageWidget extends StatelessWidget {
     final localStorage = LocalStorageService();
     final localReport = localStorage.getReport(reportId);
     
-    // Si existe imagen local,
+    // Si existe imagen local Y el archivo realmente existe en disco
     if (localReport?.localImagePath != null) {
       final localFile = File(localReport!.localImagePath!);
       
-      return ClipRRect(
-        borderRadius: BorderRadius.circular(12),
-        child: Image.file(
-          localFile,
-          width: double.infinity,
-          fit: BoxFit.cover,
-          errorBuilder: (context, error, stackTrace) {
-            return _buildErrorPlaceholder();
-          },
-        ),
-      );
+      if (localFile.existsSync()) {
+        return ClipRRect(
+          borderRadius: BorderRadius.circular(12),
+          child: Image.file(
+            localFile,
+            width: double.infinity,
+            fit: BoxFit.cover,
+            errorBuilder: (context, error, stackTrace) {
+              return _buildNetworkImage();
+            },
+          ),
+        );
+      }
     }
     
-    // Si no hay imagen local, intentar cargar de red
+    // Si no hay imagen local válida, cargar de red
+    return _buildNetworkImage();
+  }
+
+  Widget _buildNetworkImage() {
     return ClipRRect(
       borderRadius: BorderRadius.circular(12),
       child: Image.network(
@@ -536,4 +586,7 @@ class _ReportImageWidget extends StatelessWidget {
     );
   }
 }
+
+
+
 

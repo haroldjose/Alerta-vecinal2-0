@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 
-/// Servicio para monitorear la conectividad a internet
+// Servicio para monitorear la conectividad a internet
 class ConnectivityService {
   static final ConnectivityService _instance = ConnectivityService._internal();
   factory ConnectivityService() => _instance;
@@ -90,7 +90,7 @@ class ConnectivityService {
     }
   }
 
-  /// Actualizar el estado de conexión
+  // Actualizar el estado de conexión
   void _updateConnectionState(bool hasConnection) {
     final changed = hasConnection != _hasConnection;
     _hasConnection = hasConnection;
@@ -106,14 +106,14 @@ class ConnectivityService {
     }
   }
 
-  /// Verificar manualmente la conexión
+  //Verificar manualmente la conexión
   Future<bool> checkConnectionManually() async {
     debugPrint('🔄 Verificación manual de conexión a internet...');
     await _checkRealConnection();
     return _hasConnection;
   }
 
-  /// Disponer recursos
+  // Disponer recursos
   void dispose() {
     _subscription?.cancel();
     _connectionStatusController.close();

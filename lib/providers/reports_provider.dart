@@ -281,7 +281,7 @@ class ReportService {
     await _firestore.collection('reports').doc(reportId).set(report.toFirestore());
 
     await _localStorage.saveReport(
-      localReport.copyWith(isSynced: true, imageUrl: imageUrl)
+      localReport.copyWith(isSynced: true, imageUrl: imageUrl, localImagePath: null)
     );
 
     _notificationService.sendReportNotificationToAll(
@@ -672,4 +672,6 @@ final editReportProvider =
     StateNotifierProvider<EditReportNotifier, AsyncValue<void>>((ref) {
       return EditReportNotifier(ref);
     });
+
+
 

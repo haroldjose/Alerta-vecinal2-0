@@ -4,11 +4,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../core/constants/colors.dart';
 import '../../models/user_model.dart';
 import '../../providers/auth_provider.dart';
-import '../../providers/active_users_provider.dart';
 import '../../providers/settings_provider.dart';
 import '../auth/register_screen.dart';
 
-// ─── NUEVO PROVIDER ──────────────────────────────────────────────────────────
+
 // Obtiene todos los usuarios de Firestore con su rol, nombre, username y estado
 final allUsersProvider = StreamProvider.autoDispose<List<DirectoryUser>>((ref) {
   return FirebaseFirestore.instance
@@ -27,7 +26,6 @@ final allUsersProvider = StreamProvider.autoDispose<List<DirectoryUser>>((ref) {
           .toList());
 });
 
-// ─── MODELO AUXILIAR ─────────────────────────────────────────────────────────
 // Combina datos de UserModel con el estado online de ActiveUser
 class DirectoryUser {
   final String id;
@@ -88,7 +86,7 @@ class DirectoryUser {
   }
 }
 
-// ─── PANTALLA PRINCIPAL ───────────────────────────────────────────────────────
+
 class SecurityHomeScreen extends ConsumerStatefulWidget {
   const SecurityHomeScreen({super.key});
 
@@ -147,12 +145,12 @@ class _SecurityHomeScreenState extends ConsumerState<SecurityHomeScreen> {
 
       body: Column(
         children: [
-          // ─── FILTROS POR ROL ────────────────────────────────────────────
+          // filtros por rol 
           _buildRoleFilterBar(currentTheme.primary),
 
           const SizedBox(height: 8),
 
-          // ─── LISTA DE USUARIOS ──────────────────────────────────────────
+          // lista de usuarios
           Expanded(
             child: allUsers.when(
               data: (users) {
@@ -222,7 +220,7 @@ class _SecurityHomeScreenState extends ConsumerState<SecurityHomeScreen> {
         ],
       ),
 
-      // ─── FAB: Registrar nuevo usuario ────────────────────────────────────
+      // Registrar nuevo usuario
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.push(
@@ -240,7 +238,7 @@ class _SecurityHomeScreenState extends ConsumerState<SecurityHomeScreen> {
     );
   }
 
-  // ─── BARRA DE FILTROS ─────────────────────────────────────────────────────
+  // barra de filtros
   Widget _buildRoleFilterBar(Color primaryColor) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -311,7 +309,7 @@ class _SecurityHomeScreenState extends ConsumerState<SecurityHomeScreen> {
     );
   }
 
-  // ─── TARJETA DE USUARIO ───────────────────────────────────────────────────
+  // tarjeta de usuario
   Widget _buildUserCard(DirectoryUser user) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 4),
@@ -389,7 +387,7 @@ class _SecurityHomeScreenState extends ConsumerState<SecurityHomeScreen> {
     );
   }
 
-  // ─── BADGE DE ROL ─────────────────────────────────────────────────────────
+  // badge de rol
   Widget _buildRoleBadge(UserRole role) {
     String label;
     Color bgColor;
@@ -452,7 +450,7 @@ class _SecurityHomeScreenState extends ConsumerState<SecurityHomeScreen> {
     }
   }
 
-  // ─── CONFIRMAR CIERRE DE SESIÓN ───────────────────────────────────────────
+  // confirmar cierre de sesión
   Future<void> _confirmSignOut() async {
     final confirm = await showDialog<bool>(
       context: context,
