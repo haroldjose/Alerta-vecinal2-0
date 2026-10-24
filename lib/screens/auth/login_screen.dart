@@ -99,6 +99,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 }
 
   Future<void> _signIn() async {
+          
 
    if (_isLockedOut) {
       _showErrorMessage(_lockoutMessage);
@@ -124,7 +125,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         password: _passwordController.text,
       );
 
-      if (user != null && mounted) {
+      if (user != null) {
         _failedAttempts = 0; // resetea el contador de intentos fallidos
         _lockoutUntil = null; // resetea el bloqueo
         await _attemptService.reset();  
@@ -167,6 +168,7 @@ await _attemptService.setFailedAttempts(0);
     }
   }
     } catch (e) {
+      debugPrint('Login error: $e');
       if (mounted) {
         _showErrorMessage('Usuario no valido, Intenta nuevamente ');
       }

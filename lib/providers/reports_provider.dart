@@ -1,12 +1,10 @@
 import 'dart:io';
-import 'package:alerta_vecinal/models/user_model.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/report_model.dart';
 import '../models/local_models.dart';
 import '../core/services/image_service.dart';
 import '../core/services/location_service.dart';
-import '../core/services/notification_service.dart';
 import '../core/services/local_storage_service.dart';
 import '../core/services/connectivity_service.dart';
 import '../core/services/sync_service.dart';
@@ -180,7 +178,6 @@ final myReportsCountProvider = StreamProvider<int>((ref) {
 
 class ReportService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final NotificationService _notificationService = NotificationService();
   final LocalStorageService _localStorage = LocalStorageService();
   final ConnectivityService _connectivity = ConnectivityService();
 
@@ -283,15 +280,6 @@ class ReportService {
     await _localStorage.saveReport(
       localReport.copyWith(isSynced: true, imageUrl: imageUrl, localImagePath: null)
     );
-
-    _notificationService.sendReportNotificationToAll(
-      reportId: reportId,
-      reportTitle: title,
-      reportType: problemType.value,
-      creatorId: userId,
-    ).catchError((error) {
-      'Error al enviar notificación: $error';
-    });
 
   }  
 
@@ -623,8 +611,9 @@ class EditReportNotifier extends StateNotifier<AsyncValue<void>> {
         throw 'Usuario no autenticado';
       }
       
-      final isAdmin = currentUser.role == UserRole.admin;
-      if (!isAdmin && currentUser.id != userId) {
+      // Solo el dueño edita el contenido; el administrador solo cambia el
+      // estado (updateReportStatus)
+      if (currentUser.id != userId) {
         throw 'No tienes permiso para editar este reporte';
       }
 

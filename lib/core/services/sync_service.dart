@@ -6,7 +6,7 @@ import '../../models/report_model.dart';
 import 'local_storage_service.dart';
 import 'connectivity_service.dart';
 import 'image_service.dart';
-import 'notification_service.dart'; 
+
 
 // Servicio para sincronizar datos entre local y Firebase
 class SyncService {
@@ -18,7 +18,7 @@ class SyncService {
   final ConnectivityService _connectivity = ConnectivityService();
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final ImageService _imageService = ImageService();
-  final NotificationService _notificationService = NotificationService();
+  
 
   bool _isSyncing = false;
   StreamSubscription<bool>? _connectivitySubscription;
@@ -215,13 +215,6 @@ class SyncService {
 
     await _firestore.collection('reports').doc(operation.reportId).set(reportData);
 
-    // Enviar notificación
-    await _notificationService.sendReportNotificationToAll(
-      reportId: operation.reportId,
-      reportTitle: data['title'] as String,
-      reportType: data['problemType'] as String,
-      creatorId: data['userId'] as String,
-    );
 
     // Actualizar reporte local como sincronizado
     final localReport = _localStorage.getReport(operation.reportId);
