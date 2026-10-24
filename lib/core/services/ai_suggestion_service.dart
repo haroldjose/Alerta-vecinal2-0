@@ -3,6 +3,9 @@ import 'package:http/http.dart' as http;
 import '../../models/report_model.dart';
 import '../../widgets/ai_problem_suggestion_widget.dart';
 
+import 'package:firebase_auth/firebase_auth.dart';
+
+
 // encapsula si el texto es ofensivo
 class OffensiveContentResult {
 
@@ -78,8 +81,6 @@ class SimilarReportData {
 }
 
 
-
-
 class AiSuggestionService {
   //sugerencias
   static const String _functionUrl =
@@ -107,7 +108,7 @@ class AiSuggestionService {
       final response = await http
           .post(
             Uri.parse(_functionUrl),
-            headers: {'Content-Type': 'application/json'},
+            headers: await _headers(),
             body: jsonEncode({'title': title, 'description': description}),
           )
           .timeout(const Duration(seconds: 45)); 
@@ -154,7 +155,7 @@ class AiSuggestionService {
       final response = await http
           .post(
             Uri.parse(_offensiveFunctionUrl),
-            headers: {'Content-Type': 'application/json'},
+            headers: await _headers(),
             body: jsonEncode({'title': title, 'description': description}),
           )
           .timeout(const Duration(seconds: 30));
@@ -225,7 +226,7 @@ class AiSuggestionService {
       final response = await http
           .post(
             Uri.parse(_duplicateFunctionUrl),
-            headers: {'Content-Type': 'application/json'},
+            headers: await _headers(),
             body: jsonEncode(body),
           )
           .timeout(const Duration(seconds: 50));
@@ -259,6 +260,13 @@ class AiSuggestionService {
     }
   }
 
-
+   // Encabezados con el token del usuario (las funciones exigen sesión)
+  Future<Map<String, String>> _headers() async {
+    final token = await FirebaseAuth.instance.currentUser?.getIdToken();
+    return {
+      'Content-Type': 'application/json',
+      if (token != null) 'Authorization': 'Bearer $token',
+    };
+  }
 
 }

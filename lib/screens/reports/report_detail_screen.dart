@@ -204,7 +204,7 @@ class _ReportDetailScreenState extends ConsumerState<ReportDetailScreen> {
         title: const Text('Detalle del Reporte'),
         backgroundColor: AppColors.primary,
         actions: [
-          if (isOwner || isAdmin)
+          if (isOwner)
             IconButton(
               icon: const Icon(Icons.edit),
               onPressed: _editReport,
@@ -419,7 +419,7 @@ class _ReportDetailScreenState extends ConsumerState<ReportDetailScreen> {
                   ],
 
                   // Botón de editar para el dueño
-                  if (isOwner || isAdmin) ...[
+                  if (isOwner) ...[
                     const SizedBox(height: 32),
                     SizedBox(
                       width: double.infinity,

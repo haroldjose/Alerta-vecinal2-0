@@ -1,11 +1,18 @@
-const { onDocumentCreated } = require('firebase-functions/v2/firestore');
 const { onRequest } = require('firebase-functions/v2/https');
 const { defineSecret } = require('firebase-functions/params');
 const { initializeApp } = require('firebase-admin/app');
-const { getMessaging } = require('firebase-admin/messaging');
-const { getFirestore, FieldValue } = require('firebase-admin/firestore');
+const { getFirestore } = require('firebase-admin/firestore');
+
+const { requireAuth, readTextBody} = require('./security');
+const { notifyOnReportCreated} = require('./notifications');
+const { resolveLogin } = require('./login');
+
+
 
 initializeApp();
+
+exports.notifyOnReportCreated= notifyOnReportCreated;
+exports.resolveLogin = resolveLogin;
 
 const hfApiKey = defineSecret('HF_API_KEY');
 
@@ -208,7 +215,8 @@ const COSINE_THRESHOLD  = 0.70;
 
 exports.checkDuplicateReport = onRequest(
   {
-    cors: true,
+    cors: false,
+    maxInstances: 10,
     timeoutSeconds: 60,
     region: 'us-central1',
     secrets: [hfApiKey],
@@ -218,12 +226,13 @@ exports.checkDuplicateReport = onRequest(
       return res.status(405).json({ error: 'Método no permitido. Use POST.' });
     }
 
-    const {
-      title = '',
-      description = '',
-      location = null,
-      excludeReportId = null,  
-    } = req.body;
+
+    const decoded = await requireAuth(req, res);
+    if(!decoded) return;
+
+    const input = readTextBody(req, res);
+    if(!input) return;
+    const{title, description, excludeReportId} = input;
 
     const newText = `${title.trim()} ${description.trim()}`.trim();
 
@@ -357,7 +366,8 @@ const LABEL_TO_TYPE = {
 
 exports.checkOffensiveContent = onRequest(
   {
-    cors: true,
+    cors: false,
+    maximumInstances: 10,
     timeoutSeconds: 60,
     region: 'us-central1',
     secrets: [hfApiKey],
@@ -367,7 +377,14 @@ exports.checkOffensiveContent = onRequest(
       return res.status(405).json({ error: 'Método no permitido. Use POST.' });
     }
 
-    const { title = '', description = '' } = req.body;
+    const decoded = await requireAuth(req, res);
+    if (!decoded) return;
+
+    const input = readTextBody(req, res);
+    if (!input) return;
+    const { title, description } = input;
+
+
     const combinedText = `${title} ${description}`.trim();
 
     if (combinedText.length < 2) {
@@ -448,7 +465,8 @@ exports.checkOffensiveContent = onRequest(
 
 exports.suggestProblemType = onRequest(
   {
-    cors: true,
+    cors: false,
+    maxInstances: 10,
     timeoutSeconds: 60,
     region: 'us-central1',
     secrets: [hfApiKey],
@@ -458,7 +476,14 @@ exports.suggestProblemType = onRequest(
       return res.status(405).json({ error: 'Método no permitido. Use POST.' });
     }
 
-    const { title = '', description = '' } = req.body;
+    const decoded = await requireAuth(req, res);
+    if (!decoded) return;
+
+    const input = readTextBody(req, res);
+    if (!input) return;
+    const { title, description } = input;
+
+
     const combinedText = `${title} ${description}`.trim();
 
     if (combinedText.length < 5) {
@@ -581,105 +606,4 @@ exports.suggestProblemType = onRequest(
   }
 );
 
-exports.sendReportNotification = onDocumentCreated(
-  'notifications/{notificationId}',
-  async (event) => {
-    const snapshot = event.data;
-
-    if (!snapshot) {
-      console.log('No hay datos en el snapshot');
-      return null;
-    }
-
-    const notification = snapshot.data();
-
-    if (notification.status !== 'pending') {
-      console.log('Notificación ya procesada, saltando...');
-      return null;
-    }
-
-    const { tokens, title, body, reportId, reportType } = notification;
-
-    if (!tokens || tokens.length === 0) {
-      console.log('No hay tokens para enviar notificaciones');
-      await snapshot.ref.update({ status: 'skipped', reason: 'No tokens available' });
-      return null;
-    }
-
-    console.log(`Enviando notificación [${reportType ?? 'sin categoría'}] a ${tokens.length} dispositivo(s)...`);
-
-    try {
-      const messaging = getMessaging();
-
-      const response = await messaging.sendEachForMulticast({
-        tokens: tokens,
-        notification: { title: title, body: body },
-        data: {
-          reportId: reportId || '',
-          reportType: reportType || '',
-          click_action: 'FLUTTER_NOTIFICATION_CLICK',
-        },
-        android: {
-          priority: 'high',
-          notification: { channelId: 'reports_channel', sound: 'default', color: '#D63031' },
-        },
-        apns: { payload: { aps: { sound: 'default', badge: 1 } } },
-      });
-
-      console.log(`Notificaciones enviadas: ${response.successCount}/${tokens.length}`);
-
-      if (response.failureCount > 0) {
-        const failedTokens = [];
-        response.responses.forEach((resp, idx) => {
-          if (!resp.success) {
-            console.error(`Token ${tokens[idx]} falló:`, resp.error);
-            failedTokens.push(tokens[idx]);
-          }
-        });
-        if (failedTokens.length > 0) {
-          await cleanupInvalidTokens(failedTokens);
-        }
-      }
-
-      await snapshot.ref.update({
-        status: 'sent',
-        sentAt: FieldValue.serverTimestamp(),
-        successCount: response.successCount,
-        failureCount: response.failureCount,
-      });
-
-      return null;
-    } catch (error) {
-      console.error('Error al enviar notificaciones:', error);
-      await snapshot.ref.update({
-        status: 'error',
-        error: error.message,
-        errorAt: FieldValue.serverTimestamp(),
-      });
-      return null;
-    }
-  }
-);
-
-async function cleanupInvalidTokens(failedTokens) {
-  const db = getFirestore();
-  const usersRef = db.collection('users');
-
-  try {
-    for (let i = 0; i < failedTokens.length; i += 10) {
-      const batch = failedTokens.slice(i, i + 10);
-      const snapshot = await usersRef.where('fcmToken', 'in', batch).get();
-
-      const writeBatch = db.batch();
-      snapshot.docs.forEach(doc => {
-        writeBatch.update(doc.ref, { fcmToken: FieldValue.delete() });
-      });
-
-      await writeBatch.commit();
-      console.log(`${snapshot.size} tokens inválidos eliminados`);
-    }
-  } catch (error) {
-    console.error('Error al limpiar tokens:', error);
-  }
-}
 

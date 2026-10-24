@@ -5,6 +5,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/user_model.dart';
 import '../core/services/notification_service.dart'; 
 
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+
+
 //La excepcion se lanza cuando el username no existe en Firestore.
 class UsernameNotFoundException implements Exception {
   final String message;
@@ -55,6 +59,46 @@ class AuthService {
 
   static const int _maxSecurityUsers = 2; //
 
+  static const String _resolveLoginUrl =
+      'https://us-central1-alerta-vecinal-297eb.cloudfunctions.net/resolveLogin';
+
+  
+  Future<String> _resolveEmail(String username) async {
+    final response = await http
+        .post(
+          Uri.parse(_resolveLoginUrl),
+          headers: {'Content-Type': 'application/json'},
+          body: jsonEncode({'username': username}),
+        )
+        .timeout(const Duration(seconds: 15));
+
+  
+
+    if (response.statusCode == 404) {
+      throw const UsernameNotFoundException();
+    }
+
+    if (response.statusCode != 200) {
+      final body = response.body;
+      throw 'Error de conexión. Intenta nuevamente.';
+    }
+
+    Map<String, dynamic> data;
+    try {
+      data = jsonDecode(response.body) as Map<String, dynamic>;
+    } catch (_) {
+      final body = response.body;
+      throw 'Respuesta inválida del servidor.';
+    }
+
+    final email = (data['email'] as String?) ?? '';
+    if (email.isEmpty) {
+      throw const UsernameNotFoundException('Usuario sin email registrado');
+    }
+    return email;
+  }
+
+
   // Registrar usuario
   Future<UserModel?> registerUser({
   required String name,
@@ -83,6 +127,7 @@ class AuthService {
     if (existing.docs.isNotEmpty) {
       throw 'El nombre de usuario ya está en uso';
     }
+
 
     // Instancia secundaria
     FirebaseApp? secondaryApp;
@@ -126,6 +171,7 @@ class AuthService {
         .doc(newFirebaseUser.uid)
         .set(userModel.toFirestore());
 
+
     await newFirebaseUser.updateDisplayName(name);
 
     // Limpiar instancia secundaria
@@ -168,22 +214,9 @@ class AuthService {
     required String password,
   }) async {
     try {
-      // Busca el documento del usuario por su username en Firestore
-      final QuerySnapshot querySnapshot = await _firestore
-          .collection('users')
-          .where('username', isEqualTo: username)
-          .limit(1)
-          .get();
 
-      // Si no se encontró ningún documento, el username no existe
-      if (querySnapshot.docs.isEmpty) {
-        throw const UsernameNotFoundException();
-      }
-
-      // Obtener el email guardado en Firestore para ese username
-      final userDoc = querySnapshot.docs.first;
-      final data = userDoc.data() as Map<String, dynamic>;
-      final String email = data['email'] ?? '';
+      // El servidor resuelve el email del nombre de usuario 
+      final String email = await _resolveEmail(username);
 
       if (email.isEmpty) {
         throw const UsernameNotFoundException('Usuario sin email registrado');
@@ -212,6 +245,7 @@ class AuthService {
           }
         }
       } on FirebaseAuthException catch (e) {
+                
         // Mapear el error de Firebase a excepciones propias
         if (e.code == 'wrong-password' ||
             e.code == 'invalid-credential' ||
