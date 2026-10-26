@@ -163,6 +163,7 @@ class AuthService {
       celular: celular,
       cargo: cargo,
       createdAt: DateTime.now(),
+      createdBy: currentUser?.uid, //
     );
 
     // Guardar en Firestore ANTES de cerrar la sesión secundaria
@@ -332,6 +333,67 @@ class AuthService {
         return 'Error de autenticación: ${e.message ?? e.code}';
     }
   }
+
+ /////
+  static const String _functionsBase =
+    'https://us-central1-alerta-vecinal-297eb.cloudfunctions.net';
+
+Future<void> _callManaged(String function, Map<String, dynamic> body) async {
+  final token = await _auth.currentUser?.getIdToken();
+  if (token == null) throw 'Sesión expirada. Inicia sesión nuevamente.';
+
+  final response = await http
+      .post(
+        Uri.parse('$_functionsBase/$function'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: jsonEncode(body),
+      )
+      .timeout(const Duration(seconds: 20));
+
+  if (response.statusCode != 200) {
+    var msg = 'Error de conexión. Intenta nuevamente.';
+    try {
+      msg = (jsonDecode(response.body)['error'] as String?) ?? msg;
+    } catch (_) {}
+    throw msg;
+  }
+}
+
+Future<void> updateManagedUser({
+  required String uid,
+  required String name,
+  required String cedula,
+  required String celular,
+  required String email,
+  required String username,
+  String? password,
+}) {
+  return _callManaged('updateManagedUser', {
+    'uid': uid,
+    'name': name,
+    'cedula': cedula,
+    'celular': celular,
+    'email': email,
+    'username': username,
+    if (password != null && password.isNotEmpty) 'password': password,
+  });
+}
+
+Future<void> deleteManagedUser(String uid) =>
+    _callManaged('deleteManagedUser', {'uid': uid});
+
+
+
+
+
+
+
+
+
+
 }
  
 

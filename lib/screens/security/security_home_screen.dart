@@ -7,6 +7,7 @@ import '../../providers/auth_provider.dart';
 import '../../providers/settings_provider.dart';
 import '../auth/register_screen.dart';
 
+import 'edit_user_screen.dart';
 
 // Obtiene todos los usuarios de Firestore con su rol, nombre, username y estado
 final allUsersProvider = StreamProvider.autoDispose<List<DirectoryUser>>((ref) {
@@ -14,16 +15,19 @@ final allUsersProvider = StreamProvider.autoDispose<List<DirectoryUser>>((ref) {
       .collection('users')
       .orderBy('createdAt', descending: false)
       .snapshots()
-      .map((snapshot) => snapshot.docs
-          .map((doc) {
-            try {
-              return DirectoryUser.fromFirestore(doc);
-            } catch (_) {
-              return null;
-            }
-          })
-          .whereType<DirectoryUser>()
-          .toList());
+      .map(
+        (snapshot) =>
+            snapshot.docs
+                .map((doc) {
+                  try {
+                    return DirectoryUser.fromFirestore(doc);
+                  } catch (_) {
+                    return null;
+                  }
+                })
+                .whereType<DirectoryUser>()
+                .toList(),
+      );
 });
 
 // Combina datos de UserModel con el estado online de ActiveUser
@@ -35,6 +39,8 @@ class DirectoryUser {
   final UserRole role;
   final DateTime createdAt;
   final DateTime? lastActive;
+  final String? createdBy;
+  final String cedula, celular;
 
   DirectoryUser({
     required this.id,
@@ -44,6 +50,9 @@ class DirectoryUser {
     required this.role,
     required this.createdAt,
     this.lastActive,
+    this.createdBy,
+    required this.cedula,
+    required this.celular,
   });
 
   factory DirectoryUser.fromFirestore(DocumentSnapshot doc) {
@@ -58,6 +67,9 @@ class DirectoryUser {
       role: UserModel.parseRole(data['role']),
       createdAt: (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
       lastActive: lastActive,
+      createdBy: data['createdBy'],
+      cedula: data['cedula'] ?? '',
+      celular: data['celular'] ?? '',
     );
   }
 
@@ -79,13 +91,22 @@ class DirectoryUser {
   // Fecha de registro formateada (ej: "Oct 12 2023")
   String get registeredText {
     const months = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
     ];
     return 'Registrado: ${months[createdAt.month - 1]} ${createdAt.day} ${createdAt.year}';
   }
 }
-
 
 class SecurityHomeScreen extends ConsumerStatefulWidget {
   const SecurityHomeScreen({super.key});
@@ -103,6 +124,7 @@ class _SecurityHomeScreenState extends ConsumerState<SecurityHomeScreen> {
     final currentUser = ref.watch(currentUserProvider);
     final allUsers = ref.watch(allUsersProvider);
     final currentTheme = ref.watch(currentThemeProvider);
+    final myId = currentUser.value?.id;
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -145,7 +167,7 @@ class _SecurityHomeScreenState extends ConsumerState<SecurityHomeScreen> {
 
       body: Column(
         children: [
-          // filtros por rol 
+          // filtros por rol
           _buildRoleFilterBar(currentTheme.primary),
 
           const SizedBox(height: 8),
@@ -155,22 +177,30 @@ class _SecurityHomeScreenState extends ConsumerState<SecurityHomeScreen> {
             child: allUsers.when(
               data: (users) {
                 // Aplicar filtro de rol
-                final filtered = _selectedFilter == null
-                    ? users
-                    : users.where((u) => u.role == _selectedFilter).toList();
+                final filtered =
+                    _selectedFilter == null
+                        ? users
+                        : users
+                            .where((u) => u.role == _selectedFilter)
+                            .toList();
 
                 if (filtered.isEmpty) {
                   return Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.people_outline,
-                            size: 64, color: Colors.grey[400]),
+                        Icon(
+                          Icons.people_outline,
+                          size: 64,
+                          color: Colors.grey[400],
+                        ),
                         const SizedBox(height: 16),
                         Text(
                           'No hay usuarios en esta categoría',
                           style: TextStyle(
-                              color: Colors.grey[600], fontSize: 16),
+                            color: Colors.grey[600],
+                            fontSize: 16,
+                          ),
                         ),
                       ],
                     ),
@@ -184,37 +214,46 @@ class _SecurityHomeScreenState extends ConsumerState<SecurityHomeScreen> {
                   },
                   child: ListView.builder(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 8),
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
                     itemCount: filtered.length,
                     itemBuilder: (context, index) {
-                      return _buildUserCard(filtered[index]);
+                      return _buildUserCard(filtered[index], myId);
                     },
                   ),
                 );
               },
-              loading: () => const Center(
-                child: CircularProgressIndicator(color: AppColors.primary),
-              ),
-              error: (error, _) => Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.error_outline,
-                        size: 64, color: Colors.grey[400]),
-                    const SizedBox(height: 16),
-                    Text(
-                      'Error al cargar usuarios',
-                      style:
-                          TextStyle(color: Colors.grey[600], fontSize: 16),
+              loading:
+                  () => const Center(
+                    child: CircularProgressIndicator(color: AppColors.primary),
+                  ),
+              error:
+                  (error, _) => Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.error_outline,
+                          size: 64,
+                          color: Colors.grey[400],
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          'Error al cargar usuarios',
+                          style: TextStyle(
+                            color: Colors.grey[600],
+                            fontSize: 16,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        ElevatedButton(
+                          onPressed: () => ref.invalidate(allUsersProvider),
+                          child: const Text('Reintentar'),
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 8),
-                    ElevatedButton(
-                      onPressed: () => ref.invalidate(allUsersProvider),
-                      child: const Text('Reintentar'),
-                    ),
-                  ],
-                ),
-              ),
+                  ),
             ),
           ),
         ],
@@ -225,8 +264,7 @@ class _SecurityHomeScreenState extends ConsumerState<SecurityHomeScreen> {
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(
-                builder: (context) => const RegisterScreen()),
+            MaterialPageRoute(builder: (context) => const RegisterScreen()),
           ).then((_) {
             // Refresca el directorio al volver del registro
             ref.invalidate(allUsersProvider);
@@ -271,8 +309,7 @@ class _SecurityHomeScreenState extends ConsumerState<SecurityHomeScreen> {
               label: 'Seguridad',
               isSelected: _selectedFilter == UserRole.security,
               primaryColor: primaryColor,
-              onTap: () =>
-                  setState(() => _selectedFilter = UserRole.security),
+              onTap: () => setState(() => _selectedFilter = UserRole.security),
             ),
           ],
         ),
@@ -290,8 +327,7 @@ class _SecurityHomeScreenState extends ConsumerState<SecurityHomeScreen> {
       onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        padding:
-            const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
         decoration: BoxDecoration(
           color: isSelected ? primaryColor : Colors.transparent,
           borderRadius: BorderRadius.circular(20),
@@ -300,8 +336,7 @@ class _SecurityHomeScreenState extends ConsumerState<SecurityHomeScreen> {
           label,
           style: TextStyle(
             color: isSelected ? Colors.white : AppColors.textSecondary,
-            fontWeight:
-                isSelected ? FontWeight.w600 : FontWeight.normal,
+            fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
             fontSize: 14,
           ),
         ),
@@ -310,12 +345,11 @@ class _SecurityHomeScreenState extends ConsumerState<SecurityHomeScreen> {
   }
 
   // tarjeta de usuario
-  Widget _buildUserCard(DirectoryUser user) {
+  Widget _buildUserCard(DirectoryUser user, String? myId) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 4),
       child: ListTile(
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
         leading: Stack(
           children: [
             // Avatar con inicial del nombre
@@ -323,9 +357,7 @@ class _SecurityHomeScreenState extends ConsumerState<SecurityHomeScreen> {
               radius: 26,
               backgroundColor: _roleColor(user.role).withValues(alpha: 0.15),
               child: Text(
-                user.name.isNotEmpty
-                    ? user.name[0].toUpperCase()
-                    : '?',
+                user.name.isNotEmpty ? user.name[0].toUpperCase() : '?',
                 style: TextStyle(
                   color: _roleColor(user.role),
                   fontWeight: FontWeight.bold,
@@ -360,27 +392,53 @@ class _SecurityHomeScreenState extends ConsumerState<SecurityHomeScreen> {
         ),
         subtitle: Text(
           user.registeredText,
-          style: const TextStyle(
-            color: AppColors.textSecondary,
-            fontSize: 12,
-          ),
+          style: const TextStyle(color: AppColors.textSecondary, fontSize: 12),
         ),
-        trailing: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.end,
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            // Badge de rol
-            _buildRoleBadge(user.role),
-            const SizedBox(height: 4),
-            // Estado online/offline
-            Text(
-              user.isOnline ? 'Online' : 'Offline',
-              style: TextStyle(
-                color: user.isOnline ? Colors.green : Colors.grey[400],
-                fontSize: 12,
-                fontWeight: FontWeight.w500,
-              ),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                _buildRoleBadge(user.role),
+                const SizedBox(height: 4),
+                Text(
+                  user.isOnline ? 'Online' : 'Offline',
+                  style: TextStyle(
+                    color: user.isOnline ? Colors.green : Colors.grey[400],
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
             ),
+            if (myId != null &&
+    (user.createdBy == myId || user.createdBy == null) &&
+    user.role != UserRole.security)
+              PopupMenuButton<String>(
+                padding: EdgeInsets.zero,
+                icon: const Icon(
+                  Icons.more_vert,
+                  color: AppColors.textSecondary,
+                ),
+                onSelected:
+                    (v) =>
+                        v == 'edit'
+                            ? _openEditUser(user)
+                            : _confirmDeleteUser(user),
+                itemBuilder:
+                    (_) => const [
+                      PopupMenuItem(value: 'edit', child: Text('Editar')),
+                      PopupMenuItem(
+                        value: 'delete',
+                        child: Text(
+                          'Eliminar',
+                          style: TextStyle(color: AppColors.error),
+                        ),
+                      ),
+                    ],
+              ),
           ],
         ),
       ),
@@ -454,23 +512,22 @@ class _SecurityHomeScreenState extends ConsumerState<SecurityHomeScreen> {
   Future<void> _confirmSignOut() async {
     final confirm = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Cerrar sesión'),
-        content:
-            const Text('¿Estás seguro de que deseas cerrar sesión?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancelar'),
+      builder:
+          (context) => AlertDialog(
+            title: const Text('Cerrar sesión'),
+            content: const Text('¿Estás seguro de que deseas cerrar sesión?'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text('Cancelar'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(context, true),
+                style: TextButton.styleFrom(foregroundColor: AppColors.error),
+                child: const Text('Cerrar sesión'),
+              ),
+            ],
           ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: TextButton.styleFrom(
-                foregroundColor: AppColors.error),
-            child: const Text('Cerrar sesión'),
-          ),
-        ],
-      ),
     );
 
     if (confirm == true && mounted) {
@@ -478,4 +535,53 @@ class _SecurityHomeScreenState extends ConsumerState<SecurityHomeScreen> {
       await authService.signOut();
     }
   }
+
+  void _showSnack(String msg, {bool error = false}) {
+  ScaffoldMessenger.of(context).clearSnackBars();
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: Text(msg),
+      backgroundColor: error ? AppColors.error : AppColors.success,
+      behavior: SnackBarBehavior.floating,
+    ),
+  );
+}
+
+Future<void> _openEditUser(DirectoryUser user) async {
+  final updated = await Navigator.push<bool>(
+    context,
+    MaterialPageRoute(builder: (_) => EditUserScreen(user: user)),
+  );
+  if (updated == true && mounted) _showSnack('Usuario actualizado');
+}
+
+Future<void> _confirmDeleteUser(DirectoryUser user) async {
+  final label = user.username.isNotEmpty ? user.username : user.name;
+  final confirm = await showDialog<bool>(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: const Text('Eliminar usuario'),
+      content: Text('¿Eliminar a "$label"? Esta acción no se puede deshacer.'),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context, false),
+          child: const Text('Cancelar'),
+        ),
+        TextButton(
+          onPressed: () => Navigator.pop(context, true),
+          style: TextButton.styleFrom(foregroundColor: AppColors.error),
+          child: const Text('Eliminar'),
+        ),
+      ],
+    ),
+  );
+  if (confirm != true || !mounted) return;
+
+  try {
+    await ref.read(authServiceProvider).deleteManagedUser(user.id);
+    if (mounted) _showSnack('Usuario eliminado');
+  } catch (e) {
+    if (mounted) _showSnack('$e', error: true);
+  }
+}
 }

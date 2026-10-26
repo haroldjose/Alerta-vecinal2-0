@@ -417,6 +417,7 @@ void _showSuccessMessage(String message) {
                       hintText: 'Contraseña',
                       controller: _passwordController,
                       obscureText: true,
+                      showPasswordToggle: true,
                       errorText: _passwordError,
                     ),
 
@@ -440,6 +441,7 @@ void _showSuccessMessage(String message) {
                       hintText: 'Confirmar contraseña',
                       controller: _confirmPasswordController,
                       obscureText: true,
+                      showPasswordToggle: true,
                       errorText: _confirmPasswordError,
                     ),
 
