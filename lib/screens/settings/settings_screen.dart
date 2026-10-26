@@ -27,11 +27,19 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     super.initState();
     Future.microtask(() {
       ref.read(connectivityServiceProvider).checkConnectionManually();
+      final uid = ref.read(currentUserProvider).value?.id;
+      if (uid != null) {
+        ref
+            .read(settingsProvider.notifier)
+            .loadNotificationPrefsFromFirestore(uid);
+      }
     });
 
     _connectivityCheckTimer = Timer.periodic(const Duration(seconds: 3), (_) {
       if (mounted) {
-        ref.read(connectivityServiceProvider).checkConnectionManually().then((_) {
+        ref.read(connectivityServiceProvider).checkConnectionManually().then((
+          _,
+        ) {
           if (mounted) setState(() {});
         });
       }
@@ -49,11 +57,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     final currentUser = ref.watch(currentUserProvider);
     final settings = ref.watch(settingsProvider);
     final currentTheme = ref.watch(currentThemeProvider);
-    
+
     // conectividad directamente del servicio
     final connectivity = ref.watch(connectivityServiceProvider);
     final isConnected = connectivity.hasConnection;
-    
+
     final syncStatus = ref.watch(syncStatusProvider);
 
     return Scaffold(
@@ -66,8 +74,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: () async {
-              await ref.read(connectivityServiceProvider).checkConnectionManually();
-              setState(() {}); 
+              await ref
+                  .read(connectivityServiceProvider)
+                  .checkConnectionManually();
+              setState(() {});
             },
             tooltip: 'Actualizar estado de conexión',
           ),
@@ -106,15 +116,15 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   const SizedBox(height: 24),
                 ],
 
-                // Sección: Usuarios Activos 
+                // Sección: Usuarios Activos
                 if (user.role == UserRole.admin) ...[
                   _buildSectionTitle('Usuarios Activos'),
                   _buildActiveUsersList(currentTheme),
                   const SizedBox(height: 24),
                 ],
-                   
-                  //seccion prueba de rendimiento solo para administrador 
-                 if (user.role == UserRole.admin) ...[
+
+                //seccion prueba de rendimiento solo para administrador
+                if (user.role == UserRole.admin) ...[
                   _buildSectionTitle('Pruebas de rendimiento'),
                   Container(
                     margin: const EdgeInsets.symmetric(horizontal: 16),
@@ -127,17 +137,17 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       title: const Text('Prueba de carga de imágenes'),
                       subtitle: const Text('Con y sin compresión'),
                       trailing: const Icon(Icons.chevron_right),
-                      onTap: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const ImageBenchmarkScreen(),
-                        ),
-                      ),
+                      onTap:
+                          () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const ImageBenchmarkScreen(),
+                            ),
+                          ),
                     ),
                   ),
                   const SizedBox(height: 24),
                 ],
-
 
                 _buildSectionTitle('Información'),
                 _buildInfoSection(user, currentTheme),
@@ -152,9 +162,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           );
         },
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, stack) => Center(
-          child: Text('Error: $error', style: const TextStyle(color: AppColors.error)),
-        ),
+        error:
+            (error, stack) => Center(
+              child: Text(
+                'Error: $error',
+                style: const TextStyle(color: AppColors.error),
+              ),
+            ),
       ),
     );
   }
@@ -196,9 +210,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: isConnected
-                        ? AppColors.success.withValues(alpha: 0.1)
-                        : AppColors.error.withValues(alpha: 0.1),
+                    color:
+                        isConnected
+                            ? AppColors.success.withValues(alpha: 0.1)
+                            : AppColors.error.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Icon(
@@ -217,7 +232,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          color: isConnected ? AppColors.success : AppColors.error,
+                          color:
+                              isConnected ? AppColors.success : AppColors.error,
                         ),
                       ),
                       const SizedBox(height: 4),
@@ -236,9 +252,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: isConnected
-                        ? AppColors.success.withValues(alpha: 0.2)
-                        : AppColors.error.withValues(alpha: 0.2),
+                    color:
+                        isConnected
+                            ? AppColors.success.withValues(alpha: 0.2)
+                            : AppColors.error.withValues(alpha: 0.2),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
@@ -309,7 +326,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       height: 16,
                       child: CircularProgressIndicator(
                         strokeWidth: 2,
-                        valueColor: AlwaysStoppedAnimation<Color>(Colors.orange),
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          Colors.orange,
+                        ),
                       ),
                     ),
                 ],
@@ -339,7 +358,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                           height: 14,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
-                            valueColor: AlwaysStoppedAnimation<Color>(theme.primary),
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              theme.primary,
+                            ),
                           ),
                         ),
                         const SizedBox(width: 8),
@@ -355,7 +376,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     ),
                   );
                 }
-                
+
                 if (status == SyncStatus.synced) {
                   return Container(
                     padding: const EdgeInsets.all(12),
@@ -387,7 +408,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     ),
                   );
                 }
-                
+
                 return const SizedBox.shrink();
               },
               loading: () => const SizedBox.shrink(),
@@ -491,15 +512,16 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         color: isSelected ? Colors.white : Colors.transparent,
                         width: 3,
                       ),
-                      boxShadow: isSelected
-                          ? [
-                              BoxShadow(
-                                color: theme.primary.withValues(alpha: 0.3),
-                                blurRadius: 8,
-                                offset: const Offset(0, 4),
-                              ),
-                            ]
-                          : null,
+                      boxShadow:
+                          isSelected
+                              ? [
+                                BoxShadow(
+                                  color: theme.primary.withValues(alpha: 0.3),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 4),
+                                ),
+                              ]
+                              : null,
                     ),
                     child: Stack(
                       children: [
@@ -564,17 +586,22 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   .read(settingsProvider.notifier)
                   .setNotificationsEnabled(value, userId: userId);
             },
-            title: const Text('Notificaciones push',
-                style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.textPrimary)),
+            title: const Text(
+              'Notificaciones push',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: AppColors.textPrimary,
+              ),
+            ),
             subtitle: Text(
               prefs.enabled
                   ? 'Recibirás alertas de nuevos reportes'
                   : 'No recibirás alertas de reportes',
               style: const TextStyle(
-                  fontSize: 13, color: AppColors.textSecondary),
+                fontSize: 13,
+                color: AppColors.textSecondary,
+              ),
             ),
             secondary: Container(
               padding: const EdgeInsets.all(8),
@@ -619,15 +646,16 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     .read(settingsProvider.notifier)
                     .setAllCategories(value, userId: userId);
               },
-              title: const Text('Todas las categorías',
-                  style: TextStyle(
-                      fontSize: 15, color: AppColors.textPrimary)),
-              subtitle: const Text('Recibe alertas de cualquier reporte',
-                  style: TextStyle(
-                      fontSize: 12, color: AppColors.textSecondary)),
+              title: const Text(
+                'Todas las categorías',
+                style: TextStyle(fontSize: 15, color: AppColors.textPrimary),
+              ),
+              subtitle: const Text(
+                'Recibe alertas de cualquier reporte',
+                style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
+              ),
               activeColor: theme.primary,
-              contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 16),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 16),
             ),
 
             // Categorías específicas
@@ -640,16 +668,16 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     .read(settingsProvider.notifier)
                     .setAllCategories(value, userId: userId);
               },
-              title: const Text('Categorías específicas',
-                  style: TextStyle(
-                      fontSize: 15, color: AppColors.textPrimary)),
+              title: const Text(
+                'Categorías específicas',
+                style: TextStyle(fontSize: 15, color: AppColors.textPrimary),
+              ),
               subtitle: const Text(
-                  'Elige de qué tipos de reporte recibir alertas',
-                  style: TextStyle(
-                      fontSize: 12, color: AppColors.textSecondary)),
+                'Elige de qué tipos de reporte recibir alertas',
+                style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
+              ),
               activeColor: theme.primary,
-              contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 16),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 16),
             ),
 
             // Checkboxes de categoría
@@ -659,22 +687,19 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 padding: const EdgeInsets.fromLTRB(16, 10, 16, 4),
                 child: Row(
                   children: [
-                    Icon(Icons.info_outline,
-                        size: 14, color: Colors.grey[500]),
+                    Icon(Icons.info_outline, size: 14, color: Colors.grey[500]),
                     const SizedBox(width: 6),
                     Expanded(
                       child: Text(
                         'Selecciona al menos una categoría',
-                        style: TextStyle(
-                            fontSize: 12, color: Colors.grey[500]),
+                        style: TextStyle(fontSize: 12, color: Colors.grey[500]),
                       ),
                     ),
                   ],
                 ),
               ),
               ...NotificationCategory.values.map((category) {
-                final isSelected =
-                    prefs.selectedCategories.contains(category);
+                final isSelected = prefs.selectedCategories.contains(category);
                 return CheckboxListTile(
                   value: isSelected,
                   onChanged: (_) {
@@ -687,52 +712,53 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       Icon(
                         _categoryIcon(category),
                         size: 18,
-                        color: isSelected
-                            ? theme.primary
-                            : Colors.grey[400],
+                        color: isSelected ? theme.primary : Colors.grey[400],
                       ),
                       const SizedBox(width: 10),
                       Text(
                         category.label,
                         style: TextStyle(
                           fontSize: 15,
-                          color: isSelected
-                              ? AppColors.textPrimary
-                              : AppColors.textSecondary,
-                          fontWeight: isSelected
-                              ? FontWeight.w600
-                              : FontWeight.normal,
+                          color:
+                              isSelected
+                                  ? AppColors.textPrimary
+                                  : AppColors.textSecondary,
+                          fontWeight:
+                              isSelected ? FontWeight.w600 : FontWeight.normal,
                         ),
                       ),
                     ],
                   ),
                   activeColor: theme.primary,
                   checkColor: Colors.white,
-                  contentPadding:
-                      const EdgeInsets.symmetric(horizontal: 20),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 20),
                   dense: true,
                   // Advertencia visual si no hay ninguna seleccionada
-                  tileColor: prefs.selectedCategories.isEmpty
-                      ? Colors.red.withValues(alpha: 0.03)
-                      : null,
+                  tileColor:
+                      prefs.selectedCategories.isEmpty
+                          ? Colors.red.withValues(alpha: 0.03)
+                          : null,
                 );
               }),
               // Advertencia si no seleccionó ninguna
               if (prefs.selectedCategories.isEmpty)
                 Padding(
-                  padding:
-                      const EdgeInsets.fromLTRB(16, 4, 16, 12),
+                  padding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
                   child: Row(
                     children: [
-                      const Icon(Icons.warning_amber_rounded,
-                          size: 16, color: Colors.orange),
+                      const Icon(
+                        Icons.warning_amber_rounded,
+                        size: 16,
+                        color: Colors.orange,
+                      ),
                       const SizedBox(width: 6),
                       Expanded(
                         child: Text(
                           'Debes seleccionar al menos una categoría para recibir notificaciones.',
                           style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.orange[800]),
+                            fontSize: 12,
+                            color: Colors.orange[800],
+                          ),
                         ),
                       ),
                     ],
@@ -760,329 +786,326 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     }
   }
 
+  // Lista de usuarios activos
+  Widget _buildActiveUsersList(AppTheme theme) {
+    final activeUsers = ref.watch(activeUsersProvider);
+    final connectivity = ref.watch(connectivityServiceProvider);
+    final isConnected = connectivity.hasConnection;
 
-
-// Lista de usuarios activos
-Widget _buildActiveUsersList(AppTheme theme) {
-  final activeUsers = ref.watch(activeUsersProvider);
-  final connectivity = ref.watch(connectivityServiceProvider);
-  final isConnected = connectivity.hasConnection;
-
-  return Container(
-    margin: const EdgeInsets.symmetric(horizontal: 16),
-    decoration: BoxDecoration(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(12),
-      boxShadow: [
-        BoxShadow(
-          color: Colors.black.withValues(alpha: 0.05),
-          blurRadius: 8,
-          offset: const Offset(0, 2),
-        ),
-      ],
-    ),
-    child: Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.all(16),
-          child: Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: theme.primary.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(8),
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: theme.primary.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(Icons.people, color: theme.primary, size: 24),
                 ),
-                child: Icon(
-                  Icons.people,
-                  color: theme.primary,
-                  size: 24,
-                ),
-              ),
-              const SizedBox(width: 12),
-              const Expanded(
-                child: Text(
-                  'Usuarios en la plataforma',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.textPrimary,
+                const SizedBox(width: 12),
+                const Expanded(
+                  child: Text(
+                    'Usuarios en la plataforma',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.textPrimary,
+                    ),
                   ),
                 ),
-              ),
-              
-              if (isConnected)
-                IconButton(
-                  icon: const Icon(Icons.refresh, size: 20),
-                  color: theme.primary,
-                  onPressed: () {
-                    ref.invalidate(activeUsersProvider);
-                  },
-                  tooltip: 'Refrescar usuarios',
-                ),
-            ],
+
+                if (isConnected)
+                  IconButton(
+                    icon: const Icon(Icons.refresh, size: 20),
+                    color: theme.primary,
+                    onPressed: () {
+                      ref.invalidate(activeUsersProvider);
+                    },
+                    tooltip: 'Refrescar usuarios',
+                  ),
+              ],
+            ),
           ),
-        ),
-        const Divider(height: 1, color: AppColors.border),
-        activeUsers.when(
-          data: (users) {
-            if (users.isEmpty && isConnected) {
-              return Padding(
-                padding: const EdgeInsets.all(32),
-                child: Column(
-                  children: [
-                    Icon(
-                      Icons.people_outline,
-                      size: 48,
-                      color: Colors.grey[400],
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      'No hay usuarios registrados',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey[600],
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            }
-
-            if (users.isEmpty && !isConnected) {
-              return Padding(
-                padding: const EdgeInsets.all(32),
-                child: Column(
-                  children: [
-                    Icon(
-                      Icons.wifi_off,
-                      size: 48,
-                      color: Colors.grey[400],
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      'Sin conexión',
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.grey[600],
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Conéctate para ver usuarios activos',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey[500],
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
-                ),
-              );
-            }
-
-            final onlineUsers = users.where((u) => u.isOnline).length;
-            
-            return Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Row(
+          const Divider(height: 1, color: AppColors.border),
+          activeUsers.when(
+            data: (users) {
+              if (users.isEmpty && isConnected) {
+                return Padding(
+                  padding: const EdgeInsets.all(32),
+                  child: Column(
                     children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 6,
-                        ),
-                        decoration: BoxDecoration(
-                          color: AppColors.success.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Container(
-                              width: 8,
-                              height: 8,
-                              decoration: const BoxDecoration(
-                                color: AppColors.success,
-                                shape: BoxShape.circle,
-                              ),
-                            ),
-                            const SizedBox(width: 6),
-                            Text(
-                              '$onlineUsers en línea',
-                              style: const TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w600,
-                                color: AppColors.success,
-                              ),
-                            ),
-                          ],
-                        ),
+                      Icon(
+                        Icons.people_outline,
+                        size: 48,
+                        color: Colors.grey[400],
                       ),
-                      const SizedBox(width: 8),
+                      const SizedBox(height: 16),
                       Text(
-                        '${users.length} total',
-                        style: const TextStyle(
-                          fontSize: 13,
-                          color: AppColors.textSecondary,
-                        ),
+                        'No hay usuarios registrados',
+                        style: TextStyle(fontSize: 14, color: Colors.grey[600]),
                       ),
                     ],
                   ),
-                ),
-                ListView.separated(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: users.length > 10 ? 10 : users.length,
-                  separatorBuilder: (_, __) => const Divider(
-                    height: 1,
-                    color: AppColors.border,
-                    indent: 16,
-                    endIndent: 16,
+                );
+              }
+
+              if (users.isEmpty && !isConnected) {
+                return Padding(
+                  padding: const EdgeInsets.all(32),
+                  child: Column(
+                    children: [
+                      Icon(Icons.wifi_off, size: 48, color: Colors.grey[400]),
+                      const SizedBox(height: 16),
+                      Text(
+                        'Sin conexión',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Conéctate para ver usuarios activos',
+                        style: TextStyle(fontSize: 12, color: Colors.grey[500]),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
                   ),
-                  itemBuilder: (context, index) {
-                    final user = users[index];
-                    return ListTile(
-                      leading: Stack(
-                        children: [
-                          CircleAvatar(
-                            backgroundColor: theme.primary.withValues(alpha: 0.1),
-                            child: Text(
-                              user.name.isNotEmpty ? user.name[0].toUpperCase() : '?',
-                              style: TextStyle(
-                                color: theme.primary,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
+                );
+              }
+
+              final onlineUsers = users.where((u) => u.isOnline).length;
+
+              return Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 6,
                           ),
-                          if (user.isOnline)
-                            Positioned(
-                              right: 0,
-                              bottom: 0,
-                              child: Container(
-                                width: 12,
-                                height: 12,
-                                decoration: BoxDecoration(
+                          decoration: BoxDecoration(
+                            color: AppColors.success.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Container(
+                                width: 8,
+                                height: 8,
+                                decoration: const BoxDecoration(
                                   color: AppColors.success,
                                   shape: BoxShape.circle,
-                                  border: Border.all(
-                                    color: Colors.white,
-                                    width: 2,
-                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 6),
+                              Text(
+                                '$onlineUsers en línea',
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.success,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          '${users.length} total',
+                          style: const TextStyle(
+                            fontSize: 13,
+                            color: AppColors.textSecondary,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  ListView.separated(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: users.length > 10 ? 10 : users.length,
+                    separatorBuilder:
+                        (_, __) => const Divider(
+                          height: 1,
+                          color: AppColors.border,
+                          indent: 16,
+                          endIndent: 16,
+                        ),
+                    itemBuilder: (context, index) {
+                      final user = users[index];
+                      return ListTile(
+                        leading: Stack(
+                          children: [
+                            CircleAvatar(
+                              backgroundColor: theme.primary.withValues(
+                                alpha: 0.1,
+                              ),
+                              child: Text(
+                                user.name.isNotEmpty
+                                    ? user.name[0].toUpperCase()
+                                    : '?',
+                                style: TextStyle(
+                                  color: theme.primary,
+                                  fontWeight: FontWeight.w600,
                                 ),
                               ),
                             ),
-                        ],
-                      ),
-                      title: Text(
-                        user.name,
-                        style: const TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.textPrimary,
+                            if (user.isOnline)
+                              Positioned(
+                                right: 0,
+                                bottom: 0,
+                                child: Container(
+                                  width: 12,
+                                  height: 12,
+                                  decoration: BoxDecoration(
+                                    color: AppColors.success,
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                      color: Colors.white,
+                                      width: 2,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                          ],
                         ),
-                      ),
-                      subtitle: Text(
-                        user.email,
-                        style: const TextStyle(
-                          fontSize: 12,
-                          color: AppColors.textSecondary,
+                        title: Text(
+                          user.name,
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.textPrimary,
+                          ),
                         ),
-                      ),
-                      trailing: Text(
-                        user.statusText,
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: user.isOnline ? AppColors.success : AppColors.textSecondary,
-                          fontWeight: user.isOnline ? FontWeight.w600 : FontWeight.normal,
+                        subtitle: Text(
+                          user.email,
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: AppColors.textSecondary,
+                          ),
                         ),
-                      ),
-                    );
-                  },
-                ),
-              ],
-            );
-          },
-          loading: () => const Padding(
-            padding: EdgeInsets.all(32),
-            child: Center(
-              child: CircularProgressIndicator(),
-            ),
-          ),
-          error: (error, stack) {
-            final isPermissionError = error.toString().contains('permission-denied');
-            final isUnavailableError = error.toString().contains('UNAVAILABLE');
-            
-            return Padding(
-              padding: const EdgeInsets.all(24),
-              child: Column(
-                children: [
-                  Icon(
-                    isPermissionError 
-                        ? Icons.lock_outline 
-                        : isUnavailableError
-                            ? Icons.wifi_off
-                            : Icons.error_outline,
-                    size: 48,
-                    color: Colors.grey[400],
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    isPermissionError 
-                        ? 'Sin permisos de acceso'
-                        : isUnavailableError
-                            ? 'Sin conexión al servidor'
-                            : 'Error al cargar usuarios',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.grey[700],
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    isPermissionError 
-                        ? 'Verifica las reglas de seguridad en Firebase'
-                        : isUnavailableError
-                            ? 'Verifica tu conexión a internet'
-                            : 'Intenta refrescar la pantalla',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.grey[500],
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 16),
-                  OutlinedButton.icon(
-                    onPressed: () {
-                      // Forzar reconexión y refrescar
-                      ref.read(connectivityServiceProvider).checkConnectionManually();
-                      ref.invalidate(activeUsersProvider);
+                        trailing: Text(
+                          user.statusText,
+                          style: TextStyle(
+                            fontSize: 12,
+                            color:
+                                user.isOnline
+                                    ? AppColors.success
+                                    : AppColors.textSecondary,
+                            fontWeight:
+                                user.isOnline
+                                    ? FontWeight.w600
+                                    : FontWeight.normal,
+                          ),
+                        ),
+                      );
                     },
-                    icon: const Icon(Icons.refresh, size: 18),
-                    label: const Text('Reintentar'),
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: theme.primary,
-                      side: BorderSide(color: theme.primary),
-                    ),
                   ),
                 ],
-              ),
-            );
-          },
-        ),
-      ],
-    ),
-  );
-}
+              );
+            },
+            loading:
+                () => const Padding(
+                  padding: EdgeInsets.all(32),
+                  child: Center(child: CircularProgressIndicator()),
+                ),
+            error: (error, stack) {
+              final isPermissionError = error.toString().contains(
+                'permission-denied',
+              );
+              final isUnavailableError = error.toString().contains(
+                'UNAVAILABLE',
+              );
+
+              return Padding(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  children: [
+                    Icon(
+                      isPermissionError
+                          ? Icons.lock_outline
+                          : isUnavailableError
+                          ? Icons.wifi_off
+                          : Icons.error_outline,
+                      size: 48,
+                      color: Colors.grey[400],
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      isPermissionError
+                          ? 'Sin permisos de acceso'
+                          : isUnavailableError
+                          ? 'Sin conexión al servidor'
+                          : 'Error al cargar usuarios',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.grey[700],
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      isPermissionError
+                          ? 'Verifica las reglas de seguridad en Firebase'
+                          : isUnavailableError
+                          ? 'Verifica tu conexión a internet'
+                          : 'Intenta refrescar la pantalla',
+                      style: TextStyle(fontSize: 12, color: Colors.grey[500]),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 16),
+                    OutlinedButton.icon(
+                      onPressed: () {
+                        // Forzar reconexión y refrescar
+                        ref
+                            .read(connectivityServiceProvider)
+                            .checkConnectionManually();
+                        ref.invalidate(activeUsersProvider);
+                      },
+                      icon: const Icon(Icons.refresh, size: 18),
+                      label: const Text('Reintentar'),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: theme.primary,
+                        side: BorderSide(color: theme.primary),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
 
   // Sección de información
   Widget _buildInfoSection(UserModel user, AppTheme theme) {
-      String roleLabel;
+    String roleLabel;
     switch (user.role) {
       case UserRole.admin:
         roleLabel = 'Administrador';
@@ -1121,10 +1144,7 @@ Widget _buildActiveUsersList(AppTheme theme) {
             ),
             title: const Text(
               'Usuario',
-              style: TextStyle(
-                fontSize: 14,
-                color: AppColors.textSecondary,
-              ),
+              style: TextStyle(fontSize: 14, color: AppColors.textSecondary),
             ),
             subtitle: Text(
               user.name,
@@ -1135,7 +1155,12 @@ Widget _buildActiveUsersList(AppTheme theme) {
               ),
             ),
           ),
-          const Divider(height: 1, color: AppColors.border, indent: 16, endIndent: 16),
+          const Divider(
+            height: 1,
+            color: AppColors.border,
+            indent: 16,
+            endIndent: 16,
+          ),
           ListTile(
             leading: Container(
               padding: const EdgeInsets.all(8),
@@ -1147,10 +1172,7 @@ Widget _buildActiveUsersList(AppTheme theme) {
             ),
             title: const Text(
               'Correo',
-              style: TextStyle(
-                fontSize: 14,
-                color: AppColors.textSecondary,
-              ),
+              style: TextStyle(fontSize: 14, color: AppColors.textSecondary),
             ),
             subtitle: Text(
               user.email,
@@ -1161,7 +1183,12 @@ Widget _buildActiveUsersList(AppTheme theme) {
               ),
             ),
           ),
-          const Divider(height: 1, color: AppColors.border, indent: 16, endIndent: 16),
+          const Divider(
+            height: 1,
+            color: AppColors.border,
+            indent: 16,
+            endIndent: 16,
+          ),
           ListTile(
             leading: Container(
               padding: const EdgeInsets.all(8),
@@ -1173,10 +1200,7 @@ Widget _buildActiveUsersList(AppTheme theme) {
             ),
             title: const Text(
               'Rol',
-              style: TextStyle(
-                fontSize: 14,
-                color: AppColors.textSecondary,
-              ),
+              style: TextStyle(fontSize: 14, color: AppColors.textSecondary),
             ),
             subtitle: Text(
               roleLabel,
@@ -1201,23 +1225,26 @@ Widget _buildActiveUsersList(AppTheme theme) {
         onPressed: () async {
           final confirm = await showDialog<bool>(
             context: context,
-            builder: (context) => AlertDialog(
-              title: const Text('Restablecer configuración'),
-              content: const Text(
-                '¿Estás seguro de que deseas restablecer toda la configuración a los valores predeterminados?',
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context, false),
-                  child: const Text('Cancelar'),
+            builder:
+                (context) => AlertDialog(
+                  title: const Text('Restablecer configuración'),
+                  content: const Text(
+                    '¿Estás seguro de que deseas restablecer toda la configuración a los valores predeterminados?',
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context, false),
+                      child: const Text('Cancelar'),
+                    ),
+                    TextButton(
+                      onPressed: () => Navigator.pop(context, true),
+                      style: TextButton.styleFrom(
+                        foregroundColor: AppColors.error,
+                      ),
+                      child: const Text('Restablecer'),
+                    ),
+                  ],
                 ),
-                TextButton(
-                  onPressed: () => Navigator.pop(context, true),
-                  style: TextButton.styleFrom(foregroundColor: AppColors.error),
-                  child: const Text('Restablecer'),
-                ),
-              ],
-            ),
           );
 
           if (confirm == true) {
@@ -1236,13 +1263,17 @@ Widget _buildActiveUsersList(AppTheme theme) {
                     children: [
                       Icon(Icons.check_circle_outline, color: Colors.white),
                       SizedBox(width: 8),
-                      Expanded(child: Text('Configuración restablecida correctamente')),
+                      Expanded(
+                        child: Text('Configuración restablecida correctamente'),
+                      ),
                     ],
                   ),
                   backgroundColor: AppColors.success,
                   behavior: SnackBarBehavior.floating,
                   margin: EdgeInsets.all(16),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(8))),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(8)),
+                  ),
                   duration: Duration(seconds: 3),
                 ),
               );
@@ -1276,4 +1307,3 @@ Widget _buildActiveUsersList(AppTheme theme) {
     );
   }
 }
- 

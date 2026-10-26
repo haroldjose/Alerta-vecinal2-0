@@ -7,12 +7,17 @@ const { requireAuth, readTextBody} = require('./security');
 const { notifyOnReportCreated} = require('./notifications');
 const { resolveLogin } = require('./login');
 
+const { updateManagedUser, deleteManagedUser } = require('./manageUsers');
+
 
 
 initializeApp();
 
 exports.notifyOnReportCreated= notifyOnReportCreated;
 exports.resolveLogin = resolveLogin;
+
+exports.updateManagedUser = updateManagedUser;
+exports.deleteManagedUser = deleteManagedUser;
 
 const hfApiKey = defineSecret('HF_API_KEY');
 

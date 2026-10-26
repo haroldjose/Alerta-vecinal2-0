@@ -126,6 +126,7 @@ class UserModel {
   final String? profileImage;
   final DateTime createdAt;
   final NotificationPreferences notificationPreferences; //
+  final String? createdBy; //
 
   UserModel({
     required this.id,
@@ -139,6 +140,7 @@ class UserModel {
     this.profileImage,
     required this.createdAt,
     this.notificationPreferences = const NotificationPreferences(), //
+    this.createdBy, //
   });
 
   factory UserModel.fromFirestore(DocumentSnapshot doc) {
@@ -156,7 +158,8 @@ class UserModel {
       createdAt: (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
       notificationPreferences: NotificationPreferences.fromMap(
         data['notificationPreferences'] as Map<String, dynamic>?,
-        ),  
+        ),
+      createdBy: data['createdBy'], //    
     );
   }
 
@@ -197,6 +200,7 @@ class UserModel {
       'profileImage': profileImage,
       'createdAt': Timestamp.fromDate(createdAt),
       'notificationPreferences': notificationPreferences.toMap(), //
+      'createdBy': createdBy,  //
     };
   }
 
@@ -212,6 +216,7 @@ class UserModel {
     String? profileImage,
     DateTime? createdAt,
     NotificationPreferences? notificationPreferences,
+    String? createdBy,  //
   }) {
     return UserModel(
       id: id ?? this.id,
@@ -226,6 +231,7 @@ class UserModel {
       createdAt: createdAt ?? this.createdAt,
       notificationPreferences:
           notificationPreferences ?? this.notificationPreferences,
+      createdBy: createdBy ?? this.createdBy,  //  
     );
   }
 }
