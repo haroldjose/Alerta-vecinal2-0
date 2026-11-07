@@ -1,0 +1,612 @@
+{
+  "_meta": {
+    "descripcion": "Conjunto de prueba etiquetado a mano con textos de reportes vecinales (contexto Cochabamba). problemType: 40 textos (10 por categoría). offensive: 22 ofensivos y 22 no ofensivos (incluye textos legítimos con palabras como 'animal', 'robar' o 'asco' para medir falsos positivos). duplicates: 15 pares duplicados (paráfrasis del mismo hecho) y 15 no duplicados (mismo tema con hecho distinto y temas distintos).",
+    "nota": "Las etiquetas las definió el autor. Para mayor validez, que otra persona revise las etiquetas ambiguas antes de citar los resultados."
+  },
+  "problemType": [
+    {
+      "id": "T01",
+      "text": "Intentaron robar en la tienda de la esquina. Rompieron el candado de la cortina pero no pudieron entrar.",
+      "expected": "inseguridad"
+    },
+    {
+      "id": "T02",
+      "text": "Grupo de jóvenes consumiendo alcohol en la plaza y molestando a los que pasan por la noche.",
+      "expected": "inseguridad"
+    },
+    {
+      "id": "T03",
+      "text": "Dos personas sospechosas rondando los autos estacionados en mi calle desde las 11 de la noche.",
+      "expected": "inseguridad"
+    },
+    {
+      "id": "T04",
+      "text": "Me asaltaron al bajar del micro en la avenida, me quitaron el celular y la mochila.",
+      "expected": "inseguridad"
+    },
+    {
+      "id": "T05",
+      "text": "Hubo una pelea con cuchillos afuera de la cancha y hay heridos.",
+      "expected": "inseguridad"
+    },
+    {
+      "id": "T06",
+      "text": "Escucharon disparos anoche cerca del puente, necesitamos más patrullaje policial.",
+      "expected": "inseguridad"
+    },
+    {
+      "id": "T07",
+      "text": "Un hombre desconocido sigue a las niñas que salen del colegio por la tarde.",
+      "expected": "inseguridad"
+    },
+    {
+      "id": "T08",
+      "text": "Rompieron los vidrios de la sede social y dejaron amenazas escritas en las paredes.",
+      "expected": "inseguridad"
+    },
+    {
+      "id": "T09",
+      "text": "Carteristas actúan en el mercado los fines de semana, ya robaron a varias señoras.",
+      "expected": "inseguridad"
+    },
+    {
+      "id": "T10",
+      "text": "Desde hace una semana no funciona la alarma comunitaria y tememos que entren a las casas.",
+      "expected": "inseguridad"
+    },
+    {
+      "id": "T11",
+      "text": "Hace tres días no tenemos agua potable en toda la zona sur del barrio.",
+      "expected": "serviciosBasicos"
+    },
+    {
+      "id": "T12",
+      "text": "El poste de luz de la esquina lleva una semana apagado y la calle está oscura.",
+      "expected": "serviciosBasicos"
+    },
+    {
+      "id": "T13",
+      "text": "Hay un bache enorme en la calle principal que daña los autos.",
+      "expected": "serviciosBasicos"
+    },
+    {
+      "id": "T14",
+      "text": "Se rompió la tubería y sale agua limpia por la calle desde ayer.",
+      "expected": "serviciosBasicos"
+    },
+    {
+      "id": "T15",
+      "text": "El semáforo del cruce de la avenida no funciona y casi hay accidentes.",
+      "expected": "serviciosBasicos"
+    },
+    {
+      "id": "T16",
+      "text": "La alcantarilla está tapada y se inunda la calle cuando llueve.",
+      "expected": "serviciosBasicos"
+    },
+    {
+      "id": "T17",
+      "text": "Hay un cable de alta tensión suelto cerca de la escuela, es muy peligroso.",
+      "expected": "serviciosBasicos"
+    },
+    {
+      "id": "T18",
+      "text": "Hace dos semanas el camión no recoge la basura de mi calle.",
+      "expected": "serviciosBasicos"
+    },
+    {
+      "id": "T19",
+      "text": "No hay gas domiciliario desde el corte del lunes.",
+      "expected": "serviciosBasicos"
+    },
+    {
+      "id": "T20",
+      "text": "El transformador hace chispas y se corta la luz por las noches.",
+      "expected": "serviciosBasicos"
+    },
+    {
+      "id": "T21",
+      "text": "Queman llantas en el terreno baldío y el humo no nos deja respirar.",
+      "expected": "contaminacion"
+    },
+    {
+      "id": "T22",
+      "text": "Hay basura acumulada en la esquina con mal olor y moscas.",
+      "expected": "contaminacion"
+    },
+    {
+      "id": "T23",
+      "text": "Una fábrica vierte aceite y residuos en la acequia del barrio.",
+      "expected": "contaminacion"
+    },
+    {
+      "id": "T24",
+      "text": "El río que pasa por el barrio está lleno de desechos y huele muy mal.",
+      "expected": "contaminacion"
+    },
+    {
+      "id": "T25",
+      "text": "Música a todo volumen en el local de eventos hasta la madrugada, el ruido es insoportable.",
+      "expected": "contaminacion"
+    },
+    {
+      "id": "T26",
+      "text": "Tiran escombros y desmonte en el parque y todo está lleno de basura.",
+      "expected": "contaminacion"
+    },
+    {
+      "id": "T27",
+      "text": "Una nube de polvo y humo negro de los camiones nos afecta todo el día.",
+      "expected": "contaminacion"
+    },
+    {
+      "id": "T28",
+      "text": "Derramaron combustible en la calle y contaminó la tierra del jardín.",
+      "expected": "contaminacion"
+    },
+    {
+      "id": "T29",
+      "text": "Echan agua sucia con químicos al desagüe de la calle y hay un olor fuerte.",
+      "expected": "contaminacion"
+    },
+    {
+      "id": "T30",
+      "text": "Los criaderos de cerdos tiran sus desechos a la quebrada y hay un hedor permanente.",
+      "expected": "contaminacion"
+    },
+    {
+      "id": "T31",
+      "text": "Mi vecino hace fiestas ruidosas todos los fines de semana hasta las 4 de la mañana.",
+      "expected": "convivencia"
+    },
+    {
+      "id": "T32",
+      "text": "Perros sueltos sin dueño ladran toda la noche y uno mordió a un niño.",
+      "expected": "convivencia"
+    },
+    {
+      "id": "T33",
+      "text": "Un auto está estacionado bloqueando la entrada de mi garaje desde hace días.",
+      "expected": "convivencia"
+    },
+    {
+      "id": "T34",
+      "text": "Discusión constante con el vecino por el muro que construyó invadiendo mi terreno.",
+      "expected": "convivencia"
+    },
+    {
+      "id": "T35",
+      "text": "Los vecinos del edificio dejan sus bolsas en el pasillo común y no respetan los turnos de limpieza.",
+      "expected": "convivencia"
+    },
+    {
+      "id": "T36",
+      "text": "El vecino de arriba golpea el piso y grita a cualquier hora, no podemos descansar.",
+      "expected": "convivencia"
+    },
+    {
+      "id": "T37",
+      "text": "Ponen puestos de venta en la vereda y no dejan pasar a las personas mayores.",
+      "expected": "convivencia"
+    },
+    {
+      "id": "T38",
+      "text": "Hay una pelea entre vecinos por el uso del lavandero comunal.",
+      "expected": "convivencia"
+    },
+    {
+      "id": "T39",
+      "text": "Alguien rayó la pared de mi casa con pintura, hay que hablar con las familias del barrio.",
+      "expected": "convivencia"
+    },
+    {
+      "id": "T40",
+      "text": "Un vecino cría gallinas y gallos en su terraza y el canto no nos deja dormir.",
+      "expected": "convivencia"
+    }
+  ],
+  "offensive": [
+    {
+      "id": "O01",
+      "text": "El alcalde es un idiota y un inútil, no hace nada por el barrio.",
+      "expected": true
+    },
+    {
+      "id": "O02",
+      "text": "Esos vecinos son unos malditos pendejos que tiran la basura en mi puerta.",
+      "expected": true
+    },
+    {
+      "id": "O03",
+      "text": "Qué mierda de servicio de agua, son unos ladrones hijos de puta.",
+      "expected": true
+    },
+    {
+      "id": "O04",
+      "text": "Policía estúpido, nunca llega cuando lo llamamos.",
+      "expected": true
+    },
+    {
+      "id": "O05",
+      "text": "Cállense de una vez, imbéciles, nadie quiere escuchar su música.",
+      "expected": true
+    },
+    {
+      "id": "O06",
+      "text": "Ese tipo es un cabrón que le pega a su perro.",
+      "expected": true
+    },
+    {
+      "id": "O07",
+      "text": "Basura de gente, son unos asquerosos que ensucian todo.",
+      "expected": true
+    },
+    {
+      "id": "O08",
+      "text": "Eres un burro, no sabes ni leer los carteles.",
+      "expected": true
+    },
+    {
+      "id": "O09",
+      "text": "Vayan a la mierda con su fiesta de todos los días.",
+      "expected": true
+    },
+    {
+      "id": "O10",
+      "text": "Estos weones no respetan a nadie.",
+      "expected": true
+    },
+    {
+      "id": "O11",
+      "text": "El presidente de la junta vecinal es un huevón corrupto.",
+      "expected": true
+    },
+    {
+      "id": "O12",
+      "text": "Que se vayan a la chingada esos inútiles.",
+      "expected": true
+    },
+    {
+      "id": "O13",
+      "text": "Pinche gobierno, nunca arreglan nada.",
+      "expected": true
+    },
+    {
+      "id": "O14",
+      "text": "Hijos de la gran puta, me robaron la bicicleta.",
+      "expected": true
+    },
+    {
+      "id": "O15",
+      "text": "Mal nacidos todos ustedes, ojalá se mueran.",
+      "expected": true
+    },
+    {
+      "id": "O16",
+      "text": "Que te pudras, desgraciado.",
+      "expected": true
+    },
+    {
+      "id": "O17",
+      "text": "Estúpida vieja entrometida, métete en tu casa.",
+      "expected": true
+    },
+    {
+      "id": "O18",
+      "text": "Eres una porquería de persona, inservible.",
+      "expected": true
+    },
+    {
+      "id": "O19",
+      "text": "Son unos animales, no tienen educación.",
+      "expected": true
+    },
+    {
+      "id": "O20",
+      "text": "Maldito ladrón de mierda, te voy a encontrar.",
+      "expected": true
+    },
+    {
+      "id": "O21",
+      "text": "Qué id1ota el que estacionó ahí.",
+      "expected": true
+    },
+    {
+      "id": "O22",
+      "text": "Son unos p3ndejos, no respetan a nadie.",
+      "expected": true
+    },
+    {
+      "id": "L01",
+      "text": "Intentaron robar en un negocio del barrio, cortaron la cortina pero no pudieron entrar.",
+      "expected": false
+    },
+    {
+      "id": "L02",
+      "text": "Hay un ladrón rondando las casas, necesitamos patrullaje.",
+      "expected": false
+    },
+    {
+      "id": "L03",
+      "text": "Un perro suelto mordió a un niño en la plaza.",
+      "expected": false
+    },
+    {
+      "id": "L04",
+      "text": "Los animales abandonados en la calle necesitan ayuda, hay varios perros heridos.",
+      "expected": false
+    },
+    {
+      "id": "L05",
+      "text": "Hay un animal muerto en la acequia que provoca mal olor.",
+      "expected": false
+    },
+    {
+      "id": "L06",
+      "text": "La basura acumulada da asco a todos los que pasan por el parque.",
+      "expected": false
+    },
+    {
+      "id": "L07",
+      "text": "Qué bestia de bache, casi rompo la llanta.",
+      "expected": false
+    },
+    {
+      "id": "L08",
+      "text": "El agua sale turbia y con mal olor desde el lunes.",
+      "expected": false
+    },
+    {
+      "id": "L09",
+      "text": "Una pelea entre dos hombres con cuchillos terminó con un herido en la esquina.",
+      "expected": false
+    },
+    {
+      "id": "L10",
+      "text": "Hay un hueco enorme en la calle, es peligroso para los niños.",
+      "expected": false
+    },
+    {
+      "id": "L11",
+      "text": "La música muy alta de la fiesta no nos deja dormir desde las 10 de la noche.",
+      "expected": false
+    },
+    {
+      "id": "L12",
+      "text": "Pedimos al municipio reparar el poste de luz que está apagado.",
+      "expected": false
+    },
+    {
+      "id": "L13",
+      "text": "Los vecinos arrojan desechos en el río y huele muy mal.",
+      "expected": false
+    },
+    {
+      "id": "L14",
+      "text": "Roban cables de luz en la zona, ya van tres veces este mes.",
+      "expected": false
+    },
+    {
+      "id": "L15",
+      "text": "Un auto bloquea la entrada de mi casa desde hace dos días.",
+      "expected": false
+    },
+    {
+      "id": "L16",
+      "text": "Hay jóvenes tomando alcohol en la plaza hasta tarde.",
+      "expected": false
+    },
+    {
+      "id": "L17",
+      "text": "Se necesita más iluminación en la calle porque es oscura y asusta a las personas.",
+      "expected": false
+    },
+    {
+      "id": "L18",
+      "text": "No recogen la basura desde hace una semana y los contenedores están desbordados.",
+      "expected": false
+    },
+    {
+      "id": "L19",
+      "text": "Gracias a los vecinos que ayudaron a limpiar la acequia.",
+      "expected": false
+    },
+    {
+      "id": "L20",
+      "text": "El semáforo no funciona y casi atropellan a una señora.",
+      "expected": false
+    },
+    {
+      "id": "L21",
+      "text": "La tubería rota inundó el garaje y estoy muy molesto con la empresa de agua.",
+      "expected": false
+    },
+    {
+      "id": "L22",
+      "text": "Es una vergüenza que nadie arregle la calle; exigimos una respuesta de la alcaldía.",
+      "expected": false
+    }
+  ],
+  "duplicates": [
+    {
+      "id": "D01",
+      "a": "Rompieron la cortina de la tienda de la esquina para robar",
+      "b": "Intentaron robar en el negocio de la esquina, cortaron la cortina pero no pudieron entrar",
+      "expected": true
+    },
+    {
+      "id": "D02",
+      "a": "No hay agua potable en el barrio desde hace tres días",
+      "b": "Llevamos 72 horas sin agua en la zona",
+      "expected": true
+    },
+    {
+      "id": "D03",
+      "a": "El poste de luz de la calle 5 está apagado",
+      "b": "Falta iluminación en la calle 5 porque el foco del poste no prende",
+      "expected": true
+    },
+    {
+      "id": "D04",
+      "a": "Bache grande en la avenida principal",
+      "b": "Hay un hueco enorme en la avenida principal que rompe los autos",
+      "expected": true
+    },
+    {
+      "id": "D05",
+      "a": "Queman llantas en el terreno baldío",
+      "b": "Humo negro por quema de neumáticos en el lote vacío",
+      "expected": true
+    },
+    {
+      "id": "D06",
+      "a": "Fiesta ruidosa del vecino hasta la madrugada",
+      "b": "El vecino hizo una fiesta con música muy alta toda la noche",
+      "expected": true
+    },
+    {
+      "id": "D07",
+      "a": "Perro suelto mordió a un niño en la plaza",
+      "b": "Un niño fue atacado por un perro sin dueño en la plaza",
+      "expected": true
+    },
+    {
+      "id": "D08",
+      "a": "Basura acumulada en la esquina con mal olor",
+      "b": "Hay un basural en la esquina que huele muy mal",
+      "expected": true
+    },
+    {
+      "id": "D09",
+      "a": "Semáforo dañado en el cruce de la avenida",
+      "b": "El semáforo del cruce no funciona",
+      "expected": true
+    },
+    {
+      "id": "D10",
+      "a": "Grupo de jóvenes tomando alcohol en la plaza",
+      "b": "Jóvenes ebrios molestan en la plaza por la noche",
+      "expected": true
+    },
+    {
+      "id": "D11",
+      "a": "Tubería rota inunda la calle",
+      "b": "Se rompió un caño y el agua corre por la calle",
+      "expected": true
+    },
+    {
+      "id": "D12",
+      "a": "Auto bloqueando mi garaje",
+      "b": "Hay un vehículo estacionado frente a mi entrada que no me deja salir",
+      "expected": true
+    },
+    {
+      "id": "D13",
+      "a": "Asaltaron a una señora en la parada del micro",
+      "b": "Le robaron la cartera a una mujer cuando esperaba el micro",
+      "expected": true
+    },
+    {
+      "id": "D14",
+      "a": "Cable de luz suelto cerca de la escuela",
+      "b": "Hay un cable eléctrico caído junto al colegio",
+      "expected": true
+    },
+    {
+      "id": "D15",
+      "a": "Fábrica vierte aceite en la acequia",
+      "b": "Una industria tira residuos de aceite a la acequia del barrio",
+      "expected": true
+    },
+    {
+      "id": "N01",
+      "a": "Rompieron la cortina de la tienda de la esquina para robar",
+      "b": "Asaltaron a una señora en la parada del micro",
+      "expected": false
+    },
+    {
+      "id": "N02",
+      "a": "No hay agua potable en el barrio desde hace tres días",
+      "b": "Tubería rota inunda la calle",
+      "expected": false
+    },
+    {
+      "id": "N03",
+      "a": "El poste de luz de la calle 5 está apagado",
+      "b": "El transformador hace chispas en la calle 12",
+      "expected": false
+    },
+    {
+      "id": "N04",
+      "a": "Bache grande en la avenida principal",
+      "b": "El semáforo del cruce de la avenida no funciona",
+      "expected": false
+    },
+    {
+      "id": "N05",
+      "a": "Queman llantas en el terreno baldío",
+      "b": "Fábrica vierte aceite en la acequia",
+      "expected": false
+    },
+    {
+      "id": "N06",
+      "a": "Fiesta ruidosa del vecino hasta la madrugada",
+      "b": "Música a todo volumen en el local de eventos de la avenida",
+      "expected": false
+    },
+    {
+      "id": "N07",
+      "a": "Perro suelto mordió a un niño en la plaza",
+      "b": "Un vecino cría gallinas en su terraza y el canto no deja dormir",
+      "expected": false
+    },
+    {
+      "id": "N08",
+      "a": "Basura acumulada en la esquina con mal olor",
+      "b": "No recogen la basura de mi calle desde hace dos semanas",
+      "expected": false
+    },
+    {
+      "id": "N09",
+      "a": "Grupo de jóvenes tomando alcohol en la plaza",
+      "b": "Pelea con cuchillos afuera de la cancha",
+      "expected": false
+    },
+    {
+      "id": "N10",
+      "a": "Auto bloqueando mi garaje",
+      "b": "Puestos de venta bloquean la vereda",
+      "expected": false
+    },
+    {
+      "id": "N11",
+      "a": "Hay un hueco enorme en la calle",
+      "b": "Fiesta con música muy alta toda la noche",
+      "expected": false
+    },
+    {
+      "id": "N12",
+      "a": "Cable eléctrico caído junto al colegio",
+      "b": "Perro suelto mordió a un niño",
+      "expected": false
+    },
+    {
+      "id": "N13",
+      "a": "Humo de quema de llantas en el terreno",
+      "b": "Falta de agua potable en el barrio",
+      "expected": false
+    },
+    {
+      "id": "N14",
+      "a": "Asaltaron a una señora en la calle",
+      "b": "Basura acumulada en la esquina",
+      "expected": false
+    },
+    {
+      "id": "N15",
+      "a": "Fiesta ruidosa del vecino",
+      "b": "Poste de luz apagado en la calle",
+      "expected": false
+    }
+  ]
+}
