@@ -1,0 +1,2211 @@
+{
+  "mode": "hf",
+  "started": "2026-10-30T11:40:09.829Z",
+  "calls": [
+    {
+      "api": "toxicity",
+      "status": 200,
+      "ms": 705.3625999999999,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "toxicity",
+      "status": 200,
+      "ms": 91.00369999999998,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "toxicity",
+      "status": 200,
+      "ms": 84.93990000000008,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "toxicity",
+      "status": 200,
+      "ms": 87.57709999999997,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "toxicity",
+      "status": 200,
+      "ms": 98.18539999999985,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "toxicity",
+      "status": 200,
+      "ms": 89.25649999999996,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "toxicity",
+      "status": 200,
+      "ms": 84.27959999999985,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "toxicity",
+      "status": 200,
+      "ms": 86.57120000000009,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "toxicity",
+      "status": 200,
+      "ms": 83.55540000000019,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "toxicity",
+      "status": 200,
+      "ms": 84.2926,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "toxicity",
+      "status": 200,
+      "ms": 89.55539999999996,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "toxicity",
+      "status": 200,
+      "ms": 93.21650000000022,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "toxicity",
+      "status": 200,
+      "ms": 100.91300000000001,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "toxicity",
+      "status": 200,
+      "ms": 100.14469999999983,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "toxicity",
+      "status": 200,
+      "ms": 97.18510000000015,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "toxicity",
+      "status": 200,
+      "ms": 77.67759999999998,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "toxicity",
+      "status": 200,
+      "ms": 71.67919999999958,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "toxicity",
+      "status": 200,
+      "ms": 74.80960000000005,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "toxicity",
+      "status": 200,
+      "ms": 74.9411,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "toxicity",
+      "status": 200,
+      "ms": 81.11049999999977,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "toxicity",
+      "status": 200,
+      "ms": 72.86109999999962,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "toxicity",
+      "status": 200,
+      "ms": 77.52319999999963,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "toxicity",
+      "status": 200,
+      "ms": 85.3719000000001,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "toxicity",
+      "status": 200,
+      "ms": 78.01490000000013,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "toxicity",
+      "status": 200,
+      "ms": 77.55459999999994,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "toxicity",
+      "status": 200,
+      "ms": 80.76420000000007,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "toxicity",
+      "status": 200,
+      "ms": 79.3155999999999,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "toxicity",
+      "status": 200,
+      "ms": 75.58960000000025,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "toxicity",
+      "status": 200,
+      "ms": 75.20040000000017,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "toxicity",
+      "status": 200,
+      "ms": 80.14449999999988,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "toxicity",
+      "status": 200,
+      "ms": 78.72690000000011,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "toxicity",
+      "status": 200,
+      "ms": 79.61100000000033,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "toxicity",
+      "status": 200,
+      "ms": 81.12289999999985,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "toxicity",
+      "status": 200,
+      "ms": 80.02529999999979,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "toxicity",
+      "status": 200,
+      "ms": 83.53650000000016,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "toxicity",
+      "status": 200,
+      "ms": 88.57650000000012,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "toxicity",
+      "status": 200,
+      "ms": 84.17780000000039,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "toxicity",
+      "status": 200,
+      "ms": 79.04929999999968,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "toxicity",
+      "status": 200,
+      "ms": 115.40239999999994,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "toxicity",
+      "status": 200,
+      "ms": 93.09810000000016,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "toxicity",
+      "status": 200,
+      "ms": 83.65189999999984,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "toxicity",
+      "status": 200,
+      "ms": 87.6848000000009,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "toxicity",
+      "status": 200,
+      "ms": 94.28099999999995,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "toxicity",
+      "status": 200,
+      "ms": 99.10990000000038,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "type",
+      "status": 200,
+      "ms": 1987.5642000000007,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "type",
+      "status": 200,
+      "ms": 1221.5618999999997,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "type",
+      "status": 200,
+      "ms": 1299.847099999999,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "type",
+      "status": 200,
+      "ms": 1231.2760999999991,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "type",
+      "status": 200,
+      "ms": 1246.4157000000014,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "type",
+      "status": 200,
+      "ms": 1232.2931000000008,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "type",
+      "status": 200,
+      "ms": 1177.5346000000009,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "type",
+      "status": 200,
+      "ms": 1210.0187999999998,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "type",
+      "status": 200,
+      "ms": 1267.2672999999977,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "type",
+      "status": 200,
+      "ms": 1168.4807,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "type",
+      "status": 200,
+      "ms": 1149.5910000000003,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "type",
+      "status": 200,
+      "ms": 1168.5515000000014,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "type",
+      "status": 200,
+      "ms": 1197.787900000003,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "type",
+      "status": 200,
+      "ms": 1184.212599999999,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "type",
+      "status": 200,
+      "ms": 1215.4094000000005,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "type",
+      "status": 200,
+      "ms": 1177.0959000000003,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "type",
+      "status": 200,
+      "ms": 1165.3761000000013,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "type",
+      "status": 200,
+      "ms": 1153.1893999999993,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "type",
+      "status": 200,
+      "ms": 1105.8243000000002,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "type",
+      "status": 200,
+      "ms": 1114.1993000000002,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "type",
+      "status": 200,
+      "ms": 1252.7726000000002,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "type",
+      "status": 200,
+      "ms": 1183.9049000000014,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "type",
+      "status": 200,
+      "ms": 1186.7790000000023,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "type",
+      "status": 200,
+      "ms": 1343.6261999999988,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "type",
+      "status": 200,
+      "ms": 1260.7039000000004,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "type",
+      "status": 200,
+      "ms": 1376.4535000000033,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "type",
+      "status": 200,
+      "ms": 1189.6399999999994,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "type",
+      "status": 200,
+      "ms": 1223.584600000002,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "type",
+      "status": 200,
+      "ms": 1201.2049000000043,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "type",
+      "status": 200,
+      "ms": 1217.9187999999995,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "type",
+      "status": 200,
+      "ms": 1378.7903000000006,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "type",
+      "status": 200,
+      "ms": 1268.7664000000004,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "type",
+      "status": 200,
+      "ms": 1175.2914999999994,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "type",
+      "status": 200,
+      "ms": 1254.5967999999993,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "type",
+      "status": 200,
+      "ms": 1330.5517999999938,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "type",
+      "status": 200,
+      "ms": 1394.6619999999966,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "type",
+      "status": 200,
+      "ms": 1361.450499999999,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "type",
+      "status": 200,
+      "ms": 1257.8824000000022,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "type",
+      "status": 200,
+      "ms": 1610.3352999999988,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "type",
+      "status": 200,
+      "ms": 1457.2805000000008,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "similarity",
+      "status": 200,
+      "ms": 56.90269999999873,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "similarity",
+      "status": 200,
+      "ms": 34.33439999999973,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "similarity",
+      "status": 200,
+      "ms": 67.76600000000326,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "similarity",
+      "status": 200,
+      "ms": 41.859599999996135,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "similarity",
+      "status": 200,
+      "ms": 45.530100000003586,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "similarity",
+      "status": 200,
+      "ms": 34.00350000000617,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "similarity",
+      "status": 200,
+      "ms": 33.50069999999687,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "similarity",
+      "status": 200,
+      "ms": 31.301699999996345,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "similarity",
+      "status": 200,
+      "ms": 30.26459999999497,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "similarity",
+      "status": 200,
+      "ms": 33.559000000001106,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "similarity",
+      "status": 200,
+      "ms": 34.88130000000092,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "similarity",
+      "status": 200,
+      "ms": 34.80880000000616,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "similarity",
+      "status": 200,
+      "ms": 29.117599999997765,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "similarity",
+      "status": 200,
+      "ms": 30.098500000000058,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "similarity",
+      "status": 200,
+      "ms": 35.47989999999845,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "similarity",
+      "status": 200,
+      "ms": 41.38499999999476,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "similarity",
+      "status": 200,
+      "ms": 44.46850000000268,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "similarity",
+      "status": 200,
+      "ms": 27.733800000001793,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "similarity",
+      "status": 200,
+      "ms": 30.2838999999949,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "similarity",
+      "status": 200,
+      "ms": 30.021600000000035,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "similarity",
+      "status": 200,
+      "ms": 29.168399999995017,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "similarity",
+      "status": 200,
+      "ms": 31.40230000000156,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "similarity",
+      "status": 200,
+      "ms": 31.05109999999695,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "similarity",
+      "status": 200,
+      "ms": 28.560000000004948,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "similarity",
+      "status": 200,
+      "ms": 28.39159999999538,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "similarity",
+      "status": 200,
+      "ms": 27.70679999999993,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "similarity",
+      "status": 200,
+      "ms": 35.203999999997905,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "similarity",
+      "status": 200,
+      "ms": 36.604599999998754,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "similarity",
+      "status": 200,
+      "ms": 43.5112999999983,
+      "cold": 0,
+      "error": null
+    },
+    {
+      "api": "similarity",
+      "status": 200,
+      "ms": 43.409099999997125,
+      "cold": 0,
+      "error": null
+    }
+  ],
+  "results": {
+    "offensive": {
+      "rows": [
+        {
+          "id": "O01",
+          "text": "El alcalde es un idiota y un inútil, no hace nada por el barrio.",
+          "expected": true,
+          "local": true,
+          "localWords": [
+            "idiota",
+            "inutil",
+            "inútil"
+          ],
+          "hfScore": 0.9818639755249023,
+          "hfStatus": 200
+        },
+        {
+          "id": "O02",
+          "text": "Esos vecinos son unos malditos pendejos que tiran la basura en mi puerta.",
+          "expected": true,
+          "local": true,
+          "localWords": [
+            "pendejos",
+            "malditos"
+          ],
+          "hfScore": 0.019952721893787384,
+          "hfStatus": 200
+        },
+        {
+          "id": "O03",
+          "text": "Qué mierda de servicio de agua, son unos ladrones hijos de puta.",
+          "expected": true,
+          "local": true,
+          "localWords": [
+            "mierda",
+            "puta",
+            "hijos de puta"
+          ],
+          "hfScore": 0.05411780625581741,
+          "hfStatus": 200
+        },
+        {
+          "id": "O04",
+          "text": "Policía estúpido, nunca llega cuando lo llamamos.",
+          "expected": true,
+          "local": true,
+          "localWords": [
+            "estupido",
+            "estúpido"
+          ],
+          "hfScore": 0.0028171902522444725,
+          "hfStatus": 200
+        },
+        {
+          "id": "O05",
+          "text": "Cállense de una vez, imbéciles, nadie quiere escuchar su música.",
+          "expected": true,
+          "local": false,
+          "localWords": [],
+          "hfScore": 0.007415186148136854,
+          "hfStatus": 200
+        },
+        {
+          "id": "O06",
+          "text": "Ese tipo es un cabrón que le pega a su perro.",
+          "expected": true,
+          "local": true,
+          "localWords": [
+            "cabron",
+            "cabrón"
+          ],
+          "hfScore": 0.0063909669406712055,
+          "hfStatus": 200
+        },
+        {
+          "id": "O07",
+          "text": "Basura de gente, son unos asquerosos que ensucian todo.",
+          "expected": true,
+          "local": true,
+          "localWords": [
+            "asquerosos"
+          ],
+          "hfScore": 0.009623612277209759,
+          "hfStatus": 200
+        },
+        {
+          "id": "O08",
+          "text": "Eres un burro, no sabes ni leer los carteles.",
+          "expected": true,
+          "local": true,
+          "localWords": [
+            "burro"
+          ],
+          "hfScore": 0.015229936689138412,
+          "hfStatus": 200
+        },
+        {
+          "id": "O09",
+          "text": "Vayan a la mierda con su fiesta de todos los días.",
+          "expected": true,
+          "local": true,
+          "localWords": [
+            "mierda"
+          ],
+          "hfScore": 0.0005349319544620812,
+          "hfStatus": 200
+        },
+        {
+          "id": "O10",
+          "text": "Estos weones no respetan a nadie.",
+          "expected": true,
+          "local": false,
+          "localWords": [],
+          "hfScore": 0.0002341650688322261,
+          "hfStatus": 200
+        },
+        {
+          "id": "O11",
+          "text": "El presidente de la junta vecinal es un huevón corrupto.",
+          "expected": true,
+          "local": false,
+          "localWords": [],
+          "hfScore": 0.9501746892929077,
+          "hfStatus": 200
+        },
+        {
+          "id": "O12",
+          "text": "Que se vayan a la chingada esos inútiles.",
+          "expected": true,
+          "local": true,
+          "localWords": [
+            "chingada",
+            "inutiles",
+            "inútiles"
+          ],
+          "hfScore": 0.042357929050922394,
+          "hfStatus": 200
+        },
+        {
+          "id": "O13",
+          "text": "Pinche gobierno, nunca arreglan nada.",
+          "expected": true,
+          "local": true,
+          "localWords": [
+            "pinche"
+          ],
+          "hfScore": 0.00033529894426465034,
+          "hfStatus": 200
+        },
+        {
+          "id": "O14",
+          "text": "Hijos de la gran puta, me robaron la bicicleta.",
+          "expected": true,
+          "local": true,
+          "localWords": [
+            "puta"
+          ],
+          "hfScore": 0.01119439210742712,
+          "hfStatus": 200
+        },
+        {
+          "id": "O15",
+          "text": "Mal nacidos todos ustedes, ojalá se mueran.",
+          "expected": true,
+          "local": false,
+          "localWords": [],
+          "hfScore": 0.003749682568013668,
+          "hfStatus": 200
+        },
+        {
+          "id": "O16",
+          "text": "Que te pudras, desgraciado.",
+          "expected": true,
+          "local": false,
+          "localWords": [],
+          "hfScore": 0.00409143790602684,
+          "hfStatus": 200
+        },
+        {
+          "id": "O17",
+          "text": "Estúpida vieja entrometida, métete en tu casa.",
+          "expected": true,
+          "local": true,
+          "localWords": [
+            "estupida",
+            "estúpida"
+          ],
+          "hfScore": 0.0052977995947003365,
+          "hfStatus": 200
+        },
+        {
+          "id": "O18",
+          "text": "Eres una porquería de persona, inservible.",
+          "expected": true,
+          "local": false,
+          "localWords": [],
+          "hfScore": 0.018153969198465347,
+          "hfStatus": 200
+        },
+        {
+          "id": "O19",
+          "text": "Son unos animales, no tienen educación.",
+          "expected": true,
+          "local": true,
+          "localWords": [
+            "animales"
+          ],
+          "hfScore": 0.003450765972957015,
+          "hfStatus": 200
+        },
+        {
+          "id": "O20",
+          "text": "Maldito ladrón de mierda, te voy a encontrar.",
+          "expected": true,
+          "local": true,
+          "localWords": [
+            "mierda",
+            "maldito"
+          ],
+          "hfScore": 0.006634000688791275,
+          "hfStatus": 200
+        },
+        {
+          "id": "O21",
+          "text": "Qué id1ota el que estacionó ahí.",
+          "expected": true,
+          "local": false,
+          "localWords": [],
+          "hfScore": 0.00010017438034992665,
+          "hfStatus": 200
+        },
+        {
+          "id": "O22",
+          "text": "Son unos p3ndejos, no respetan a nadie.",
+          "expected": true,
+          "local": false,
+          "localWords": [],
+          "hfScore": 0.007689859718084335,
+          "hfStatus": 200
+        },
+        {
+          "id": "L01",
+          "text": "Intentaron robar en un negocio del barrio, cortaron la cortina pero no pudieron entrar.",
+          "expected": false,
+          "local": false,
+          "localWords": [],
+          "hfScore": 0.00020348983525764197,
+          "hfStatus": 200
+        },
+        {
+          "id": "L02",
+          "text": "Hay un ladrón rondando las casas, necesitamos patrullaje.",
+          "expected": false,
+          "local": false,
+          "localWords": [],
+          "hfScore": 0.0013506896793842316,
+          "hfStatus": 200
+        },
+        {
+          "id": "L03",
+          "text": "Un perro suelto mordió a un niño en la plaza.",
+          "expected": false,
+          "local": false,
+          "localWords": [],
+          "hfScore": 0.0005582526209764183,
+          "hfStatus": 200
+        },
+        {
+          "id": "L04",
+          "text": "Los animales abandonados en la calle necesitan ayuda, hay varios perros heridos.",
+          "expected": false,
+          "local": true,
+          "localWords": [
+            "animales"
+          ],
+          "hfScore": 0.006116374395787716,
+          "hfStatus": 200
+        },
+        {
+          "id": "L05",
+          "text": "Hay un animal muerto en la acequia que provoca mal olor.",
+          "expected": false,
+          "local": true,
+          "localWords": [
+            "animal"
+          ],
+          "hfScore": 0.004284305032342672,
+          "hfStatus": 200
+        },
+        {
+          "id": "L06",
+          "text": "La basura acumulada da asco a todos los que pasan por el parque.",
+          "expected": false,
+          "local": true,
+          "localWords": [
+            "asco"
+          ],
+          "hfScore": 0.00042801565723493695,
+          "hfStatus": 200
+        },
+        {
+          "id": "L07",
+          "text": "Qué bestia de bache, casi rompo la llanta.",
+          "expected": false,
+          "local": true,
+          "localWords": [
+            "bestia"
+          ],
+          "hfScore": 0.0036013952922075987,
+          "hfStatus": 200
+        },
+        {
+          "id": "L08",
+          "text": "El agua sale turbia y con mal olor desde el lunes.",
+          "expected": false,
+          "local": false,
+          "localWords": [],
+          "hfScore": 0.0002824778202921152,
+          "hfStatus": 200
+        },
+        {
+          "id": "L09",
+          "text": "Una pelea entre dos hombres con cuchillos terminó con un herido en la esquina.",
+          "expected": false,
+          "local": false,
+          "localWords": [],
+          "hfScore": 0.003991149831563234,
+          "hfStatus": 200
+        },
+        {
+          "id": "L10",
+          "text": "Hay un hueco enorme en la calle, es peligroso para los niños.",
+          "expected": false,
+          "local": false,
+          "localWords": [],
+          "hfScore": 0.013893784955143929,
+          "hfStatus": 200
+        },
+        {
+          "id": "L11",
+          "text": "La música muy alta de la fiesta no nos deja dormir desde las 10 de la noche.",
+          "expected": false,
+          "local": false,
+          "localWords": [],
+          "hfScore": 0.00022631196770817041,
+          "hfStatus": 200
+        },
+        {
+          "id": "L12",
+          "text": "Pedimos al municipio reparar el poste de luz que está apagado.",
+          "expected": false,
+          "local": false,
+          "localWords": [],
+          "hfScore": 0.0009885746985673904,
+          "hfStatus": 200
+        },
+        {
+          "id": "L13",
+          "text": "Los vecinos arrojan desechos en el río y huele muy mal.",
+          "expected": false,
+          "local": false,
+          "localWords": [],
+          "hfScore": 0.039243411272764206,
+          "hfStatus": 200
+        },
+        {
+          "id": "L14",
+          "text": "Roban cables de luz en la zona, ya van tres veces este mes.",
+          "expected": false,
+          "local": false,
+          "localWords": [],
+          "hfScore": 0.00021128333173692226,
+          "hfStatus": 200
+        },
+        {
+          "id": "L15",
+          "text": "Un auto bloquea la entrada de mi casa desde hace dos días.",
+          "expected": false,
+          "local": false,
+          "localWords": [],
+          "hfScore": 0.00013644971477333456,
+          "hfStatus": 200
+        },
+        {
+          "id": "L16",
+          "text": "Hay jóvenes tomando alcohol en la plaza hasta tarde.",
+          "expected": false,
+          "local": false,
+          "localWords": [],
+          "hfScore": 0.0006539374589920044,
+          "hfStatus": 200
+        },
+        {
+          "id": "L17",
+          "text": "Se necesita más iluminación en la calle porque es oscura y asusta a las personas.",
+          "expected": false,
+          "local": false,
+          "localWords": [],
+          "hfScore": 0.0010471834102645516,
+          "hfStatus": 200
+        },
+        {
+          "id": "L18",
+          "text": "No recogen la basura desde hace una semana y los contenedores están desbordados.",
+          "expected": false,
+          "local": false,
+          "localWords": [],
+          "hfScore": 0.00018044249736703932,
+          "hfStatus": 200
+        },
+        {
+          "id": "L19",
+          "text": "Gracias a los vecinos que ayudaron a limpiar la acequia.",
+          "expected": false,
+          "local": false,
+          "localWords": [],
+          "hfScore": 0.0004407013766467571,
+          "hfStatus": 200
+        },
+        {
+          "id": "L20",
+          "text": "El semáforo no funciona y casi atropellan a una señora.",
+          "expected": false,
+          "local": false,
+          "localWords": [],
+          "hfScore": 0.0024569083470851183,
+          "hfStatus": 200
+        },
+        {
+          "id": "L21",
+          "text": "La tubería rota inundó el garaje y estoy muy molesto con la empresa de agua.",
+          "expected": false,
+          "local": false,
+          "localWords": [],
+          "hfScore": 0.003910277970135212,
+          "hfStatus": 200
+        },
+        {
+          "id": "L22",
+          "text": "Es una vergüenza que nadie arregle la calle; exigimos una respuesta de la alcaldía.",
+          "expected": false,
+          "local": false,
+          "localWords": [],
+          "hfScore": 0.0016001337207853794,
+          "hfStatus": 200
+        }
+      ],
+      "local": {
+        "tp": 14,
+        "fp": 4,
+        "fn": 8,
+        "tn": 18,
+        "precision": 0.7777777777777778,
+        "recall": 0.6363636363636364,
+        "f1": 0.7000000000000001,
+        "accuracy": 0.7272727272727273,
+        "n": 44
+      },
+      "hf": {
+        "tp": 2,
+        "fp": 0,
+        "fn": 20,
+        "tn": 22,
+        "precision": 1,
+        "recall": 0.09090909090909091,
+        "f1": 0.16666666666666669,
+        "accuracy": 0.5454545454545454,
+        "n": 44
+      },
+      "combined": {
+        "tp": 15,
+        "fp": 4,
+        "fn": 7,
+        "tn": 18,
+        "precision": 0.7894736842105263,
+        "recall": 0.6818181818181818,
+        "f1": 0.7317073170731707,
+        "accuracy": 0.75,
+        "n": 44
+      }
+    },
+    "type": {
+      "rows": [
+        {
+          "id": "T01",
+          "text": "Intentaron robar en la tienda de la esquina. Rompieron el candado de la cortina pero no pudieron entrar.",
+          "expected": "inseguridad",
+          "kw": null,
+          "kwDominance": null,
+          "hfType": "convivencia",
+          "hfScore": 0.45713189244270325,
+          "pred": "convivencia",
+          "source": "IA"
+        },
+        {
+          "id": "T02",
+          "text": "Grupo de jóvenes consumiendo alcohol en la plaza y molestando a los que pasan por la noche.",
+          "expected": "inseguridad",
+          "kw": null,
+          "kwDominance": null,
+          "hfType": "contaminacion",
+          "hfScore": 0.40623024106025696,
+          "pred": "contaminacion",
+          "source": "IA"
+        },
+        {
+          "id": "T03",
+          "text": "Dos personas sospechosas rondando los autos estacionados en mi calle desde las 11 de la noche.",
+          "expected": "inseguridad",
+          "kw": null,
+          "kwDominance": null,
+          "hfType": "serviciosBasicos",
+          "hfScore": 0.5131900906562805,
+          "pred": "serviciosBasicos",
+          "source": "IA"
+        },
+        {
+          "id": "T04",
+          "text": "Me asaltaron al bajar del micro en la avenida, me quitaron el celular y la mochila.",
+          "expected": "inseguridad",
+          "kw": "inseguridad",
+          "kwDominance": 1,
+          "hfType": "serviciosBasicos",
+          "hfScore": 0.4056946337223053,
+          "pred": "inseguridad",
+          "source": "palabras clave"
+        },
+        {
+          "id": "T05",
+          "text": "Hubo una pelea con cuchillos afuera de la cancha y hay heridos.",
+          "expected": "inseguridad",
+          "kw": "inseguridad",
+          "kwDominance": 1,
+          "hfType": "serviciosBasicos",
+          "hfScore": 0.30618175864219666,
+          "pred": "inseguridad",
+          "source": "palabras clave"
+        },
+        {
+          "id": "T06",
+          "text": "Escucharon disparos anoche cerca del puente, necesitamos más patrullaje policial.",
+          "expected": "inseguridad",
+          "kw": "inseguridad",
+          "kwDominance": 1,
+          "hfType": "serviciosBasicos",
+          "hfScore": 0.3729834258556366,
+          "pred": "inseguridad",
+          "source": "palabras clave"
+        },
+        {
+          "id": "T07",
+          "text": "Un hombre desconocido sigue a las niñas que salen del colegio por la tarde.",
+          "expected": "inseguridad",
+          "kw": null,
+          "kwDominance": null,
+          "hfType": "convivencia",
+          "hfScore": 0.5736741423606873,
+          "pred": "convivencia",
+          "source": "IA"
+        },
+        {
+          "id": "T08",
+          "text": "Rompieron los vidrios de la sede social y dejaron amenazas escritas en las paredes.",
+          "expected": "inseguridad",
+          "kw": "inseguridad",
+          "kwDominance": 1,
+          "hfType": "serviciosBasicos",
+          "hfScore": 0.5603367686271667,
+          "pred": "inseguridad",
+          "source": "palabras clave"
+        },
+        {
+          "id": "T09",
+          "text": "Carteristas actúan en el mercado los fines de semana, ya robaron a varias señoras.",
+          "expected": "inseguridad",
+          "kw": "inseguridad",
+          "kwDominance": 1,
+          "hfType": "inseguridad",
+          "hfScore": 0.43965980410575867,
+          "pred": "inseguridad",
+          "source": "IA"
+        },
+        {
+          "id": "T10",
+          "text": "Desde hace una semana no funciona la alarma comunitaria y tememos que entren a las casas.",
+          "expected": "inseguridad",
+          "kw": "inseguridad",
+          "kwDominance": 1,
+          "hfType": "serviciosBasicos",
+          "hfScore": 0.4938834309577942,
+          "pred": "inseguridad",
+          "source": "palabras clave"
+        },
+        {
+          "id": "T11",
+          "text": "Hace tres días no tenemos agua potable en toda la zona sur del barrio.",
+          "expected": "serviciosBasicos",
+          "kw": "serviciosBasicos",
+          "kwDominance": 1,
+          "hfType": "serviciosBasicos",
+          "hfScore": 0.7710186243057251,
+          "pred": "serviciosBasicos",
+          "source": "IA"
+        },
+        {
+          "id": "T12",
+          "text": "El poste de luz de la esquina lleva una semana apagado y la calle está oscura.",
+          "expected": "serviciosBasicos",
+          "kw": "serviciosBasicos",
+          "kwDominance": 1,
+          "hfType": "serviciosBasicos",
+          "hfScore": 0.7893354892730713,
+          "pred": "serviciosBasicos",
+          "source": "palabras clave"
+        },
+        {
+          "id": "T13",
+          "text": "Hay un bache enorme en la calle principal que daña los autos.",
+          "expected": "serviciosBasicos",
+          "kw": "serviciosBasicos",
+          "kwDominance": 1,
+          "hfType": "contaminacion",
+          "hfScore": 0.6797148585319519,
+          "pred": "serviciosBasicos",
+          "source": "palabras clave"
+        },
+        {
+          "id": "T14",
+          "text": "Se rompió la tubería y sale agua limpia por la calle desde ayer.",
+          "expected": "serviciosBasicos",
+          "kw": "serviciosBasicos",
+          "kwDominance": 1,
+          "hfType": "serviciosBasicos",
+          "hfScore": 0.7284654378890991,
+          "pred": "serviciosBasicos",
+          "source": "palabras clave"
+        },
+        {
+          "id": "T15",
+          "text": "El semáforo del cruce de la avenida no funciona y casi hay accidentes.",
+          "expected": "serviciosBasicos",
+          "kw": "serviciosBasicos",
+          "kwDominance": 1,
+          "hfType": "serviciosBasicos",
+          "hfScore": 0.5265260934829712,
+          "pred": "serviciosBasicos",
+          "source": "palabras clave"
+        },
+        {
+          "id": "T16",
+          "text": "La alcantarilla está tapada y se inunda la calle cuando llueve.",
+          "expected": "serviciosBasicos",
+          "kw": "serviciosBasicos",
+          "kwDominance": 1,
+          "hfType": "serviciosBasicos",
+          "hfScore": 0.5558817386627197,
+          "pred": "serviciosBasicos",
+          "source": "IA"
+        },
+        {
+          "id": "T17",
+          "text": "Hay un cable de alta tensión suelto cerca de la escuela, es muy peligroso.",
+          "expected": "serviciosBasicos",
+          "kw": "inseguridad",
+          "kwDominance": 1,
+          "hfType": "contaminacion",
+          "hfScore": 0.3292072117328644,
+          "pred": "inseguridad",
+          "source": "palabras clave"
+        },
+        {
+          "id": "T18",
+          "text": "Hace dos semanas el camión no recoge la basura de mi calle.",
+          "expected": "serviciosBasicos",
+          "kw": null,
+          "kwDominance": null,
+          "hfType": "serviciosBasicos",
+          "hfScore": 0.5067377686500549,
+          "pred": "serviciosBasicos",
+          "source": "IA"
+        },
+        {
+          "id": "T19",
+          "text": "No hay gas domiciliario desde el corte del lunes.",
+          "expected": "serviciosBasicos",
+          "kw": "serviciosBasicos",
+          "kwDominance": 1,
+          "hfType": "convivencia",
+          "hfScore": 0.7398236989974976,
+          "pred": "serviciosBasicos",
+          "source": "palabras clave"
+        },
+        {
+          "id": "T20",
+          "text": "El transformador hace chispas y se corta la luz por las noches.",
+          "expected": "serviciosBasicos",
+          "kw": "serviciosBasicos",
+          "kwDominance": 1,
+          "hfType": "serviciosBasicos",
+          "hfScore": 0.6336175799369812,
+          "pred": "serviciosBasicos",
+          "source": "palabras clave"
+        },
+        {
+          "id": "T21",
+          "text": "Queman llantas en el terreno baldío y el humo no nos deja respirar.",
+          "expected": "contaminacion",
+          "kw": "contaminacion",
+          "kwDominance": 1,
+          "hfType": "contaminacion",
+          "hfScore": 0.9944160580635071,
+          "pred": "contaminacion",
+          "source": "palabras clave"
+        },
+        {
+          "id": "T22",
+          "text": "Hay basura acumulada en la esquina con mal olor y moscas.",
+          "expected": "contaminacion",
+          "kw": "contaminacion",
+          "kwDominance": 1,
+          "hfType": "contaminacion",
+          "hfScore": 0.9070718884468079,
+          "pred": "contaminacion",
+          "source": "palabras clave"
+        },
+        {
+          "id": "T23",
+          "text": "Una fábrica vierte aceite y residuos en la acequia del barrio.",
+          "expected": "contaminacion",
+          "kw": null,
+          "kwDominance": null,
+          "hfType": "serviciosBasicos",
+          "hfScore": 0.8444991111755371,
+          "pred": "serviciosBasicos",
+          "source": "IA"
+        },
+        {
+          "id": "T24",
+          "text": "El río que pasa por el barrio está lleno de desechos y huele muy mal.",
+          "expected": "contaminacion",
+          "kw": "contaminacion",
+          "kwDominance": 1,
+          "hfType": "contaminacion",
+          "hfScore": 0.9827848076820374,
+          "pred": "contaminacion",
+          "source": "IA"
+        },
+        {
+          "id": "T25",
+          "text": "Música a todo volumen en el local de eventos hasta la madrugada, el ruido es insoportable.",
+          "expected": "contaminacion",
+          "kw": null,
+          "kwDominance": null,
+          "hfType": "contaminacion",
+          "hfScore": 0.34034836292266846,
+          "pred": "contaminacion",
+          "source": "IA"
+        },
+        {
+          "id": "T26",
+          "text": "Tiran escombros y desmonte en el parque y todo está lleno de basura.",
+          "expected": "contaminacion",
+          "kw": null,
+          "kwDominance": null,
+          "hfType": "contaminacion",
+          "hfScore": 0.8114955425262451,
+          "pred": "contaminacion",
+          "source": "IA"
+        },
+        {
+          "id": "T27",
+          "text": "Una nube de polvo y humo negro de los camiones nos afecta todo el día.",
+          "expected": "contaminacion",
+          "kw": "contaminacion",
+          "kwDominance": 1,
+          "hfType": "contaminacion",
+          "hfScore": 0.9853774309158325,
+          "pred": "contaminacion",
+          "source": "IA"
+        },
+        {
+          "id": "T28",
+          "text": "Derramaron combustible en la calle y contaminó la tierra del jardín.",
+          "expected": "contaminacion",
+          "kw": null,
+          "kwDominance": null,
+          "hfType": "contaminacion",
+          "hfScore": 0.9944876432418823,
+          "pred": "contaminacion",
+          "source": "IA"
+        },
+        {
+          "id": "T29",
+          "text": "Echan agua sucia con químicos al desagüe de la calle y hay un olor fuerte.",
+          "expected": "contaminacion",
+          "kw": "serviciosBasicos",
+          "kwDominance": 1,
+          "hfType": "contaminacion",
+          "hfScore": 0.8253002166748047,
+          "pred": "serviciosBasicos",
+          "source": "palabras clave"
+        },
+        {
+          "id": "T30",
+          "text": "Los criaderos de cerdos tiran sus desechos a la quebrada y hay un hedor permanente.",
+          "expected": "contaminacion",
+          "kw": "contaminacion",
+          "kwDominance": 1,
+          "hfType": "contaminacion",
+          "hfScore": 0.5577591061592102,
+          "pred": "contaminacion",
+          "source": "palabras clave"
+        },
+        {
+          "id": "T31",
+          "text": "Mi vecino hace fiestas ruidosas todos los fines de semana hasta las 4 de la mañana.",
+          "expected": "convivencia",
+          "kw": null,
+          "kwDominance": null,
+          "hfType": "convivencia",
+          "hfScore": 0.9340779185295105,
+          "pred": "convivencia",
+          "source": "IA"
+        },
+        {
+          "id": "T32",
+          "text": "Perros sueltos sin dueño ladran toda la noche y uno mordió a un niño.",
+          "expected": "convivencia",
+          "kw": "convivencia",
+          "kwDominance": 1,
+          "hfType": "convivencia",
+          "hfScore": 0.36389458179473877,
+          "pred": "convivencia",
+          "source": "palabras clave"
+        },
+        {
+          "id": "T33",
+          "text": "Un auto está estacionado bloqueando la entrada de mi garaje desde hace días.",
+          "expected": "convivencia",
+          "kw": null,
+          "kwDominance": null,
+          "hfType": "convivencia",
+          "hfScore": 0.4482986629009247,
+          "pred": "convivencia",
+          "source": "IA"
+        },
+        {
+          "id": "T34",
+          "text": "Discusión constante con el vecino por el muro que construyó invadiendo mi terreno.",
+          "expected": "convivencia",
+          "kw": null,
+          "kwDominance": null,
+          "hfType": "convivencia",
+          "hfScore": 0.5727041363716125,
+          "pred": "convivencia",
+          "source": "IA"
+        },
+        {
+          "id": "T35",
+          "text": "Los vecinos del edificio dejan sus bolsas en el pasillo común y no respetan los turnos de limpieza.",
+          "expected": "convivencia",
+          "kw": null,
+          "kwDominance": null,
+          "hfType": "serviciosBasicos",
+          "hfScore": 0.851197361946106,
+          "pred": "serviciosBasicos",
+          "source": "IA"
+        },
+        {
+          "id": "T36",
+          "text": "El vecino de arriba golpea el piso y grita a cualquier hora, no podemos descansar.",
+          "expected": "convivencia",
+          "kw": null,
+          "kwDominance": null,
+          "hfType": "convivencia",
+          "hfScore": 0.9644191265106201,
+          "pred": "convivencia",
+          "source": "IA"
+        },
+        {
+          "id": "T37",
+          "text": "Ponen puestos de venta en la vereda y no dejan pasar a las personas mayores.",
+          "expected": "convivencia",
+          "kw": null,
+          "kwDominance": null,
+          "hfType": "convivencia",
+          "hfScore": 0.9032174944877625,
+          "pred": "convivencia",
+          "source": "IA"
+        },
+        {
+          "id": "T38",
+          "text": "Hay una pelea entre vecinos por el uso del lavandero comunal.",
+          "expected": "convivencia",
+          "kw": "inseguridad",
+          "kwDominance": 1,
+          "hfType": "serviciosBasicos",
+          "hfScore": 0.6704391837120056,
+          "pred": "inseguridad",
+          "source": "palabras clave"
+        },
+        {
+          "id": "T39",
+          "text": "Alguien rayó la pared de mi casa con pintura, hay que hablar con las familias del barrio.",
+          "expected": "convivencia",
+          "kw": null,
+          "kwDominance": null,
+          "hfType": "convivencia",
+          "hfScore": 0.7841314673423767,
+          "pred": "convivencia",
+          "source": "IA"
+        },
+        {
+          "id": "T40",
+          "text": "Un vecino cría gallinas y gallos en su terraza y el canto no nos deja dormir.",
+          "expected": "convivencia",
+          "kw": null,
+          "kwDominance": null,
+          "hfType": "convivencia",
+          "hfScore": 0.9873191714286804,
+          "pred": "convivencia",
+          "source": "IA"
+        }
+      ],
+      "keywords": {
+        "cm": {
+          "inseguridad": {
+            "inseguridad": 6,
+            "serviciosBasicos": 0,
+            "contaminacion": 0,
+            "convivencia": 0,
+            "ninguna": 4
+          },
+          "serviciosBasicos": {
+            "inseguridad": 1,
+            "serviciosBasicos": 8,
+            "contaminacion": 0,
+            "convivencia": 0,
+            "ninguna": 1
+          },
+          "contaminacion": {
+            "inseguridad": 0,
+            "serviciosBasicos": 1,
+            "contaminacion": 5,
+            "convivencia": 0,
+            "ninguna": 4
+          },
+          "convivencia": {
+            "inseguridad": 1,
+            "serviciosBasicos": 0,
+            "contaminacion": 0,
+            "convivencia": 1,
+            "ninguna": 8
+          }
+        },
+        "cols": [
+          "inseguridad",
+          "serviciosBasicos",
+          "contaminacion",
+          "convivencia",
+          "ninguna"
+        ],
+        "perClass": [
+          {
+            "label": "inseguridad",
+            "precision": 0.75,
+            "recall": 0.6,
+            "f1": 0.6666666666666665
+          },
+          {
+            "label": "serviciosBasicos",
+            "precision": 0.8888888888888888,
+            "recall": 0.8,
+            "f1": 0.8421052631578948
+          },
+          {
+            "label": "contaminacion",
+            "precision": 1,
+            "recall": 0.5,
+            "f1": 0.6666666666666666
+          },
+          {
+            "label": "convivencia",
+            "precision": 1,
+            "recall": 0.1,
+            "f1": 0.18181818181818182
+          }
+        ],
+        "accuracy": 0.5,
+        "macroF1": 0.5893141945773523,
+        "n": 40
+      },
+      "hf": {
+        "cm": {
+          "inseguridad": {
+            "inseguridad": 1,
+            "serviciosBasicos": 6,
+            "contaminacion": 1,
+            "convivencia": 2,
+            "ninguna": 0
+          },
+          "serviciosBasicos": {
+            "inseguridad": 0,
+            "serviciosBasicos": 7,
+            "contaminacion": 2,
+            "convivencia": 1,
+            "ninguna": 0
+          },
+          "contaminacion": {
+            "inseguridad": 0,
+            "serviciosBasicos": 1,
+            "contaminacion": 9,
+            "convivencia": 0,
+            "ninguna": 0
+          },
+          "convivencia": {
+            "inseguridad": 0,
+            "serviciosBasicos": 2,
+            "contaminacion": 0,
+            "convivencia": 8,
+            "ninguna": 0
+          }
+        },
+        "cols": [
+          "inseguridad",
+          "serviciosBasicos",
+          "contaminacion",
+          "convivencia",
+          "ninguna"
+        ],
+        "perClass": [
+          {
+            "label": "inseguridad",
+            "precision": 1,
+            "recall": 0.1,
+            "f1": 0.18181818181818182
+          },
+          {
+            "label": "serviciosBasicos",
+            "precision": 0.4375,
+            "recall": 0.7,
+            "f1": 0.5384615384615384
+          },
+          {
+            "label": "contaminacion",
+            "precision": 0.75,
+            "recall": 0.9,
+            "f1": 0.8181818181818182
+          },
+          {
+            "label": "convivencia",
+            "precision": 0.7272727272727273,
+            "recall": 0.8,
+            "f1": 0.761904761904762
+          }
+        ],
+        "accuracy": 0.625,
+        "macroF1": 0.575091575091575,
+        "n": 40
+      },
+      "combined": {
+        "cm": {
+          "inseguridad": {
+            "inseguridad": 6,
+            "serviciosBasicos": 1,
+            "contaminacion": 1,
+            "convivencia": 2,
+            "ninguna": 0
+          },
+          "serviciosBasicos": {
+            "inseguridad": 1,
+            "serviciosBasicos": 9,
+            "contaminacion": 0,
+            "convivencia": 0,
+            "ninguna": 0
+          },
+          "contaminacion": {
+            "inseguridad": 0,
+            "serviciosBasicos": 2,
+            "contaminacion": 8,
+            "convivencia": 0,
+            "ninguna": 0
+          },
+          "convivencia": {
+            "inseguridad": 1,
+            "serviciosBasicos": 1,
+            "contaminacion": 0,
+            "convivencia": 8,
+            "ninguna": 0
+          }
+        },
+        "cols": [
+          "inseguridad",
+          "serviciosBasicos",
+          "contaminacion",
+          "convivencia",
+          "ninguna"
+        ],
+        "perClass": [
+          {
+            "label": "inseguridad",
+            "precision": 0.75,
+            "recall": 0.6,
+            "f1": 0.6666666666666665
+          },
+          {
+            "label": "serviciosBasicos",
+            "precision": 0.6923076923076923,
+            "recall": 0.9,
+            "f1": 0.7826086956521738
+          },
+          {
+            "label": "contaminacion",
+            "precision": 0.8888888888888888,
+            "recall": 0.8,
+            "f1": 0.8421052631578948
+          },
+          {
+            "label": "convivencia",
+            "precision": 0.8,
+            "recall": 0.8,
+            "f1": 0.8000000000000002
+          }
+        ],
+        "accuracy": 0.775,
+        "macroF1": 0.7728451563691838,
+        "n": 40
+      }
+    },
+    "duplicates": {
+      "rows": [
+        {
+          "id": "D01",
+          "a": "Rompieron la cortina de la tienda de la esquina para robar",
+          "b": "Intentaron robar en el negocio de la esquina, cortaron la cortina pero no pudieron entrar",
+          "expected": true,
+          "jaccard": 0.3,
+          "cosine": 0.8157749176025391
+        },
+        {
+          "id": "D02",
+          "a": "No hay agua potable en el barrio desde hace tres días",
+          "b": "Llevamos 72 horas sin agua en la zona",
+          "expected": true,
+          "jaccard": 0.125,
+          "cosine": 0.6184183955192566
+        },
+        {
+          "id": "D03",
+          "a": "El poste de luz de la calle 5 está apagado",
+          "b": "Falta iluminación en la calle 5 porque el foco del poste no prende",
+          "expected": true,
+          "jaccard": 0.25,
+          "cosine": 0.8859977722167969
+        },
+        {
+          "id": "D04",
+          "a": "Bache grande en la avenida principal",
+          "b": "Hay un hueco enorme en la avenida principal que rompe los autos",
+          "expected": true,
+          "jaccard": 0.25,
+          "cosine": 0.7051535844802856
+        },
+        {
+          "id": "D05",
+          "a": "Queman llantas en el terreno baldío",
+          "b": "Humo negro por quema de neumáticos en el lote vacío",
+          "expected": true,
+          "jaccard": 0,
+          "cosine": 0.4383629262447357
+        },
+        {
+          "id": "D06",
+          "a": "Fiesta ruidosa del vecino hasta la madrugada",
+          "b": "El vecino hizo una fiesta con música muy alta toda la noche",
+          "expected": true,
+          "jaccard": 0.2222222222222222,
+          "cosine": 0.6621483564376831
+        },
+        {
+          "id": "D07",
+          "a": "Perro suelto mordió a un niño en la plaza",
+          "b": "Un niño fue atacado por un perro sin dueño en la plaza",
+          "expected": true,
+          "jaccard": 0.42857142857142855,
+          "cosine": 0.8544751405715942
+        },
+        {
+          "id": "D08",
+          "a": "Basura acumulada en la esquina con mal olor",
+          "b": "Hay un basural en la esquina que huele muy mal",
+          "expected": true,
+          "jaccard": 0.2857142857142857,
+          "cosine": 0.8112056255340576
+        },
+        {
+          "id": "D09",
+          "a": "Semáforo dañado en el cruce de la avenida",
+          "b": "El semáforo del cruce no funciona",
+          "expected": true,
+          "jaccard": 0.4,
+          "cosine": 0.6462725400924683
+        },
+        {
+          "id": "D10",
+          "a": "Grupo de jóvenes tomando alcohol en la plaza",
+          "b": "Jóvenes ebrios molestan en la plaza por la noche",
+          "expected": true,
+          "jaccard": 0.25,
+          "cosine": 0.8545358180999756
+        },
+        {
+          "id": "D11",
+          "a": "Tubería rota inunda la calle",
+          "b": "Se rompió un caño y el agua corre por la calle",
+          "expected": true,
+          "jaccard": 0.125,
+          "cosine": 0.9012865424156189
+        },
+        {
+          "id": "D12",
+          "a": "Auto bloqueando mi garaje",
+          "b": "Hay un vehículo estacionado frente a mi entrada que no me deja salir",
+          "expected": true,
+          "jaccard": 0,
+          "cosine": 0.6475830078125
+        },
+        {
+          "id": "D13",
+          "a": "Asaltaron a una señora en la parada del micro",
+          "b": "Le robaron la cartera a una mujer cuando esperaba el micro",
+          "expected": true,
+          "jaccard": 0.125,
+          "cosine": 0.6489871144294739
+        },
+        {
+          "id": "D14",
+          "a": "Cable de luz suelto cerca de la escuela",
+          "b": "Hay un cable eléctrico caído junto al colegio",
+          "expected": true,
+          "jaccard": 0.1111111111111111,
+          "cosine": 0.8191238045692444
+        },
+        {
+          "id": "D15",
+          "a": "Fábrica vierte aceite en la acequia",
+          "b": "Una industria tira residuos de aceite a la acequia del barrio",
+          "expected": true,
+          "jaccard": 0.25,
+          "cosine": 0.6003302335739136
+        },
+        {
+          "id": "N01",
+          "a": "Rompieron la cortina de la tienda de la esquina para robar",
+          "b": "Asaltaron a una señora en la parada del micro",
+          "expected": false,
+          "jaccard": 0,
+          "cosine": 0.3998478055000305
+        },
+        {
+          "id": "N02",
+          "a": "No hay agua potable en el barrio desde hace tres días",
+          "b": "Tubería rota inunda la calle",
+          "expected": false,
+          "jaccard": 0,
+          "cosine": 0.4694913625717163
+        },
+        {
+          "id": "N03",
+          "a": "El poste de luz de la calle 5 está apagado",
+          "b": "El transformador hace chispas en la calle 12",
+          "expected": false,
+          "jaccard": 0.16666666666666666,
+          "cosine": 0.48026347160339355
+        },
+        {
+          "id": "N04",
+          "a": "Bache grande en la avenida principal",
+          "b": "El semáforo del cruce de la avenida no funciona",
+          "expected": false,
+          "jaccard": 0.14285714285714285,
+          "cosine": 0.5118145942687988
+        },
+        {
+          "id": "N05",
+          "a": "Queman llantas en el terreno baldío",
+          "b": "Fábrica vierte aceite en la acequia",
+          "expected": false,
+          "jaccard": 0,
+          "cosine": 0.20516462624073029
+        },
+        {
+          "id": "N06",
+          "a": "Fiesta ruidosa del vecino hasta la madrugada",
+          "b": "Música a todo volumen en el local de eventos de la avenida",
+          "expected": false,
+          "jaccard": 0,
+          "cosine": 0.5438401699066162
+        },
+        {
+          "id": "N07",
+          "a": "Perro suelto mordió a un niño en la plaza",
+          "b": "Un vecino cría gallinas en su terraza y el canto no deja dormir",
+          "expected": false,
+          "jaccard": 0,
+          "cosine": 0.20059436559677124
+        },
+        {
+          "id": "N08",
+          "a": "Basura acumulada en la esquina con mal olor",
+          "b": "No recogen la basura de mi calle desde hace dos semanas",
+          "expected": false,
+          "jaccard": 0.1111111111111111,
+          "cosine": 0.3049200475215912
+        },
+        {
+          "id": "N09",
+          "a": "Grupo de jóvenes tomando alcohol en la plaza",
+          "b": "Pelea con cuchillos afuera de la cancha",
+          "expected": false,
+          "jaccard": 0,
+          "cosine": 0.08468983322381973
+        },
+        {
+          "id": "N10",
+          "a": "Auto bloqueando mi garaje",
+          "b": "Puestos de venta bloquean la vereda",
+          "expected": false,
+          "jaccard": 0,
+          "cosine": 0.46570488810539246
+        },
+        {
+          "id": "N11",
+          "a": "Hay un hueco enorme en la calle",
+          "b": "Fiesta con música muy alta toda la noche",
+          "expected": false,
+          "jaccard": 0,
+          "cosine": 0.29832977056503296
+        },
+        {
+          "id": "N12",
+          "a": "Cable eléctrico caído junto al colegio",
+          "b": "Perro suelto mordió a un niño",
+          "expected": false,
+          "jaccard": 0,
+          "cosine": 0.13083362579345703
+        },
+        {
+          "id": "N13",
+          "a": "Humo de quema de llantas en el terreno",
+          "b": "Falta de agua potable en el barrio",
+          "expected": false,
+          "jaccard": 0,
+          "cosine": 0.3984421193599701
+        },
+        {
+          "id": "N14",
+          "a": "Asaltaron a una señora en la calle",
+          "b": "Basura acumulada en la esquina",
+          "expected": false,
+          "jaccard": 0,
+          "cosine": 0.18464523553848267
+        },
+        {
+          "id": "N15",
+          "a": "Fiesta ruidosa del vecino",
+          "b": "Poste de luz apagado en la calle",
+          "expected": false,
+          "jaccard": 0,
+          "cosine": 0.39049050211906433
+        }
+      ],
+      "jaccardOnly": {
+        "tp": 13,
+        "fp": 3,
+        "fn": 2,
+        "tn": 12,
+        "precision": 0.8125,
+        "recall": 0.8666666666666667,
+        "f1": 0.8387096774193549,
+        "accuracy": 0.8333333333333334,
+        "n": 30
+      },
+      "hf": {
+        "tp": 8,
+        "fp": 0,
+        "fn": 7,
+        "tn": 15,
+        "precision": 1,
+        "recall": 0.5333333333333333,
+        "f1": 0.6956521739130436,
+        "accuracy": 0.7666666666666667,
+        "n": 30
+      },
+      "pipeline": {
+        "tp": 8,
+        "fp": 0,
+        "fn": 7,
+        "tn": 15,
+        "precision": 1,
+        "recall": 0.5333333333333333,
+        "f1": 0.6956521739130436,
+        "accuracy": 0.7666666666666667,
+        "n": 30
+      }
+    }
+  }
+}
